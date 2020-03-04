@@ -1,0 +1,216 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "商城"
+					// #ifdef H5
+					,
+				"navigationStyle": "custom"
+				// #endif
+
+			}
+		}, {
+			"path": "pages/index/search",
+			"style": {
+				"navigationBarTitleText": "搜索"
+			}
+		}, {
+			"path": "pages/index/signIn",
+			"style": {
+				"navigationBarTitleText": "签到"
+			}
+		}, {
+			"path": "pages/index/Integral",
+			"style": {
+				"navigationBarTitleText": "积分商城"
+			}
+		}, {
+			"path": "pages/index/goodsDetail",
+			"style": {
+				"navigationBarTitleText": "商品详情"
+			}
+		}, {
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "登录/注册"
+			}
+		}, {
+			"path": "pages/login/forget",
+			"style": {
+				"navigationBarTitleText": "忘记密码"
+			}
+		}, {
+			"path": "pages/category/category",
+			"style": {
+				"navigationBarTitleText": "分类"
+					// #ifdef H5
+					,
+				"navigationStyle": "custom"
+				// #endif
+			}
+		}, {
+			"path": "pages/category/categoryList",
+			"style": {
+				"navigationBarTitleText": "商城"
+			}
+		}, {
+			"path": "pages/cars/cars",
+			"style": {
+				"navigationBarTitleText": "购物车"
+					// #ifdef H5
+					,
+				"navigationStyle": "custom"
+				// #endif
+			}
+		}, {
+			"path": "pages/my/my",
+			"style": {
+				"navigationBarTitleText": "商城"
+					// #ifdef H5
+					,
+				"navigationStyle": "custom"
+				// #endif
+			}
+		}, {
+			"path": "pages/my/myCollection",
+			"style": {
+				"navigationBarTitleText": "商城"
+			}
+		},
+		{
+			"path": "pages/my/myIntegral"
+		},
+
+		{
+			"path": "pages/my/balanceWithdraw",
+			"style": {
+				"navigationBarTitleText": "提现"
+			}
+		},
+		{
+			"path": "pages/my/bankList",
+			"style": {
+				"navigationBarTitleText": "银行卡"
+			}
+		},
+		{
+			"path": "pages/my/myQrcode",
+			"style": {
+				"navigationBarTitleText": "我的二维码"
+			}
+		},
+		{
+			"path": "pages/my/myOrder",
+			"style": {
+				"navigationBarTitleText": "我的订单"
+			}
+		},
+		{
+			"path": "pages/my/addEvaluate",
+			"style": {
+				"navigationBarTitleText": "评价"
+			}
+		},
+		{
+			"path": "pages/my/orderDetail",
+			"style": {
+				"navigationBarTitleText": "订单详情"
+			}
+		},
+		{
+			"path": "pages/my/aboutUs",
+			"style": {
+				"navigationBarTitleText": "关于我们"
+			}
+		},
+		{
+			"path": "pages/my/myAddress",
+			"style": {
+				"navigationBarTitleText": "收货地址"
+			}
+		},
+		{
+			"path": "pages/my/addAddress",
+			"style": {
+				"navigationBarTitleText": "收货地址"
+			}
+		},
+		{
+			"path": "pages/my/feedback",
+			"style": {
+				"navigationBarTitleText": "意见反馈"
+			}
+		},
+		{
+			"path": "pages/my/myEvaluate",
+			"style": {
+				"navigationBarTitleText": "我的评价"
+			}
+		},
+		{
+			"path": "pages/index/confirmOrder",
+			"style": {
+				"navigationBarTitleText": "确认订单"
+			}
+		},
+		{
+			"path": "pages/index/paymentResult",
+			"style": {
+				"navigationBarTitleText": "订单支付结果"
+			}
+		},
+		{
+			"path": "pages/index/goodsEvaluate",
+			"style": {
+				"navigationBarTitleText": "商品评价"
+			}
+		}, {
+			"path": "pages/index/prodectList",
+			"style": {
+				"navigationBarTitleText": "文章列表"
+			}
+		}, {
+			"path": "pages/index/prodectDetail",
+			"style": {
+				"navigationBarTitleText": "文章详情"
+			}
+		},
+		{
+			"path": "pages/my/realNameAuth",
+			"style": {
+				"navigationBarTitleText": "实名认证"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "商城",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#FFF"
+	},
+	"tabBar": {
+		"selectedColor": "#f23030",
+		"list": [{
+			"pagePath": "pages/index/index",
+			"iconPath": "static/index1.png",
+			"selectedIconPath": "static/index.png",
+			"text": "首页"
+		}, {
+			"pagePath": "pages/category/category",
+			"iconPath": "static/category1.png",
+			"selectedIconPath": "static/category.png",
+			"text": "分类"
+		}, {
+			"pagePath": "pages/cars/cars",
+			"iconPath": "static/cars1.png",
+			"selectedIconPath": "static/cars.png",
+			"text": "购物车"
+		}, {
+			"pagePath": "pages/my/my",
+			"iconPath": "static/my1.png",
+			"selectedIconPath": "static/my.png",
+			"text": "我的"
+		}]
+	}
+}
