@@ -86,7 +86,7 @@ export default {
 			search: '',
 			swiperList: [{ url: '/static/aboutusbg.png' }, { url: '/static/aboutusbg.png' }],
 			noticeList: [{ content: '公告1' }, { content: '公告2' }],
-			cuIconList: ['免费试用', '团购', '转盘', '投稿', '视频', '文章'],
+			cuIconList: ['免费试用', '团购', '抽奖', '投稿', '视频', '文章'],
 			offset: 1,
 			hootGoods: [
 				{
@@ -148,6 +148,12 @@ export default {
 					break;
 				case 1:
 					url = '/pages/index/Integral?type=' + 2;
+					break;
+				case 2:
+					url = '/pages/index/luckDraw';
+					break;
+				case 3:
+					url = '/pages/index/uploadProdect';
 					break;
 				case 4:
 					url = '/pages/index/prodectList?type=' + 1;

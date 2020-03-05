@@ -182,7 +182,18 @@
 				"navigationBarTitleText": "实名认证"
 			}
 		}
-	],
+	    ,{
+            "path" : "pages/index/luckDraw",
+            "style" : {
+				"navigationBarTitleText": "抽奖"
+			}
+        },{
+            "path" : "pages/index/uploadProdect",
+            "style" : {
+				"navigationBarTitleText": "投稿"
+			}
+        }
+    ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "商城",
