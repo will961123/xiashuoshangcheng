@@ -12,7 +12,7 @@ export default {
 			type: 1, // 1视频 2文章
 			id: '',
 			videoSrc: '',
-			richText: ''
+			richText: '<p>文章详情</p>'
 		};
 	},
 	onLoad(options) {

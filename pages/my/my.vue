@@ -4,10 +4,11 @@
 			<image class="bg" src="/static/my_bg.png" mode="aspectFill"></image>
 			<view class="userbox flex justify-between align-center">
 				<view class="headerbox flex align-center">
-					<image :src="userInfo ? userInfo.wxPic || '/static/headerpic.png' : ''" mode="aspectFit" style="border-radius:50%;"></image>
+					<image :src="userInfo ? userInfo.wxPic || '/static/headerpic.png' : ''" mode="aspectFill" style="border-radius:50%;"></image>
 					<view>
 						<view class="uname">{{ userInfo ? userInfo.account || userInfo.wxName : '' }}</view>
-						<view class="uphone">{{ userInfo ? userInfo.phone || '暂未设置' : '暂未设置' }}</view>
+						<!-- <view class="uphone">{{ userInfo ? userInfo.phone || '暂未设置' : '暂未设置' }}</view> -->
+						<view class="uVipLv bg-black">普通会员</view>
 					</view>
 				</view>
 				<view @click="gotoQrcode" class="ewmbox flex align-center">
@@ -15,7 +16,7 @@
 					<text>二维码</text>
 				</view>
 			</view>
-			<view class="numbox flex text-center justify-around">
+			<!-- <view class="numbox flex text-center justify-around">
 				<view @click="gotoSc(index)" v-for="(item, index) in numlist" :key="index" class="numlist flex flex-direction">
 					<view v-if="index === 0" class="num">{{ collectNum }}</view>
 					<view v-if="index === 1" class="num">{{ footMarkNum }}</view>
@@ -23,7 +24,7 @@
 					<view v-if="index === 3" class="num">{{ userInfo.balance || 0 }}</view>
 					<view class="tit">{{ item }}</view>
 				</view>
-			</view>
+			</view> -->
 		</view>
 
 		<view style="padding: 0 30rpx;">
@@ -101,7 +102,7 @@ export default {
 		return {
 			numlist: ['收藏', '足迹', '积分', '余额'],
 			// orderlist: ['待付款', '待发货', '待收货', '待评价', '实名认证', '会员', '我的评价', '收货地址', '建议反馈', '关于我们'],
-			orderlist: ['待付款', '待发货', '待收货', '待评价', '实名认证', '会员', '我的评价', '收货地址', '建议反馈', '关于我们'],
+			orderlist: ['待付款', '待发货', '待收货', '待评价', '我的收藏', '钱包', '我的评价', '收货地址', '建议反馈', '关于我们'],
 			orderNum: {
 				notPaying: 1,
 				notSend: 2,
@@ -213,18 +214,19 @@ export default {
 				url: '/pages/my/myOrder?type=' + (Number(type) + 1)
 			});
 		},
-		// '实名认证', '会员', '我的评价', '收货地址', '建议反馈', '关于我们'
+		// '实名认证', '钱包/优惠卷', '我的评价', '收货地址', '建议反馈', '关于我们'
 		gotoGj(type) {
 			console.log(type);
 			switch (type) {
 				case 4:
 					uni.navigateTo({
-						url: '/pages/my/realNameAuth'
+						// url: '/pages/my/realNameAuth'
+						url: '/pages/my/myCollection?type=1' 
 					});
 					break;
 				case 5:
 					uni.navigateTo({
-						url: '/pages/index/Integral?type=1'
+						url: '/pages/my/coupon'
 					});
 					break;
 				case 6:
@@ -310,6 +312,13 @@ export default {
 				.uphone {
 					font-size: 26rpx;
 				}
+				.uVipLv{
+					line-height: 30rpx;
+					border-radius: 15rpx;
+					padding: 10rpx;
+					text-align: center;
+					font-size: 22rpx;
+				}
 			}
 			.ewmbox {
 				height: 60rpx;
@@ -332,7 +341,7 @@ export default {
 		position: relative;
 		width: 100%;
 		border-radius: 20rpx;
-		margin-bottom: 11px;
+		margin-bottom: 20px;
 		.titbox {
 			border-bottom: 1rpx solid #e5e5e5;
 			padding: 0 30rpx;
@@ -351,7 +360,7 @@ export default {
 			}
 		}
 		&.item1 {
-			margin-top: -40px;
+			margin-top: -70px;
 			.item1list {
 				.item {
 					padding: 40rpx 0;

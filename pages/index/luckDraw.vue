@@ -41,35 +41,28 @@ export default {
 		return {
 			list: [
 				{
-					name: '5折',
-					value: '5',
-					icon: 'icondazhe text-danger'
+					name: '谢谢',
+					value: '5', 
 				},
 				{
-					name: '6折',
-					value: '6',
-					icon: 'icondazhe text-danger'
+					name: '试吃羊肉一份',
+					value: '6', 
 				},
 				{
-					name: '7折',
-					value: '7',
-					icon: 'icondazhe text-danger'
+					name: '试吃牛肉一份',
+					value: '7', 
 				},
 				{
-					name: '8折',
-					value: '8',
-					icon: 'icondazhe text-danger'
+					name: '试吃小野菜一份',
+					value: '8', 
 				},
 				{
-					name: '9折',
-					value: '9',
-					icon: 'icondazhe text-danger'
+					name: '优惠卷20元',
+					value: '9', 
 				},
 				{
-					name: '感谢参与',
-					value: '10',
-					icon: 'iconfangqi1 text-master',
-					isNoPrize: true // 是否未中奖
+					name: '优惠卷50元',
+					value: '10', 
 				}
 			],
 			width: 0,
@@ -107,7 +100,7 @@ export default {
 			this.animation(index, duration);
 
 			setTimeout(() => {
-				uni.showModal({ content: this.list[index].isNoPrize ? '抱歉，您未中奖' : '恭喜，中奖' });
+				uni.showModal({ content: this.list[index].name   });
 				this.btnDisabled = '';
 				// document.getElementById('zhuanpano').style=''
 			}, duration + 1000);

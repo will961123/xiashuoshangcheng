@@ -179,7 +179,7 @@ export default {
 			}
 			this.showLoading();
 			this.request({
-				url: ' ',
+				url: '',
 				data: {
 					userId: userInfo.userId
 				},

@@ -1,14 +1,14 @@
 <template>
 	<view class="index">
-		<view class="search bg-white flex align-center">
-			<!-- <navigator hover-class="none" url="/pages/index/signIn"><image src="/static/qiandao.png" mode="aspectFit"></image></navigator> -->
+		<!-- <view class="search bg-white flex align-center">
+			<navigator hover-class="none" url="/pages/index/signIn"><image src="/static/qiandao.png" mode="aspectFit"></image></navigator>
 			<view class="searchiptbox flex align-center">
 				<image src="/static/search.png" mode="aspectFill"></image>
 				<navigator hover-class="none" style="flex:1" url="/pages/index/search">
 					<input style="width: 100%;" disabled="true" type="text" placeholder="美妆" value="" />
 				</navigator>
 			</view>
-		</view>
+		</view> -->
 
 		<swiper class="screen-swiper square-dot" :indicator-dots="true" :autoplay="true">
 			<swiper-item v-for="(item, index) in swiperList" :key="index"><image :src="item.url" mode="aspectFill"></image></swiper-item>
@@ -26,8 +26,8 @@
 
 		<view class="cu-list grid no-border col-3">
 			<view @click="gotoIntegral(index)" class="cu-item text-center" v-for="(item, index) in cuIconList" :key="index">
-				<image style="width: 80%; margin: 0 auto;" src="/static/icon_idx_6.png" mode="widthFix"></image>
-				{{ item }}
+				<image style="width: 60px; height: 60px; margin: 0 auto;margin-bottom: 15px;" :src="item.pic" mode="aspectFill"></image>
+				{{ item.name }}
 			</view>
 		</view>
 
@@ -86,7 +86,15 @@ export default {
 			search: '',
 			swiperList: [{ url: '/static/aboutusbg.png' }, { url: '/static/aboutusbg.png' }],
 			noticeList: [{ content: '公告1' }, { content: '公告2' }],
-			cuIconList: ['免费试用', '团购', '抽奖', '投稿', '视频', '文章'],
+			cuIconList: [
+				{ name: '免费试吃', pic: '/static/indexicon1.png' },
+				{ name: '超级团购', pic: '/static/indexicon2.png' },
+				{ name: '幸运转盘', pic: '/static/indexicon3.png' },
+				{ name: '会员投稿', pic: '/static/indexicon4.png' },
+				{ name: '视频', pic: '/static/indexicon5.png' },
+				{ name: '文章', pic: '/static/indexicon6.png' }
+			],
+			// cuIconList: ['免费试吃', '超级团购', '幸运转盘', '会员投稿', '视频', '文章'],
 			offset: 1,
 			hootGoods: [
 				{
