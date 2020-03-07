@@ -26,10 +26,27 @@
 			</view>
 			<!-- 规则 -->
 			<view class="guize" style="margin-top: 100upx;">
-				<view class="title">规则说明</view>
-				<view class="g_item">1.用户每天登录即送1次抽奖机会，分享好友则多赠1次机会</view>
-				<view class="g_item">2.用户点击大转盘抽奖按钮，有积分和现金两种方式可参与抽奖，没抽一次消耗1次抽奖机会</view>
-				<view class="g_item">3.用户获得的奖品，可在我的道具里查看</view>
+				<view class="titbox flex">
+					<view @click="showGuize=true" :class="{'select':showGuize}" class="title ">规则说明</view>
+					<view @click="showGuize=false" :class="{'select':!showGuize}" class="title">我的奖品</view>
+				</view>
+				
+				<view v-if="showGuize" class="guizeList">
+					<scroll-view scroll-y="true" style="height: 180px;padding: 10px 0;">
+						<view>
+							<view class="g_item">1.用户每天登录即送1次抽奖机会，分享好友则多赠1次机会</view>
+							<view class="g_item">2.用户点击大转盘抽奖按钮，有积分和现金两种方式可参与抽奖，没抽一次消耗1次抽奖机会</view>
+							<view class="g_item">3.用户获得的奖品，可在我的道具里查看</view> 
+						</view>
+					</scroll-view>
+					
+				</view>
+				<view v-else class="goodsList">
+					<view class="g_item">奖品1  </view>  
+					<view class="g_item">奖品1  </view>  
+					<view class="g_item">奖品1  </view>  
+					<view class="g_item">奖品1  </view>  
+				</view>
 			</view>
 		</view>
 	</view>
@@ -67,7 +84,8 @@ export default {
 			],
 			width: 0,
 			animationData: {},
-			btnDisabled: ''
+			btnDisabled: '',
+			showGuize:true
 		};
 	},
 	onLoad: function() {
@@ -312,6 +330,12 @@ image.caidai {
 .guize .title {
 	text-align: center;
 	margin-bottom: 28upx;
+	flex: 1;
+	border: 1rpx solid #c5c2c6;
+	padding: 10px 20px;
+}
+.guize .title.select{
+	color: red;
 }
 
 .guize .g_item {
@@ -321,6 +345,8 @@ image.caidai {
 	letter-spacing: 0.5px;
 	text-align: justify;
 	line-height: 20px;
+	padding: 5px 0;
+	border-bottom: 1rpx dashed #eeeeee;
 }
 
 .myrewards .title {

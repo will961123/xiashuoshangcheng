@@ -33,7 +33,7 @@
 				<view v-else class="selectgg">{{ goodsInfo.specList[spaceIndex].name }}</view>
 				<image src="/static/aroow.png" mode="aspectFit"></image>
 			</view>
-			<view class="assemble  ">
+			<view v-if="goodsType === 2" class="assemble  ">
 				<view class="tit text-center">他们正在拼团 赶快加入把</view>
 				<view v-for="(item, index) in assembleList" :key="index" class="item flex align-center justify-between ">
 					<view class="left flex align-center">
@@ -42,7 +42,7 @@
 					</view>
 					<view class="right flex align-center">
 						<text>{{ item.totNum }}人拼 还差{{ item.nowNum }}人成团</text>
-						<button @click="buyNow(3, item)" class="btn cu-btn bg-red ">去参团</button>
+						<button @click="buyNow(2, item)" class="btn cu-btn bg-red ">去参团</button>
 					</view>
 				</view>
 			</view>
@@ -107,8 +107,14 @@
 				</view>
 			</view>
 			<button @click="showSpec = true" class=" cu-btn add">加入购物车</button>
-			<button v-if="goodsType === 3" @click="showSpec = true" class=" cu-btn buy">发起拼团</button>
-			<button v-else @click="showSpec = true" class=" cu-btn buy">立即购买</button>
+
+			<button v-if="goodsType === 2" @click="showSpec = true" class=" cu-btn buy">发起拼团</button>
+			<button v-if="goodsType === 3" @click="showSpec = true" class=" cu-btn buy">{{ userInfo.isVip ? '免费领取' : '升级会员' }}</button>
+			<button v-if="goodsType === 4 && goodsInfo.canGetShareGoods" @click="showSpec = true" class=" cu-btn buy">免费领取</button>
+			<button v-if="goodsType === 4 && !goodsInfo.canGetShareGoods" open-type="share" class=" cu-btn buy">立即分享</button>
+			<button v-if="goodsType === 1" @click="showSpec = true" class=" cu-btn buy">立即购买</button>
+			<!-- <button v-if="goodsType === 2" @click="showSpec = true" class=" cu-btn buy">发起拼团</button>
+			<button v-else @click="showSpec = true" class=" cu-btn buy">立即购买</button> -->
 		</view>
 
 		<view v-show="showSpec" @click="showSpec = false" class="cu-modal bottom-modal" style="z-index: 500;" :class="showSpec ? 'show' : ''">
@@ -143,8 +149,13 @@
 				</view>
 				<view class="btnbox">
 					<button @click="addCrats" class=" cu-btn add">加入购物车</button>
-					<button v-if="goodsType === 3" @click="buyNow(4)" class=" cu-btn buy">发起拼团</button>
-					<button v-else @click="buyNow(1)" class=" cu-btn buy">立即购买</button>
+					<!-- // buyType 1普通 2参与拼图 3发起拼图 4会员 5分享 -->
+					<!-- // goodsType 1 普通商品 2团购 3会员 4分享领取 -->
+					<button v-if="goodsType === 2" @click="buyNow(3)" class=" cu-btn buy">发起拼团</button>
+					<button v-if="goodsType === 3" @click="buyNow(4)" class=" cu-btn buy">{{ userInfo.isVip ? '免费领取' : '升级会员' }}</button>
+					<button v-if="goodsType === 4 && goodsInfo.canGetShareGoods" @click="buyNow(5)" class=" cu-btn buy">免费领取</button>
+					<button v-if="goodsType === 4 && !goodsInfo.canGetShareGoods" open-type="share" class=" cu-btn buy">立即分享</button>
+					<button v-if="goodsType === 1" @click="buyNow(1)" class=" cu-btn buy">立即购买</button>
 				</view>
 			</view>
 		</view>
@@ -177,7 +188,8 @@ export default {
 						id: 2333
 					}
 				],
-				details: '<p>富文本</p>'
+				details: '<p>富文本</p>',
+				canGetShareGoods: false
 			},
 			evaluate: [
 				{
@@ -221,16 +233,33 @@ export default {
 			showSpec: false,
 			goodsId: '',
 
-			goodsType: 1 // 1普通 3拼团
+			goodsType: 1, // 1 普通商品 2团购 3会员 4分享领取
+			userInfo: {
+				isVip: false
+			},
+			searchUserId: ''
 		};
 	},
 	onLoad(options) {
 		options.goodsId ? (this.goodsId = options.goodsId) : '';
-		options.goodsType ? (this.goodsType = Number(options.goodsType)) : 1;
-		console.log(this.goodsType);
+		options.goodsType ? (this.goodsType = Number(options.goodsType)) : (this.goodsType = 1);
+		options.searchUserId ? (this.searchUserId = options.searchUserId) : (this.searchUserId = '');
+		this.searchUserId && AddsearchNum();
+		console.log('1 普通商品 2团购 3会员 4分享领取---', this.goodsType);
+
 		// this.getGoodsDetail();
 		// this.findCommentByProductId();
 		// this.saveFootMark();
+	},
+	onShareAppMessage(e) {
+		if (e.from === 'button') {
+			console.log(e.target);
+			return {
+				title: '免费试吃',
+				path: '/pages/index/goodsDetail?goodsId=' + id + '&goodsType=4' + '&searchUserId=' + uni.getStorageSync('userInfo').id
+				// imageUrl:'/static/goods.jpg'
+			};
+		}
 	},
 	filters: {
 		replaceImgStr(val) {
@@ -272,8 +301,23 @@ export default {
 				}
 			});
 		},
-
+		AddsearchNum() {
+			if (!this.searchUserId) {
+				return;
+			}
+			this.request({
+				url: '',
+				data: {
+					searchUserId: this.searchUserId,
+					userId: uni.getStorageSync('userInfo').id
+				},
+				success: res => {
+					console.log('给分享者增加分享数量', res);
+				}
+			});
+		},
 		buyNow(buyType, assemble) {
+			// buyType 1普通 2参与拼图 3发起拼图 4会员 5分享
 			if (this.spaceIndex < 0) {
 				this.showToast('请选择规格');
 				return;
@@ -297,13 +341,91 @@ export default {
 			}
 			this.showSpec = false;
 			let url = '/pages/index/confirmOrder?from=1&goodslist=' + JSON.stringify(goodslist);
-			if (buyType === 3) {
-				url = '/pages/index/confirmOrder?from=1&goodslist=' + JSON.stringify(goodslist) + '&buyType=3' + '&assemble=' + JSON.stringify(assemble);
+			// buyType 1普通 2参与拼图 3发起拼图 4会员 5分享
+			if (buyType === 2) {
+				url = '/pages/index/confirmOrder?from=1&goodslist=' + JSON.stringify(goodslist) + '&buyType=2' + '&assemble=' + JSON.stringify(assemble);
+				uni.navigateTo({
+					url: url
+				});
+			} else if (buyType === 3) {
+				url = '/pages/index/confirmOrder?from=1&goodslist=' + JSON.stringify(goodslist) + '&buyType=3';
+				uni.navigateTo({
+					url: url
+				});
 			} else if (buyType === 4) {
 				url = '/pages/index/confirmOrder?from=1&goodslist=' + JSON.stringify(goodslist) + '&buyType=4';
+				if (this.userInfo.isVip) {
+					uni.navigateTo({
+						url: url
+					});
+				} else {
+					this.buyVip(this.goodsId);
+				}
+			} else if (buyType === 5) {
+				url = '/pages/index/confirmOrder?from=1&goodslist=' + JSON.stringify(goodslist) + '&buyType=5';
+				if (this.goodsInfo.canGetShareGoods) {
+					uni.navigateTo({
+						url: url
+					});
+				} else {
+					uni.showModal({
+						title: '请分享商品',
+						content: '分享小程序给朋友领取奖励',
+						showCancel: false,
+						showCancel: true,
+						success: res => {
+							if (res.confirm) {
+								console.log('分享');
+							}
+						}
+					});
+				}
 			}
-			uni.navigateTo({
-				url: url
+		},
+		//  开通会员试吃
+		buyVip(goodsid) {
+			uni.showModal({
+				content: '需要支付***开通会员来领取',
+				title: '开通会员',
+				success: modalRes => {
+					if (modalRes.confirm) {
+						// this.$set(this.userInfo,'isVip',true)
+						//  return
+						this.showLoading();
+						this.request({
+							url: '',
+							data: {
+								goodsid: goodsid,
+								userId: uni.getStorageSync('userInfo').id
+							},
+							success: res => {
+								console.log('生成订单数据', res);
+								if (res.data.returnCode === 1) {
+									this.wxpay(res);
+								}
+							}
+						});
+					}
+				}
+			});
+		},
+		wxpay(options) {
+			uni.requestPayment({
+				timeStamp: options.timeStamp,
+				nonceStr: options.nonceStr,
+				package: options.package,
+				signType: 'MD5',
+				paySign: options.paySign,
+				success: res => {
+					uni.hideLoading();
+					this.showToast('开通成功');
+					console.log('success:' + JSON.stringify(res));
+				},
+				fail: err => {
+					uni.hideLoading();
+					this.showToast('开通失败');
+					console.log('fail:' + JSON.stringify(err));
+				}
 			});
 		},
 		Collection(type = 1) {

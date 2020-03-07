@@ -1,10 +1,33 @@
 <template>
 	<view class="Integral">
-		<view class="bg-img">
+		<!-- <view class="bg-img">
 			<image :src="type == 1 ? '/static/aboutusbg.png' : type == 2 ? '/static/aboutusbg.png' : '/static/aboutusbg.png'" style="width: 100%;height: 200px;" mode=""></image>
+		</view> -->
+		<view class="titBox flex justify-between">
+			<view @click="changeFreeGoodsType(0)" :class="{ select: freeGoodsType === 0 }" class="tit">全部</view>
+			<view @click="changeFreeGoodsType(1)" :class="{ select: freeGoodsType === 1 }" class="tit">0元抢</view>
+			<view @click="changeFreeGoodsType(2)" :class="{ select: freeGoodsType === 2 }" class="tit">会员免费</view>
+			<view @click="changeFreeGoodsType(3)" :class="{ select: freeGoodsType === 3 }" class="tit">分享免费</view>
 		</view>
-		<view v-if="type === 1" class="lsitbox bg-white ">
-			<view class="titview text-center text-bold">零元试吃</view>
+		<!-- <view v-if="type === 1" class="lsitbox bg-white "> -->
+		<view v-if="type === 1" class="lsitbox " style="border: none;">
+			<view v-if="freeGoodsType === 0 ? true : item.type === freeGoodsType" v-for="(item, index) in goodsList" :key="index" class="itemFree  flex align-center">
+				<image :src="item.smallPic" mode="aspectFill"></image>
+				<view style="height: auto;" class="infobox flex flex-direction justify-between">
+					<view class="info textov2">
+						<text :class="'typeName' + item.type" class="typeName">{{ item.type === 1 ? '0元抢' : item.type === 2 ? '会员免费' : '分享免费' }}</text>
+						{{ item.name }}此标题最多显示2行此标题最多显示2行此标题最多
+					</view>
+					<view class="moneybox flex align-center justify-between">
+						<view class="money">￥123</view>
+						<view class="xl">剩余{{ item.saleNum }}份</view>
+						<button v-if="item.type === 1" @click="ClickfreeBtn(item.id, item.type)" class="btn cu-btn  ">0元抢</button>
+						<button v-else @click="ClickfreeBtn(item.id, item.type)" class="btn cu-btn  ">免费领取</button>
+					</view>
+				</view>
+			</view>
+
+			<!-- <view class="titview text-center text-bold">零元试吃</view>
 			<view v-for="(item, index) in goodsList" :key="index" class="item flex align-center">
 				<image :src="item.smallPic" mode="aspectFill"></image>
 				<view class="infobox flex flex-direction justify-between">
@@ -36,7 +59,7 @@
 						<button @click="buyVip(item.id)" class="btn cu-btn bg-cyan">升级会员</button>
 					</view>
 				</view>
-			</view>
+			</view> -->
 		</view>
 		<view v-if="type === 2" class="lsitbox bg-white ">
 			<view @click="gotoDetail(item.id)" v-for="(item, index) in goodsList" :key="index" class="item flex align-center">
@@ -76,21 +99,32 @@ export default {
 			goodsList: [
 				{
 					smallPic: '/static/goods.jpg',
-					name: '商品1',
+					name: '0元',
 					price: 100,
 					saleNum: 999,
-					id: 1
+					id: 1,
+					type: 1
 				},
 				{
 					smallPic: '/static/goods.jpg',
-					name: '商品2',
+					name: '会员免费',
 					price: 100,
 					saleNum: 999,
-					id: 2
+					id: 2,
+					type: 2
+				},
+				{
+					smallPic: '/static/goods.jpg',
+					name: '分享免费',
+					price: 100,
+					saleNum: 999,
+					id: 2,
+					type: 3
 				}
 			],
 			offset: 1,
 			type: 1, //1 免费试用 2 团购
+			freeGoodsType: 0, // 0全部 1零元 2会员免费 3分享免费
 			showTrial: false,
 			trialId: null,
 			trialText: ''
@@ -151,7 +185,28 @@ export default {
 					}
 				}
 			});
-		}, 
+		},
+		changeFreeGoodsType(type) {
+			if (type === this.freeGoodsType) {
+				return;
+			}
+			this.freeGoodsType = type;
+		},
+		ClickfreeBtn(id, type) {
+			if (type === 1) {
+				this.showTrialView(id);
+			} else if (type === 2) {
+				// type 1零元 2会员 3分享
+				// goodsType 2团购 3会员 4分享领取
+				uni.navigateTo({
+					url: '/pages/index/goodsDetail?goodsId=' + id + '&goodsType=3'
+				});
+			} else if (type === 3) {
+				uni.navigateTo({
+					url: '/pages/index/goodsDetail?goodsId=' + id + '&goodsType=4'
+				});
+			}
+		},
 		// 显示申请0元试吃界面
 		showTrialView(id) {
 			this.showTrial = true;
@@ -246,10 +301,11 @@ export default {
 			if (this.type === 1) {
 				return;
 			}
-			//1 免费试用 2 团购
+			// type 免费试用 2 团购
+			// goodsType 2团购 3会员 4分享领取
 			uni.navigateTo({
 				// url: '/pages/index/goodsDetail?goodsType=' + goodsType + '&goodsId=' + id,
-				url: '/pages/index/goodsDetail?goodsId=' + id + '&goodsType=' + (Number(this.type) + 1)
+				url: '/pages/index/goodsDetail?goodsId=' + id + '&goodsType=' + Number(this.type)
 			});
 		}
 	}
@@ -258,11 +314,28 @@ export default {
 
 <style lang="scss">
 .Integral {
+	padding: 0 30rpx;
+	.titBox {
+		padding: 30rpx 20rpx;
+		.tit {
+			line-height: 42rpx;
+			color: #000;
+			font-size: 28rpx;
+			border: 2rpx solid rgba(0, 0, 0, 1);
+			padding: 0 24rpx;
+			border-radius: 21rpx;
+			&.select {
+				background: #ff5858;
+				color: #ffffff;
+				border-color: #ff5858;
+			}
+		}
+	}
 	.lsitbox {
 		position: relative;
 		overflow: hidden;
 		border-radius: 20px 20px 0px 0px;
-		top: -15px;
+		// top: -15px;
 		.titview {
 			line-height: 40px;
 			margin-top: 20px;
@@ -296,6 +369,69 @@ export default {
 					.xl {
 						font-size: 26rpx;
 						color: #999999;
+					}
+				}
+			}
+		}
+		.itemFree {
+			padding: 0 30rpx;
+			margin-bottom: 30rpx;
+			background: #ffffff;
+			border-radius: 20rpx;
+			& > image {
+				width: 140rpx;
+				height: 140rpx;
+			}
+			.infobox {
+				margin-left: 34rpx;
+				flex: 1;
+				height: 260rpx;
+				padding: 30rpx 0;
+				.info {
+					font-size: 32rpx;
+					line-height: 48rpx;
+					color: #000000;
+					.typeName {
+						margin-right: 4px;
+						display: inline-block;
+						line-height: 36rpx;
+						padding: 2px 6px;
+						font-size: 22rpx;
+						&.typeName1 {
+							color: #ff4b4b;
+							border: 1px solid #ff4b4b;
+						}
+						&.typeName2 {
+							color: #ef9b29;
+							border: 1px solid #ef9b29;
+						}
+						&.typeName3 {
+							color: #57c77a;
+							border: 1px solid #57c77a;
+						}
+					}
+				}
+				.moneybox {
+					margin-top: 10px;
+					.money {
+						font-size: 28rpx;
+						color: #f23030;
+						& > text {
+							font-size: 22rpx;
+						}
+					}
+					.xl {
+						font-size: 26rpx;
+						color: #999999;
+					}
+					& > button {
+						height: 46rpx;
+						line-height: 46rpx;
+						font-size: 28rpx;
+						border-radius: 23rpx;
+						padding: 0 24rpx;
+						background: #ff5858;
+						color: #fff;
 					}
 				}
 			}

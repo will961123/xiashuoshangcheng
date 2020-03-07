@@ -14,19 +14,24 @@
 			<swiper-item v-for="(item, index) in swiperList" :key="index"><image :src="item.url" mode="aspectFill"></image></swiper-item>
 		</swiper>
 
-		<view style="padding:  0 30rpx; " class="bg-white">
+		<!-- <view style="padding:  0 30rpx; " class="bg-white">
 			<view class="noteData flex align-center ">
 				<image src="/static/gg.png" mode="aspectFit"></image>
 				<swiper vertical="true" :autoplay="true">
 					<swiper-item style="width: 100%;" class="textov1" v-for="(item, index) in noticeList" :key="index">{{ item.content }}</swiper-item>
 				</swiper>
-				<!-- <text class="more">更多</text> -->
+				<text class="more">更多</text>
 			</view>
-		</view>
+		</view> -->
 
-		<view class="cu-list grid no-border col-3">
-			<view @click="gotoIntegral(index)" class="cu-item text-center" v-for="(item, index) in cuIconList" :key="index">
-				<image style="width: 60px; height: 60px; margin: 0 auto;margin-bottom: 15px;" :src="item.pic" mode="aspectFill"></image>
+		<view class="cu-list grid no-border col-4 justify-between" style="padding:  30rpx;">
+			<view
+				@click="gotoIntegral(index)"
+				class="cu-item text-center text-bold "
+				style="font-size: 24rpx;color:#383D43;width: 150rpx;line-height: 40px;border:1px solid rgba(112,112,112,1);border-radius: 5px;"
+				v-for="(item, index) in cuIconList"
+				:key="index"
+			>
 				{{ item.name }}
 			</view>
 		</view>
@@ -49,9 +54,9 @@
 		<view class="hotgoods bg-white">
 			<view class="hot_tit">
 				<image class="bgimg" src="/static/hotgoods.png" mode=""></image>
-				热门商品
+				精品展示
 			</view>
-			<view class="listbox  flex justify-between">
+			<!-- <view class="listbox  flex justify-between">
 				<view @click="gotoDetail(item.id)" class="item" v-for="(item, index) in hootGoods" :key="index">
 					<image :src="item.smallPic" mode="widthFix"></image>
 					<view class="title textov2">{{ item.name }}</view>
@@ -59,8 +64,29 @@
 						<view class="money ">
 							<text>￥</text>
 							{{ item.price }}
+							<text class="oldMoney">￥123</text>
 						</view>
 						<view class="num">销量:{{ item.saleNum }}</view>
+					</view>
+				</view>
+			</view> -->
+			<view class="listbox2 ">
+				<view @click="gotoDetail(item.id)" class="item flex" v-for="(item, index) in hootGoods" :key="index">
+					<image :src="item.smallPic" mode="widthFix"></image>
+					<view class="flex flex-direction justify-between" style="flex: 1;">
+						<view class="title textov2">{{ item.name }}</view>
+						<view class="typeBox flex">
+							<view class="typeName">折扣</view>
+							<view class="typeName">保真</view>
+						</view>
+						<view class="moneybox flex justify-between align-center"  >
+							<view class="money ">
+								<text>￥</text>
+								{{ item.price }}
+								<!-- <text class="oldMoney">￥123</text> -->
+							</view>
+							<view class="num">销量:{{ item.saleNum }}</view>
+						</view>
 					</view>
 				</view>
 			</view>
@@ -70,7 +96,7 @@
 		<will-mc class="mc" v-if="showGetAuthor">
 			<view class="_mcMain bg-white ">
 				<image @click="showGetAuthor = false" src="/static/delect.png" mode=""></image>
-				<view class="tit">欢迎授权登录所暮商城</view>
+				<view class="tit">欢迎授权登录霞烁商城</view>
 				<view class="tip">授权登录后即可使用哦~</view>
 				<button @getuserinfo="getOpenId_btn" class="btn cu-btn" open-type="getUserInfo">点击授权</button>
 			</view>
@@ -87,12 +113,12 @@ export default {
 			swiperList: [{ url: '/static/aboutusbg.png' }, { url: '/static/aboutusbg.png' }],
 			noticeList: [{ content: '公告1' }, { content: '公告2' }],
 			cuIconList: [
-				{ name: '免费试吃', pic: '/static/indexicon1.png' },
+				{ name: '免费试吃>', pic: '/static/indexicon1.png' },
 				{ name: '超级团购', pic: '/static/indexicon2.png' },
 				{ name: '幸运转盘', pic: '/static/indexicon3.png' },
-				{ name: '会员投稿', pic: '/static/indexicon4.png' },
-				{ name: '视频', pic: '/static/indexicon5.png' },
-				{ name: '文章', pic: '/static/indexicon6.png' }
+				{ name: '会员投稿', pic: '/static/indexicon4.png' }
+				// { name: '视频', pic: '/static/indexicon5.png' },
+				// { name: '文章', pic: '/static/indexicon6.png' }
 			],
 			// cuIconList: ['免费试吃', '超级团购', '幸运转盘', '会员投稿', '视频', '文章'],
 			offset: 1,
@@ -385,9 +411,60 @@ page {
 						& > text {
 							font-size: 20rpx;
 						}
+						.oldMoney {
+							color: #bababa;
+							font-size: 24rpx;
+							text-decoration: line-through;
+							margin-left: 5px;
+						}
 					}
 					.num {
 						font-size: 22rpx;
+						color: #999999;
+					}
+				}
+			}
+		}
+		.listbox2 {
+			.item {
+				margin-top: 15px;
+				& > image {
+					width: 212rpx;
+					height: 212rpx;
+					margin-right: 30rpx;
+				}
+				.title {
+					font-size: 26rpx;
+					line-height: 36rpx;
+					color: #000000; 
+				}
+				.typeBox{
+					.typeName{
+						line-height: 36rpx;
+						padding: 0 6px;
+						border: 1px solid #A7A7A7;
+						color: #A7A7A7;
+						font-size: 22rpx;
+						text-align: center;
+						margin-right: 8px;
+					}
+				}
+				.moneybox {
+					.money {
+						color: #FF6060;
+						font-size: 32rpx;
+						& > text {
+							font-size: 20rpx;
+						}
+						.oldMoney {
+							color: #bababa;
+							font-size: 24rpx;
+							text-decoration: line-through;
+							margin-left: 5px;
+						}
+					}
+					.num {
+						font-size: 24rpx;
 						color: #999999;
 					}
 				}

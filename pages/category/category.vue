@@ -1,8 +1,23 @@
 <template>
 	<view>
+		<view class="search bg-white flex align-center"> 
+			<view class="searchiptbox flex align-center">
+				<image src="/static/search.png" mode="aspectFill"></image>
+				<navigator hover-class="none" style="flex:1" url="/pages/index/search">
+					<input style="width: 100%;" disabled="true" type="text" placeholder="羊肉" value="" />
+				</navigator>
+			</view>
+		</view>
 		<view class="VerticalBox">
 			<scroll-view class="VerticalNav nav" scroll-y scroll-with-animation :scroll-top="verticalNavTop" :style="heightList">
-				<view class="cu-item" :class="index == tabCur ? 'text-green cur' : ''" v-for="(item, index) in list" :key="index" @tap="TabSelect" :data-id="index">{{ item.name }}</view>
+				<!-- <view class="cu-item" :class="index == tabCur ? 'text-green cur' : ''" v-for="(item, index) in list" :key="index" @tap="TabSelect" :data-id="index">
+					{{ item.name }}
+				</view> -->
+				<view class="cu-item"  v-for="(item, index) in list" :key="index" @tap="TabSelect" :data-id="index">
+					<text :class="index == tabCur ? 'select' : ''">
+						{{ item.name }}
+					</text>
+				</view>
 			</scroll-view>
 			<scroll-view class="VerticalMain" scroll-y scroll-with-animation :style="heightList" :scroll-into-view="'main-' + mainCur" @scroll="VerticalMain">
 				<view class="padding-top padding-lr" v-for="(item, index) in list" :key="index" :id="'main-' + index">
@@ -15,6 +30,24 @@
 					<view class="cu-list menu-avatar">
 						<view class="cu-item2 bg-white " style="height: auto;">
 							<view class="flex flex-wrap">
+								<view @click="gotoDetail(item2.id)" class="item2 flex" style=" width: 100%;" v-for="(item2, index2) in item.children" :key="index2">
+									<image :src="item2.smallPic" mode="aspectFill"></image>
+									<view class="flex flex-direction justify-between" style="flex: 1;">
+										<view class="title textov2">{{ item2.name }}</view>
+										<view class="moneybox flex justify-between align-center">
+											<view class="money ">
+												<text>￥</text>
+												{{ item2.price }}
+												<text class="oldMoney">￥123</text>
+											</view>
+											<view class="num">销量:{{ item2.solid }}</view>
+										</view>
+									</view>
+								</view>
+							</view>
+						</view>
+						<!-- <view class="cu-item2 bg-white " style="height: auto;">
+							<view class="flex flex-wrap">
 								<view
 									@click="gotoCategory(item2.id, item2.name)"
 									class="item flex flex-direction  justify-center align-center "
@@ -25,7 +58,7 @@
 									<text>{{ item2.name }}</text>
 								</view>
 							</view>
-						</view>
+						</view> -->
 					</view>
 				</view>
 			</scroll-view>
@@ -35,7 +68,7 @@
 		<will-mc class="mc" v-if="showGetAuthor">
 			<view class="_mcMain bg-white ">
 				<image @click="showGetAuthor = false" src="/static/delect.png" mode=""></image>
-				<view class="tit">欢迎授权登录所暮商城</view>
+				<view class="tit">欢迎授权登录霞烁商城</view>
 				<view class="tip">授权登录后即可使用哦~</view>
 				<button @getuserinfo="getOpenId_btn" class="btn cu-btn" open-type="getUserInfo">点击授权</button>
 			</view>
@@ -49,28 +82,33 @@ export default {
 	data() {
 		return {
 			list: [],
-			tabCur: -1,
+			tabCur: 0,
 			mainCur: 0,
 			verticalNavTop: 0,
-			load: true, 
-			heightList: 'height:calc(100vh - 50px )',
+			load: true,
+			// heightList: 'height:calc(100vh - 50px )',
+			heightList: 'height:calc(100vh - 90px )',
 			showGetAuthor: false,
 			userInfo: {}
 		};
 	},
 	onLoad() {
 		// #ifdef MP-WEIXIN
-		this.heightList = 'height: 100vh';
-		// #endif 
-		
+		// this.heightList = 'height: 100vh';
+		this.heightList = 'height: calc(100vh - 50px )';
+		// #endif
+
 		let list = [{}];
-		for (let i = 0; i < 26; i++) {
+		for (let i = 0; i < 16; i++) {
 			list[i] = {};
-			list[i].name =  '分类' + i;
+			list[i].name = '分类' + i;
 			list[i].id = i;
-			list[i].children =[{icon:"/static/goods.jpg",id:233},{icon:"/static/goods.jpg",id:2333}]
+			list[i].children = [
+				{ smallPic: '/static/goods.jpg', id: 233, price: 999, name: '商品名称12313313', solid: 999 },
+				{ smallPic: '/static/goods.jpg', id: 233, price: 999, name: '商品名称12313313', solid: 999 }
+			];
 		}
-		this.list = list; 	
+		this.list = list;
 
 		// this.getCategoryList();
 	},
@@ -116,7 +154,11 @@ export default {
 				url: '/pages/category/categoryList?id=' + id + '&name=' + name + '&type=2'
 			});
 		},
-
+		gotoDetail(id) {
+			uni.navigateTo({
+				url: '/pages/index/goodsDetail?goodsId=' + id
+			});
+		},
 		changeIdxByStorage() {
 			let tabCurId = uni.getStorageSync('tabCurId');
 			if (tabCurId && this.list) {
@@ -145,18 +187,16 @@ export default {
 			if (this.load) {
 				for (let i = 0; i < this.list.length; i++) {
 					let view = uni.createSelectorQuery().select('#main-' + this.list[i].id);
-					view
-						.fields(
-							{
-								size: true
-							},
-							data => {
-								this.list[i].top = tabHeight;
-								tabHeight = tabHeight + data.height;
-								this.list[i].bottom = tabHeight;
-							}
-						)
-						.exec();
+					view.fields(
+						{
+							size: true
+						},
+						data => {
+							this.list[i].top = tabHeight;
+							tabHeight = tabHeight + data.height;
+							this.list[i].bottom = tabHeight;
+						}
+					).exec();
 				}
 				this.load = false;
 			}
@@ -175,6 +215,34 @@ export default {
 </script>
 
 <style lang="scss">
+	.search {
+		padding: 10px 30rpx;
+		& > navigator {
+			& > image {
+				width: 20px;
+				height: 20px;
+				margin-right: 15px;
+			}
+		}
+		.searchiptbox {
+			background: #f5f5f5;
+			height: 30px;
+			border-radius: 15px;
+			padding: 0 30rpx;
+			font-size: 26rpx;
+			flex: 1;
+	
+			& > image {
+				width: 16px;
+				height: 16px;
+				margin-right: 20rpx;
+			}
+			input {
+				height: 30px;
+				flex: 1;
+			}
+		}
+	}
 .fixed {
 	position: fixed;
 	z-index: 99;
@@ -193,6 +261,14 @@ export default {
 	border: none;
 	height: 50px;
 	position: relative;
+	&>text.select{ 
+		width: 90%;
+		line-height:66rpx;
+		border-radius: 33rpx;
+		display: inline-block;
+		background: black;
+		color: #fff;
+	}
 }
 
 .VerticalNav.nav .cu-item.cur {
@@ -237,6 +313,51 @@ export default {
 			image {
 				width: 112rpx;
 				height: 112rpx;
+			}
+		}
+	}
+	.item2 {
+		margin-top: 15px;
+		padding: 0 15rpx;
+		padding-bottom: 20px;
+		& > image {
+			width: 140rpx;
+			height: 140rpx;
+			margin-right: 30rpx;
+		}
+		.title {
+			font-size: 26rpx;
+			line-height: 36rpx;
+			color: #000000;
+		}
+		.typeBox {
+			.typeName {
+				line-height: 36rpx;
+				padding: 0 6px;
+				border: 1px solid #a7a7a7;
+				color: #a7a7a7;
+				font-size: 22rpx;
+				text-align: center;
+				margin-right: 8px;
+			}
+		}
+		.moneybox {
+			.money {
+				color: #ff6060;
+				font-size: 32rpx;
+				& > text {
+					font-size: 20rpx;
+				}
+				.oldMoney {
+					color: #bababa;
+					font-size: 24rpx;
+					text-decoration: line-through;
+					margin-left: 5px;
+				}
+			}
+			.num {
+				font-size: 24rpx;
+				color: #999999;
 			}
 		}
 	}

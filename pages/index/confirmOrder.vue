@@ -115,22 +115,28 @@ export default {
 
 			isAssemble: false,
 			assemble: {},
-			assembleByself: false
+			assembleByself: false,
+			
+			buyType: 1// 1 普通 2 参与拼团 3 发起拼团 4 会员领取 5分享领取
 		};
 	},
 	onLoad(options) {
+			this.buyType  = options.buyType?Number(options.buyType):1
+			console.log(this.buyType,"----1 普通 2 参与拼团 3 发起拼团 4 会员领取 5分享领取");
 		if (options.from) {
 			this.from = Number(options.type) || 1;
 			this.goodslist = JSON.parse(options.goodslist);
 			this.cartIds = options.cartIds ? JSON.parse(options.cartIds) : [];
 			console.log('商品', this.goodslist, '购物车', this.cartIds);
 		}
-		if (options.buyType == 3) {
+	
+		
+		if (options.buyType == 2) {
 			this.assemble = JSON.parse(options.assemble);
-			this.isAssemble = true;
+			this.isAssemble = true; 
 			console.log('参与拼团', this.assemble);
 		}
-		if (options.buyType == 4) {
+		if (options.buyType == 3) {
 			this.isAssemble = true;
 			this.assembleByself = true;
 			console.log('发起拼团');
