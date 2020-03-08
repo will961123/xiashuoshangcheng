@@ -181,7 +181,7 @@ export default {
 					url = '/pages/index/Integral?type=' + 1;
 					break;
 				case 1:
-					url = '/pages/index/Integral?type=' + 2;
+					url = '/pages/index/groupPurchase'  ;
 					break;
 				case 2:
 					url = '/pages/index/luckDraw';

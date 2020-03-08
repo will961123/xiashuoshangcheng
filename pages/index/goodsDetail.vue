@@ -97,14 +97,14 @@
 					<text>客服</text>
 					<button open-type="contact" style="width: 100%;height: 100%;position: absolute;left: 0;top: 0;opacity: 0;"></button>
 				</view>
-				<view class="item flex flex-direction align-center">
+				<!-- <view class="item flex flex-direction align-center">
 					<image
 						@click="Collection(goodsInfo.collectType == 1 ? 2 : 1)"
 						:src="goodsInfo.collectType == 1 ? '/static/detailscyes.png' : '/static/detailscno.png'"
 						mode=""
 					></image>
 					<text>收藏</text>
-				</view>
+				</view> -->
 			</view>
 			<button @click="showSpec = true" class=" cu-btn add">加入购物车</button>
 

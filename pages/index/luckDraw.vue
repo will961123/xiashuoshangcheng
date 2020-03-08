@@ -329,10 +329,10 @@ image.caidai {
 
 .guize .title {
 	text-align: center;
-	margin-bottom: 28upx;
-	flex: 1;
+	margin-bottom: 28upx; 
+	width: 50%;
 	border: 1rpx solid #c5c2c6;
-	padding: 10px 20px;
+	padding: 10px 0px;
 }
 .guize .title.select{
 	color: red;

@@ -86,6 +86,12 @@
 		{
 			"path": "pages/my/myIntegral"
 		},
+		{
+			"path": "pages/index/groupPurchase",
+			"style": {
+				"navigationBarTitleText": "超级团购"
+			}
+		},
 
 		{
 			"path": "pages/my/balanceWithdraw",
