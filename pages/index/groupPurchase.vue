@@ -1,11 +1,11 @@
 <template>
 	<view class="Integral">
-		<view class="titBox flex justify-between">
+		<!-- <view class="titBox flex justify-between">
 			<view @click="changeGroupGoodsType(0)" :class="{ select: groupGoodsType === 0 }" class="tit">全部</view>
 			<view @click="changeGroupGoodsType(1)" :class="{ select: groupGoodsType === 1 }" class="tit">团购价</view>
 			<view @click="changeGroupGoodsType(2)" :class="{ select: groupGoodsType === 2 }" class="tit">限时拼单</view>
 			<view @click="changeGroupGoodsType(3)" :class="{ select: groupGoodsType === 3 }" class="tit">新品优惠</view>
-		</view>
+		</view> -->
 		<view class="lsitbox flex justify-between flex-wrap" style="border-radius: 0;">
 			<view @click="gotoDetail(item.id)" v-if="groupGoodsType === 0 ? true : item.type === groupGoodsType" v-for="(item, index) in goodsList" :key="index" class="itemFree  ">
 				<image :src="item.smallPic" mode="aspectFill"></image>
@@ -13,10 +13,10 @@
 					<view class="info textov2"> 
 						{{ item.name }}此标题最多显示2行此标题最多显示2行此标题最多
 					</view>
-					<view class="typeBox flex">
+					<!-- <view class="typeBox flex">
 						<view class="typeName">折扣</view>
 						<view class="typeName">保真</view>
-					</view>
+					</view> -->
 					<view class="moneybox flex align-center justify-between">
 						<view class="money">￥123</view>
 						<view class="xl">销量{{ item.saleNum }}份</view> 

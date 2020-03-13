@@ -1,13 +1,11 @@
 <script>
 	export default {
-		onLaunch: function() {
-			console.log('App Launch')
+		onLaunch: function() { 
 		},
-		onShow: function() {
-			console.log('App Show')
+		onShow: function() { 
+			console.log(uni.getStorageSync('userInfo')?'已登录 ':'未登录')
 		},
-		onHide: function() {
-			console.log('App Hide')
+		onHide: function() { 
 		}
 	}
 </script>

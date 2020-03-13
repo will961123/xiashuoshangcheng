@@ -7,9 +7,9 @@
 			</view>
 			<image @click="gotoDetail(item.productId)" :src="item.spec.picture" mode="aspectFill"></image>
 			<!-- 			<image @click="gotoDetail(item.productId)" :src="imgUrl + item.spec.picture" mode="aspectFill"></image> -->
-			<view class="infobox flex flex-direction ">
-				<view class="title textov2">{{ item.product.name }}</view>
-				<view class="gg">{{ item.spec.name }}</view>
+			<view class="infobox flex flex-direction  ">
+				<view class="title textov2" style="margin-bottom: 20px;">{{ item.product.name }}</view>
+				<!-- <view class="gg">{{ item.spec.name }}</view> -->
 				<view class="bottombox flex justify-between align-end">
 					<view class="moneybox">
 						<text>￥</text>
@@ -42,7 +42,7 @@
 export default {
 	data() {
 		return {
-			selectList: [false,true],
+			selectList: [false, true],
 			selectEvery: false,
 			goodsList: [
 				{
@@ -59,7 +59,7 @@ export default {
 					specId: 2,
 					num: 3,
 					hot: 1,
-					id:233
+					id: 233
 				},
 				{
 					productId: 1,
@@ -75,7 +75,7 @@ export default {
 					specId: 2,
 					num: 3,
 					hot: 1,
-					id:233
+					id: 233
 				}
 			],
 			showGetAuthor: false,

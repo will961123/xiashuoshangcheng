@@ -23,7 +23,7 @@
 								<view class="infobox flex flex-direction justify-between">
 									<view class="info">
 										<view class="tetov1">{{ goods.productName }}</view>
-										<view class="gg">规格：{{ goods.productSpecName }}</view>
+										<!-- <view class="gg">规格：{{ goods.productSpecName }}</view> -->
 									</view>
 									<view class="moneybox flex justify-between">
 										<view class="money">￥{{ goods.price }}</view>

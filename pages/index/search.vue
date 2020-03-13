@@ -8,7 +8,7 @@
 			<button @click="gotoCategory" class="text-bold cu-btn bg-white">搜索</button>
 		</view>
 
-		<view class="itembox bg-white">
+		<!-- <view class="itembox bg-white">
 			<view class="titbox  text-bold"><text>热门搜索</text></view>
 			<view class="mainbox flex flex-wrap">
 				<button @click="changeSearch(item)" class="cu-btn item" v-for="(item, index) in searchItemList.hot" :key="index">{{ item }}</button>
@@ -26,7 +26,7 @@
 			<view class="mainbox flex flex-wrap">
 				<button @click="changeSearch(item)" class="item cu-btn  " v-for="(item, index) in searchItemList.history" :key="index">{{ item }}</button>
 			</view>
-		</view>
+		</view> -->
 	</view>
 </template>
 

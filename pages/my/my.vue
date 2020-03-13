@@ -15,7 +15,7 @@
 					<image src="/static/ewmsm.png" mode="aspectFit"></image>
 					<text>二维码</text>
 				</view>	 -->
-				<view @click="signIn" class="ewmbox flex align-center"><text>签到送礼</text></view>
+				<!-- <view @click="signIn" class="ewmbox flex align-center"><text>签到送礼</text></view> -->
 			</view>
 			<!-- <view class="numbox flex text-center justify-around">
 				<view @click="gotoSc(index)" v-for="(item, index) in numlist" :key="index" class="numlist flex flex-direction">
@@ -51,7 +51,21 @@
 				</view>
 			</view>
 
-			<view class="mainbox item2  bg-white">
+			<view class="mainbox item1  bg-white" style="margin-top: 0;">
+				<view class="titbox flex justify-between"><view class="itemTit">我的工具</view></view>
+				<view class="item1list flex  ">
+					<view  class="item flex flex-direction align-center " style="position: relative;width: 25%;">
+						<button open-type="contact" style="width: 100%;height: 100%;opacity: 0;position: absolute;left: 0;top: 0;z-index: 2;" ></button>
+						<view class="imgbox"><image src="../../static/my_icon5.png" mode="aspectFit"></image></view>
+						<text>联系客服</text>
+					</view>
+					<view @click="gotoGj(5)" style="width: 25%;" class="item flex flex-direction align-center ">
+						<view class="imgbox"><image src="../../static/my_icon6.png" mode="aspectFit"></image></view>
+						<text>优惠卷</text>
+					</view>
+				</view> 
+			</view>
+			<!-- <view class="mainbox item2  bg-white">
 				<view class="titbox flex justify-between"><view class="itemTit">我的工具</view></view>
 				<view class="item2list flex ">
 					<button style="border-radius: 0;" open-type="contact" class="item flex flex-direction align-center justify-center bg-white">
@@ -70,8 +84,7 @@
 						<text>{{ item }}</text>
 					</view>
 				</view>
-			</view>
-
+			</view> -->
 			<!-- <view class="mainbox   bg-white">
 				<view @click="Logout" class="titbox flex justify-between" style="border: none;"><view class="itemTit">退出登录</view></view>
 			</view> -->

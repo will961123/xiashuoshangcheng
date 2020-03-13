@@ -21,7 +21,7 @@
 				<view class="rightbox flex flex-direction justify-between">
 					<view class="infobox">
 						<view class="info textov1" style="width: 450rpx;">{{ item.productName }}</view>
-						<view class="tip">规格：{{ item.productSpecName }}</view>
+						<!-- <view class="tip">规格：{{ item.productSpecName }}</view> -->
 					</view>
 					<view class="moneybox flex justify-between">
 						<view class="money">￥{{ item.price }}</view>

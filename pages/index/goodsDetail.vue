@@ -6,10 +6,13 @@
 		<view class="infobox bg-white ">
 			<view style="padding: 30rpx;">
 				<view class="info">{{ goodsInfo.name }}</view>
-				<view class="moneybox">
-					￥
-					<text class="money">{{ goodsInfo.price }}</text>
-					<text class="showmoney">￥{{ goodsInfo.showPrice }}</text>
+				<view class="moneybox flex justify-between">
+					<view class="">
+						￥
+						<text class="money">{{ goodsInfo.price }}</text>
+						<text class="showmoney">￥{{ goodsInfo.showPrice }}</text>
+					</view>
+					<view class="kd" style="color: #999;">销量：{{ goodsInfo.saleNum }}</view>
 				</view>
 				<!-- <view v-if="goodsInfo.hot != 4" class="moneybox">
 					￥
@@ -21,18 +24,18 @@
 					<text class="money">{{ goodsInfo.needIntegral }}</text>
 					<text class="showmoney">￥{{ goodsInfo.showPrice }}</text>
 				</view> -->
-				<view class="kdbox flex justify-between">
+				<!-- <view class="kdbox flex justify-between">
 					<view class="kd">剩余数量：{{ goodsInfo.stock || 0 }}</view>
 					<view class="kd">销量：{{ goodsInfo.saleNum }}</view>
-					<!-- <view class="kd">{{ goodsInfo.address || '暂无地址' }}</view> -->
-				</view>
+					<view class="kd">{{ goodsInfo.address || '暂无地址' }}</view>
+				</view> -->
 			</view>
-			<view @click="showSpec = true" class="gg flex align-center">
+			<!-- <view @click="showSpec = true" class="gg flex align-center">
 				<text>规格</text>
 				<view v-if="spaceIndex === -1" class="selectgg">请选择规格</view>
 				<view v-else class="selectgg">{{ goodsInfo.specList[spaceIndex].name }}</view>
 				<image src="/static/aroow.png" mode="aspectFit"></image>
-			</view>
+			</view> -->
 			<view v-if="goodsType === 2" class="assemble  ">
 				<view class="tit text-center">他们正在拼团 赶快加入把</view>
 				<view v-for="(item, index) in assembleList" :key="index" class="item flex align-center justify-between ">
@@ -60,14 +63,14 @@
 					<text>成本价</text>
 				</view>
 			</view>
-			<view class="pjnumbox gg flex align-center justify-between">
+			<!-- <view class="pjnumbox gg flex align-center justify-between">
 				<text>评价</text>
 				<view class="flex align-center" @click="gotoGoodsEvaluate">
 					查看更多评价
 					<image src="/static/aroow.png" mode="aspectFit"></image>
 				</view>
-			</view>
-			<view v-if="evaluate.length" class="pingjiaone">
+			</view> -->
+			<!-- <view v-if="evaluate.length" class="pingjiaone">
 				<view class="userbox flex align-center">
 					<image :src="evaluate[0].userPic" mode="aspectFill"></image>
 					<text class="name">{{ evaluate[0].userName }}</text>
@@ -81,14 +84,33 @@
 			<view v-if="evaluate.length" @click="gotoGoodsEvaluate" class="findmore flex justify-center align-center ">
 				查看更多评价
 				<image src="/static/aroow.png" mode="aspectFit"></image>
-			</view>
+			</view> -->
 			<view style="background: #f5f5f5;height: 10px;"></view>
 		</view>
 
-		<view class="fuwenbenbox">
+		<view class="changeTit bg-white flex" style=" font-size: 30rpx;color: #333;line-height: 40px;text-align: center;">
+			<view @click="titType = 1" :class="titType === 1 ? 'tit titselect' : 'tit'" style="flex: 1;">图文详情</view>
+			<view @click="titType = 2" :class="titType === 2 ? 'tit titselect' : 'tit'" style="flex: 1;">商品评价</view>
+		</view>
+		<rich-text v-if="titType === 1" :nodes="goodsInfo.details | replaceImgStr"></rich-text>
+		<view v-else class="pingjiaList">
+			<view class="item">
+				<view class="userbox flex align-center">
+					<image :src="evaluate[0].userPic" mode="aspectFill"></image>
+					<text class="name">{{ evaluate[0].userName }}</text>
+					<text>{{ evaluate[0].data }}</text>
+				</view>
+				<view class="commenttxt">{{ evaluate[0].content }}</view>
+				<!-- <view class="commentImgBox flex flex-wrap justify-start ">
+					<view class="imgbox text-center" v-for="(img, idx) in evaluate[0].picList" :key="idx"><image :src="img.commentPic" mode="aspectFill"></image></view>
+				</view> -->
+			</view>
+		</view>
+
+		<!-- <view class="fuwenbenbox">
 			<view class="bg-white" style="text-align: center;font-size: 30rpx;color: #333;line-height: 40px;">宝贝详情</view>
 			<rich-text :nodes="goodsInfo.details | replaceImgStr"></rich-text>
-		</view>
+		</view> -->
 
 		<view class="bottombox flex bg-white">
 			<view class="left flex align-center justify-around">
@@ -107,7 +129,6 @@
 				</view> -->
 			</view>
 			<button @click="showSpec = true" class=" cu-btn add">加入购物车</button>
-
 			<button v-if="goodsType === 2" @click="showSpec = true" class=" cu-btn buy">发起拼团</button>
 			<button v-if="goodsType === 3" @click="showSpec = true" class=" cu-btn buy">{{ userInfo.isVip ? '免费领取' : '升级会员' }}</button>
 			<button v-if="goodsType === 4 && goodsInfo.canGetShareGoods" @click="showSpec = true" class=" cu-btn buy">免费领取</button>
@@ -117,6 +138,7 @@
 			<button v-else @click="showSpec = true" class=" cu-btn buy">立即购买</button> -->
 		</view>
 
+		<!-- 规格 -->
 		<view v-show="showSpec" @click="showSpec = false" class="cu-modal bottom-modal" style="z-index: 500;" :class="showSpec ? 'show' : ''">
 			<view class="cu-dialog bg-white" @click.stop="" v-show="goodsInfo">
 				<view style="padding: 0 30rpx;">
@@ -127,10 +149,10 @@
 								￥
 								<text>{{ spaceIndex > -1 ? goodsInfo.specList[spaceIndex].price : goodsInfo.price }}</text>
 							</view>
-							<view class="kc">剩余数量{{ goodsInfo.stock || 0 }}件</view>
+							<view class="kc">销量999件</view>
 						</view>
 					</view>
-					<view class="specList">
+					<!-- <view class="specList">
 						<view class="tit">规格</view>
 						<text
 							@click="spaceChange(spaceIdx)"
@@ -141,11 +163,13 @@
 						>
 							{{ spaceItm.name }}
 						</text>
-					</view>
+					</view> -->
+					<view style="height: 40px;width: 100%;"></view>
 					<view class="numbox flex justify-between align-center">
 						<text class="tit">数量</text>
 						<sunui-stepper :val="1" :min="1" :max="999" @change="stepperChange"></sunui-stepper>
 					</view>
+					<view style="height: 20px;width: 100%;"></view>
 				</view>
 				<view class="btnbox">
 					<button @click="addCrats" class=" cu-btn add">加入购物车</button>
@@ -237,7 +261,9 @@ export default {
 			userInfo: {
 				isVip: false
 			},
-			searchUserId: ''
+			searchUserId: '',
+
+			titType: 1 //1 图文 2 评价
 		};
 	},
 	onLoad(options) {
@@ -318,22 +344,34 @@ export default {
 		},
 		buyNow(buyType, assemble) {
 			// buyType 1普通 2参与拼图 3发起拼图 4会员 5分享
-			if (this.spaceIndex < 0) {
-				this.showToast('请选择规格');
-				return;
-			}
+			// if (this.spaceIndex < 0) {
+			// 	this.showToast('请选择规格');
+			// 	return;
+			// }
+			// let goodslist = [
+			// 	{
+			// 		checkState: true,
+			// 		productId: this.goodsId,
+			// 		productName: this.goodsInfo.name,
+			// 		productPic: this.goodsInfo.specList[this.spaceIndex].picture ? this.goodsInfo.specList[this.spaceIndex].picture : this.goodsInfo.smallPic,
+			// 		productSpecId: this.goodsInfo.specList[this.spaceIndex].id,
+			// 		productSpecName: this.goodsInfo.specList[this.spaceIndex].name,
+			// 		price: Number(this.goodsInfo.specList[this.spaceIndex].price),
+			// 		number: this.spaceNum,
+			// 		total: Number(this.goodsInfo.specList[this.spaceIndex].price) * Number(this.spaceNum),
+			// 		hot: this.goodsInfo.hot
+			// 	}
+			// ];
+
 			let goodslist = [
 				{
 					checkState: true,
 					productId: this.goodsId,
 					productName: this.goodsInfo.name,
-					productPic: this.goodsInfo.specList[this.spaceIndex].picture ? this.goodsInfo.specList[this.spaceIndex].picture : this.goodsInfo.smallPic,
-					productSpecId: this.goodsInfo.specList[this.spaceIndex].id,
-					productSpecName: this.goodsInfo.specList[this.spaceIndex].name,
-					price: Number(this.goodsInfo.specList[this.spaceIndex].price),
+					productPic: this.goodsInfo.smallPic,
+					price: Number(this.goodsInfo.price),
 					number: this.spaceNum,
-					total: Number(this.goodsInfo.specList[this.spaceIndex].price) * Number(this.spaceNum),
-					hot: this.goodsInfo.hot
+					total: Number(this.goodsInfo.price) * Number(this.spaceNum)
 				}
 			];
 			if (this.goodsInfo.hot == 4) {
@@ -342,7 +380,12 @@ export default {
 			this.showSpec = false;
 			let url = '/pages/index/confirmOrder?from=1&goodslist=' + JSON.stringify(goodslist);
 			// buyType 1普通 2参与拼图 3发起拼图 4会员 5分享
-			if (buyType === 2) {
+			if(buyType === 1){
+				uni.navigateTo({
+					url: url
+				});
+			}
+			else if (buyType === 2) {
 				url = '/pages/index/confirmOrder?from=1&goodslist=' + JSON.stringify(goodslist) + '&buyType=2' + '&assemble=' + JSON.stringify(assemble);
 				uni.navigateTo({
 					url: url
@@ -677,6 +720,7 @@ export default {
 				margin-left: 20rpx;
 			}
 		}
+
 		.pingjiaone {
 			padding: 0 30rpx;
 			font-size: 26rpx;
@@ -728,6 +772,59 @@ export default {
 				width: 14rpx;
 				height: 24rpx;
 				margin-left: 20rpx;
+			}
+		}
+	}
+	.changeTit {
+		.titselect {
+			color: #ff7f69;
+			border-bottom: 1rpx solid #ff7f69;
+		}
+	}
+	.pingjiaList {
+		padding-bottom: 20px;
+		.item {
+			padding: 10px 30rpx;
+			font-size: 26rpx;
+			border: 1rpx solid #ededed;
+			color: #333;
+			background: #fff;
+			.userbox {
+				font-size: 22rpx;
+				color: #999999;
+				margin: 20rpx 0;
+				.name {
+					font-size: 26rpx;
+					color: #333;
+					flex: 1;
+				}
+				& > image {
+					width: 60rpx;
+					height: 60rpx;
+					border-radius: 50%;
+					margin-right: 20rpx;
+				}
+			}
+			.commenttxt {
+				font-size: 26rpx;
+				line-height: 36rpx;
+				letter-spacing: 1rpx;
+				color: #333333;
+			}
+			.commentImgBox {
+				.imgbox {
+					margin-top: 10px;
+					width: calc(100% / 3);
+					& > image {
+						width: 220rpx;
+						height: 220rpx;
+					}
+				}
+			}
+			.ggg {
+				line-height: 30px;
+				font-size: 22rpx;
+				color: #999999;
 			}
 		}
 	}

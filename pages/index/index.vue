@@ -75,10 +75,10 @@
 					<image :src="item.smallPic" mode="widthFix"></image>
 					<view class="flex flex-direction justify-between" style="flex: 1;">
 						<view class="title textov2">{{ item.name }}</view>
-						<view class="typeBox flex">
+						<!-- <view class="typeBox flex">
 							<view class="typeName">折扣</view>
 							<view class="typeName">保真</view>
-						</view>
+						</view> -->
 						<view class="moneybox flex justify-between align-center"  >
 							<view class="money ">
 								<text>￥</text>

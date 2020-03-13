@@ -1,24 +1,42 @@
 <template>
 	<view class="confirmOrder">
 		<view class="topbox bg-white">
-			<view @click="chooseAddressInfo" v-if="addressInfo" class="addressbox flex justify-between align-center">
+			<view @click="getWxAddress" v-if="addressInfo" class="addressbox flex justify-between align-center">
 				<image class="address" src="/static/addredd.png" mode="aspectFit"></image>
 				<view class="uinfobox">
 					<view class="namebox">
-						{{ addressInfo.name }}
-						<text style="margin-left: 40rpx;">{{ addressInfo.phone }}</text>
+						{{ addressInfo.userName }}
+						<text style="margin-left: 40rpx;">{{ addressInfo.telNumber }}</text>
 					</view>
-					<view class="addbox">{{ addressInfo.province }}-{{ addressInfo.city }}-{{ addressInfo.area }} {{ addressInfo.address }}</view>
+					<view class="addbox">{{ addressInfo.provinceName }}-{{ addressInfo.cityName }}-{{ addressInfo.countyName }} {{ addressInfo.detailInfo }}</view>
 				</view>
 				<image class="row" src="/static/aroow.png" mode="aspectFill"></image>
 			</view>
-			<view @click="chooseAddressInfo" v-else class="noaddess flex align-center justify-between">
+			<view @click="getWxAddress" v-else class="noaddess flex align-center justify-between">
 				<view class="left flex align-center">
 					<image src="/static/addredd.png" mode="aspectFit"></image>
 					<text>选择收货地址</text>
 				</view>
 				<image class="row" src="/static/aroow.png" mode="aspectFill"></image>
 			</view>
+			<!-- <view @click="chooseAddressInfo" v-if="addressInfo" class="addressbox flex justify-between align-center">
+				<image class="address" src="/static/addredd.png" mode="aspectFit"></image>
+				<view class="uinfobox">
+					<view class="namebox">
+						{{ addressInfo.userName }}
+						<text style="margin-left: 40rpx;">{{ addressInfo.telNumber }}</text>
+					</view>
+					<view class="addbox">{{ addressInfo.provinceName }}-{{ addressInfo.cityName }}-{{ addressInfo.countyName }} {{ addressInfo.detailInfo }}</view>
+				</view>
+				<image class="row" src="/static/aroow.png" mode="aspectFill"></image>
+			</view>
+			 <view @click="chooseAddressInfo" v-else class="noaddess flex align-center justify-between">
+				<view class="left flex align-center">
+					<image src="/static/addredd.png" mode="aspectFit"></image>
+					<text>选择收货地址</text>
+				</view>
+				<image class="row" src="/static/aroow.png" mode="aspectFill"></image>
+			</view> -->
 			<image class="topbg" src="/static/addressorderbg.png"></image>
 		</view>
 
@@ -116,24 +134,23 @@ export default {
 			isAssemble: false,
 			assemble: {},
 			assembleByself: false,
-			
-			buyType: 1// 1 普通 2 参与拼团 3 发起拼团 4 会员领取 5分享领取
+
+			buyType: 1 // 1 普通 2 参与拼团 3 发起拼团 4 会员领取 5分享领取
 		};
 	},
 	onLoad(options) {
-			this.buyType  = options.buyType?Number(options.buyType):1
-			console.log(this.buyType,"----1 普通 2 参与拼团 3 发起拼团 4 会员领取 5分享领取");
+		this.buyType = options.buyType ? Number(options.buyType) : 1;
+		console.log(this.buyType, '----1 普通 2 参与拼团 3 发起拼团 4 会员领取 5分享领取');
 		if (options.from) {
 			this.from = Number(options.type) || 1;
 			this.goodslist = JSON.parse(options.goodslist);
 			this.cartIds = options.cartIds ? JSON.parse(options.cartIds) : [];
 			console.log('商品', this.goodslist, '购物车', this.cartIds);
 		}
-	
-		
+
 		if (options.buyType == 2) {
 			this.assemble = JSON.parse(options.assemble);
-			this.isAssemble = true; 
+			this.isAssemble = true;
 			console.log('参与拼团', this.assemble);
 		}
 		if (options.buyType == 3) {
@@ -143,8 +160,8 @@ export default {
 		}
 	},
 	onShow() {
-		let addressInfo = uni.getStorageSync('addressInfo');
-		addressInfo ? (this.addressInfo = addressInfo) : '';
+		// let addressInfo = uni.getStorageSync('addressInfo');
+		// addressInfo ? (this.addressInfo = addressInfo) : '';
 	},
 	computed: {
 		allPrice() {
@@ -249,6 +266,56 @@ export default {
 		chooseAddressInfo() {
 			uni.navigateTo({
 				url: '/pages/my/myAddress?type=1'
+			});
+		},
+		getWxAddress() {
+			var that = this;
+			wx.getSetting({
+				success(res) {
+					console.log(res);
+					if (res.authSetting['scope.address']) {
+						console.log('授权成功');
+						wx.chooseAddress({
+							success(res) {
+								// console.log(res.userName);
+								// console.log(res.postalCode);
+								// console.log(res.provinceName);
+								// console.log(res.cityName);
+								// console.log(res.countyName);
+								// console.log(res.detailInfo);
+								// console.log(res.nationalCode);
+								// console.log(res.telNumber);
+								console.log(res);
+								that.addressInfo = res;
+							}
+						});
+					} else {
+						if (res.authSetting['scope.address'] == false) {
+							console.log('需要打开授权界面');
+							wx.openSetting({
+								success(res) {
+									console.log('设置结果', res.authSetting);
+									if (res.authSetting['scope.address']) {
+										wx.chooseAddress({
+											success(res) {
+												// console.log(res.userName);
+												// console.log(res.postalCode);
+												// console.log(res.provinceName);
+												// console.log(res.cityName);
+												// console.log(res.countyName);
+												// console.log(res.detailInfo);
+												// console.log(res.nationalCode);
+												// console.log(res.telNumber);
+												console.log(res);
+												that.addressInfo = res;
+											}
+										});
+									}
+								}
+							});
+						}
+					}
+				}
 			});
 		},
 		choosePayStyle() {

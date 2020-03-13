@@ -27,25 +27,24 @@
 			<!-- 规则 -->
 			<view class="guize" style="margin-top: 100upx;">
 				<view class="titbox flex">
-					<view @click="showGuize=true" :class="{'select':showGuize}" class="title ">规则说明</view>
-					<view @click="showGuize=false" :class="{'select':!showGuize}" class="title">我的奖品</view>
+					<view @click="showGuize = true" :class="{ select: showGuize }" class="title ">规则说明</view>
+					<view @click="showGuize = false" :class="{ select: !showGuize }" class="title">我的奖品</view>
 				</view>
-				
+
 				<view v-if="showGuize" class="guizeList">
 					<scroll-view scroll-y="true" style="height: 180px;padding: 10px 0;">
 						<view>
 							<view class="g_item">1.用户每天登录即送1次抽奖机会，分享好友则多赠1次机会</view>
 							<view class="g_item">2.用户点击大转盘抽奖按钮，有积分和现金两种方式可参与抽奖，没抽一次消耗1次抽奖机会</view>
-							<view class="g_item">3.用户获得的奖品，可在我的道具里查看</view> 
+							<view class="g_item">3.用户获得的奖品，可在我的道具里查看</view>
 						</view>
 					</scroll-view>
-					
 				</view>
 				<view v-else class="goodsList">
-					<view class="g_item">奖品1  </view>  
-					<view class="g_item">奖品1  </view>  
-					<view class="g_item">奖品1  </view>  
-					<view class="g_item">奖品1  </view>  
+					<view class="g_item">奖品1</view>
+					<view class="g_item">奖品1</view>
+					<view class="g_item">奖品1</view>
+					<view class="g_item">奖品1</view>
 				</view>
 			</view>
 		</view>
@@ -59,39 +58,48 @@ export default {
 			list: [
 				{
 					name: '谢谢',
-					value: '5', 
+					value: '5'
 				},
 				{
 					name: '试吃羊肉一份',
-					value: '6', 
+					value: '6'
 				},
 				{
 					name: '试吃牛肉一份',
-					value: '7', 
+					value: '7'
 				},
 				{
 					name: '试吃小野菜一份',
-					value: '8', 
+					value: '8'
 				},
 				{
 					name: '优惠卷20元',
-					value: '9', 
+					value: '9'
 				},
 				{
 					name: '优惠卷50元',
-					value: '10', 
+					value: '10'
 				}
 			],
 			width: 0,
 			animationData: {},
 			btnDisabled: '',
-			showGuize:true
+			showGuize: true,
+
+			timer: null
 		};
 	},
 	onLoad: function() {
 		// 获取奖品列表
 		this.width = 360 / this.list.length;
 	},
+	onUnload() {
+		if (this.timer) {
+			console.log('卸载');
+			clearTimeout(this.timer);
+		}
+	},
+
 	methods: {
 		animation(index, duration) {
 			//中奖index
@@ -116,9 +124,8 @@ export default {
 			let index = 1;
 			let duration = 4000;
 			this.animation(index, duration);
-
-			setTimeout(() => {
-				uni.showModal({ content: this.list[index].name   });
+			this.timer = setTimeout(() => {
+				uni.showModal({ content: this.list[index].name });
 				this.btnDisabled = '';
 				// document.getElementById('zhuanpano').style=''
 			}, duration + 1000);
@@ -329,12 +336,12 @@ image.caidai {
 
 .guize .title {
 	text-align: center;
-	margin-bottom: 28upx; 
+	margin-bottom: 28upx;
 	width: 50%;
 	border: 1rpx solid #c5c2c6;
 	padding: 10px 0px;
 }
-.guize .title.select{
+.guize .title.select {
 	color: red;
 }
 
