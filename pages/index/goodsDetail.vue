@@ -1,7 +1,7 @@
 <template>
 	<view class="goodsDetail">
 		<swiper class="banner_sw" :indicator-dots="false" :autoplay="true" :interval="3000" :duration="1000">
-			<swiper-item v-for="(item, index) in goodsInfo.bannerList" :key="index"><image :src="item.src" mode="scaleToFill"></image></swiper-item>
+			<swiper-item v-for="(item, index) in goodsInfo.bannerList" :key="index"><image :src="item.src" mode="aspectFill"></image></swiper-item>
 		</swiper>
 		<view class="infobox bg-white ">
 			<view style="padding: 30rpx;">

@@ -62,7 +62,7 @@ export default {
 		userAgreement() {
 			this.showLoading();
 			this.request({
-				url: '/appUserAgreement/find',
+				url: '',
 				data: {},
 				success: res => {
 					uni.hideLoading();
@@ -107,7 +107,7 @@ export default {
 				}
 				this.showLoading();
 				this.request({
-					url: '/appLogin/saveUser',
+					url: '',
 					data: {
 						account: this.formData.phone,
 						phone: this.formData.phone,
@@ -142,7 +142,7 @@ export default {
 			}
 			this.showLoading();
 			this.request({
-				url: '/appLogin/sendVerifyNum',
+				url: '',
 				data: {
 					phone: this.formData.phone
 				},

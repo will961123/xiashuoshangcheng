@@ -13,10 +13,10 @@ Vue.component('will-mc', willMc);
 
 Vue.prototype.imgUrl = 'imgUrl'
 // #ifdef H5
-Vue.prototype.apiUrl = '/suomu'
+Vue.prototype.apiUrl = '/xiashuo'
 // #endif
 // #ifndef H5
-Vue.prototype.apiUrl = 'http://192.168.0.123:8080/suomu'
+Vue.prototype.apiUrl = 'http://192.168.1.1:8080/xiashuo'
 // #endif
 
 // #ifdef MP-WEIXIN

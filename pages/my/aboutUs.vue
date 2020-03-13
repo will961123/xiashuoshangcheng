@@ -34,7 +34,7 @@ export default {
 		getAboutUs() {
 			this.showLoading();
 			this.request({
-				url: '/appAbout/find',
+				url: '',
 				data: {},
 				success: res => {
 					console.log('关于我们', res);
@@ -48,7 +48,7 @@ export default {
 
 		findContact() {
 			this.request({
-				url: '/appcontact/findContact',
+				url: '',
 				data: {},
 				success: res => {
 					console.log('联系方式', res);
