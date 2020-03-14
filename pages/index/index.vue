@@ -56,9 +56,9 @@
 				<image class="bgimg" src="/static/hotgoods.png" mode=""></image>
 				精品展示
 			</view>
-			<!-- <view class="listbox  flex justify-between">
+			<view class="listbox  flex justify-between">
 				<view @click="gotoDetail(item.id)" class="item" v-for="(item, index) in hootGoods" :key="index">
-					<image :src="item.smallPic" mode="widthFix"></image>
+					<image :src="item.smallPic" style="border-radius: 14rpx;" mode="aspectFill"></image>
 					<view class="title textov2">{{ item.name }}</view>
 					<view class="moneybox flex justify-between align-center">
 						<view class="money ">
@@ -69,27 +69,27 @@
 						<view class="num">销量:{{ item.saleNum }}</view>
 					</view>
 				</view>
-			</view> -->
-			<view class="listbox2 ">
+			</view>
+			<!-- <view class="listbox2 ">
 				<view @click="gotoDetail(item.id)" class="item flex" v-for="(item, index) in hootGoods" :key="index">
 					<image :src="item.smallPic" mode="widthFix"></image>
 					<view class="flex flex-direction justify-between" style="flex: 1;">
 						<view class="title textov2">{{ item.name }}</view>
-						<!-- <view class="typeBox flex">
+						<view class="typeBox flex">
 							<view class="typeName">折扣</view>
 							<view class="typeName">保真</view>
-						</view> -->
+						</view>
 						<view class="moneybox flex justify-between align-center"  >
 							<view class="money ">
 								<text>￥</text>
 								{{ item.price }}
-								<!-- <text class="oldMoney">￥123</text> -->
+								<text class="oldMoney">￥123</text>
 							</view>
 							<view class="num">销量:{{ item.saleNum }}</view>
 						</view>
 					</view>
 				</view>
-			</view>
+			</view> -->
 		</view>
 
 		<!-- #ifdef MP-WEIXIN -->
@@ -147,7 +147,15 @@ export default {
 		// this.getHotGoods();
 		// this.getActivity();
 		// this.getCategoryList();
-		// this.findNoticeBySysCode()
+		// this.findNoticeBySysCode() 
+			
+		this.request({
+			url:'/',
+			data:{},
+			success:res=>{
+				console.log(res)
+			}
+		})
 	},
 	onReachBottom() {
 		// this.getHotGoods();

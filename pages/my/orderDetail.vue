@@ -46,7 +46,7 @@
 		</view>
 
 		<view class="btnList bg-white flex justify-end align-center flex-wrap">
-			<button @click="contactUs" class="btn bg-white cu-btn">联系卖家</button>
+			<!-- <button @click="contactUs" class="btn bg-white cu-btn">联系卖家</button> -->
 			<button @click="cancelOrder" v-if="order.state === 1" class="btn bg-white cu-btn">取消订单</button>
 			<button @click="payment" v-if="order.state === 1" class="btn bg-white cu-btn selectbtn">确认付款</button>
 			<button @click="refund" v-if="order.state === 2" class="btn bg-white cu-btn">退款</button>

@@ -41,7 +41,7 @@
 								<!-- <text v-else style="color: #f23030;">积分：{{ item.price }}</text> -->
 							</view>
 							<view class="btnList flex justify-end flex-wrap">
-								<button @click="contactUs" v-if="item.state < 4" class="btn bg-white cu-btn">联系卖家</button>
+								<!-- <button @click="contactUs" v-if="item.state < 4" class="btn bg-white cu-btn">联系卖家</button> -->
 								<button @click="cancelOrder" :data-item="item" v-if="item.state === 1" class="btn bg-white cu-btn">取消订单</button>
 								<button @click="payment" :data-item="item" v-if="item.state === 1" class="btn bg-white cu-btn">确认付款</button>
 								<button @click="refund" :data-item="item" v-if="item.state === 2" class="btn bg-white cu-btn">退款</button>

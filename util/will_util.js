@@ -1,5 +1,15 @@
 import Vue from 'vue'
 import App from '@/App'
+
+Vue.prototype.isLoad = function() {
+	// #ifdef MP-WEIXIN
+	if (!uni.getStorageSync('userInfo')) {
+		return false
+	} else {
+		return true
+	}
+	// #endif
+}
 // 请求
 Vue.prototype.request = function(obj) {  
 	var header = obj.header || {}
