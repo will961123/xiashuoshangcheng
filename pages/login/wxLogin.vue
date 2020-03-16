@@ -21,7 +21,9 @@
 </template>
 
 <script>
+	// import willMc from '../../components/will_mc/will_mc.vue'
 export default {
+	 
 	data() {
 		return {
 			showGetAuthor: true,

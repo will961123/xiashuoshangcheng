@@ -71,6 +71,10 @@
 				<!-- <text @click="choosePayStyle" v-if="goodslist[0].hot != 4">{{ payStyle === 1 ? '微信支付' : payStyle === 2 ? '支付宝支付' : '余额支付' }}</text> -->
 				<!-- <text v-else>{{ '积分支付' }}</text> -->
 			</view>
+			<view @click="showCounpAnimation" class="payStyle flex justify-between align-center">
+				优惠卷
+				<text>{{ selectCounopIdx > -1 ? '选择了第' + selectCounopIdx + '个' : '请选择' }}</text>
+			</view>
 			<view class="goodslist">
 				<view v-for="(item, index) in goodslist" :key="index" class="item flex">
 					<image :src="item.productPic" mode="aspectFill"></image>
@@ -117,6 +121,27 @@
 			<view v-else class="tot btn bg-white">积分：{{ allPrice }}</view>
 			<button @click="saveOrder" class="buynow btn cu-btn">立即购买</button>
 		</view>
+
+		<will-mc @mcClick="closeAnimation" v-if="showCounp" style="padding: 0;">
+			<view :animation="animationData" class="mcCountBox">
+				<scroll-view scroll-y="true" class="mcScrollView">
+					<view v-for="(item, index) in 10" :key="index" class="item flex bg-red justify-between align-center">
+						<view class="moneyBox">
+							<view class="money">￥15</view>
+							<view class="needMoney">满50元可用</view>
+						</view>
+						<view class="infoBox">
+							<view class="name">平台满减卷</view>
+							<view class="endTime">2020-03-16日到期</view>
+						</view>
+						<view class="selectBox">
+							<label class="radio" @click="changeRadio(index)"><radio :checked="selectCounopIdx === index" color="black" value="" /></label>
+						</view>
+					</view>
+				</scroll-view>
+				<button @click="closeAnimation" class="btn cu-btn ">关闭</button>
+			</view>
+		</will-mc>
 	</view>
 </template>
 
@@ -135,7 +160,11 @@ export default {
 			assemble: {},
 			assembleByself: false,
 
-			buyType: 1 // 1 普通 2 参与拼团 3 发起拼团 4 会员领取 5分享领取
+			buyType: 1, // 1 普通 2 参与拼团 3 发起拼团 4 会员领取 5分享领取
+
+			showCounp: false,
+			animationData: {},
+			selectCounopIdx: -1
 		};
 	},
 	onLoad(options) {
@@ -158,6 +187,7 @@ export default {
 			this.assembleByself = true;
 			console.log('发起拼团');
 		}
+		this.animationShow();
 	},
 	onShow() {
 		// let addressInfo = uni.getStorageSync('addressInfo');
@@ -173,6 +203,35 @@ export default {
 		}
 	},
 	methods: {
+		changeRadio(idx) {
+			if (this.selectCounopIdx === Number(idx)) {
+				this.selectCounopIdx = -1;
+				console.log(1)
+			} else {
+				console.log(2)
+				this.selectCounopIdx = Number(idx);
+			}
+		},
+		closeAnimation() {
+			this.showCounp = false;
+		},
+		showCounpAnimation() {
+			this.showCounp = true;
+			this.animationShow();
+		},
+		animationShow() {
+			var animation = uni.createAnimation({
+				duration: 600,
+				timingFunction: 'ease',
+				delay: 0
+			});
+			animation.bottom('-70%').step();
+			this.animationData = animation.export();
+			setTimeout(() => {
+				animation.bottom(0).step();
+				this.animationData = animation.export();
+			}, 200);
+		},
 		saveOrder() {
 			if (!this.addressInfo) {
 				this.showToast('请选择地址');
@@ -540,6 +599,45 @@ export default {
 				font-size: 32rpx;
 				letter-spacing: 2rpx;
 				color: #ffffff;
+			}
+		}
+	}
+
+	.mcCountBox {
+		width: 100%;
+		height: 55%;
+		background: white;
+		position: absolute;
+		// left: 0; 
+		.btn {
+			background-image: linear-gradient(-90deg, #ff585f 0%, #ff826a 100%);
+			width: calc(100% - 60rpx);
+			height: 45px;
+			font-size: 34rpx;
+			color: #fff;
+			font-weight: 700;
+		}
+	}
+	.mcScrollView {
+		height: calc(100% - 50px);
+		padding: 10px 30rpx;
+		// height: 50%;
+		width: 100%;
+		.item {
+			padding: 8px 16rpx;
+			border-radius: 8rpx;
+			margin-bottom: 14px;
+			.moneyBox {
+				.money {
+					font-size: 24px;
+					font-weight: 700;
+				}
+			}
+			.infoBox {
+				.endTime {
+					color: #999;
+					margin-top: 8px;
+				}
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 <template>
-	<view class="tc_mc" :catchtouchmove="false"><slot ></slot></view>
+	<view @click.self="mcClick" class="tc_mc" :catchtouchmove="false"><slot ></slot></view>
 </template>
 
 <script>
@@ -7,7 +7,11 @@ export default {
 	data() {
 		return {};
 	},
-	methods: {}
+	methods: {
+		mcClick(){
+			this.$emit('mcClick')
+		}
+	}
 };
 </script>
 
