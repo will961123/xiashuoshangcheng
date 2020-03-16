@@ -15,7 +15,7 @@ Vue.component('will-mc', willMc);
 Vue.config.productionTip = false
 
 App.mpType = 'app'
-
+ 
 
 
 const app = new Vue({
