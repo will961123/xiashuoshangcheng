@@ -1,7 +1,7 @@
 <template>
 	<view class="goodsDetail">
 		<swiper class="banner_sw" :indicator-dots="false" :autoplay="true" :interval="3000" :duration="1000">
-			<swiper-item v-for="(item, index) in goodsInfo.bannerList" :key="index"><image :src="item.src" mode="aspectFill"></image></swiper-item>
+			<swiper-item v-for="(item, index) in goodsInfo.images" :key="index"><image :src="item" mode="aspectFill"></image></swiper-item>
 		</swiper>
 		<view class="infobox bg-white ">
 			<view style="padding: 30rpx;">
@@ -10,9 +10,9 @@
 					<view class="">
 						￥
 						<text class="money">{{ goodsInfo.price }}</text>
-						<text class="showmoney">￥{{ goodsInfo.showPrice }}</text>
+						<text class="showmoney">￥{{ goodsInfo.mark_price }}</text>
 					</view>
-					<view class="kd" style="color: #999;">销量：{{ goodsInfo.saleNum }}</view>
+					<view class="kd" style="color: #999;">销量：{{ goodsInfo.sale_num }}</view>
 				</view>
 				<!-- <view v-if="goodsInfo.hot != 4" class="moneybox">
 					￥
@@ -92,7 +92,8 @@
 			<view @click="titType = 1" :class="titType === 1 ? 'tit titselect' : 'tit'" style="flex: 1;">图文详情</view>
 			<view @click="titType = 2" :class="titType === 2 ? 'tit titselect' : 'tit'" style="flex: 1;">商品评价</view>
 		</view>
-		<rich-text v-if="titType === 1" :nodes="goodsInfo.details | replaceImgStr"></rich-text>
+		<!-- <rich-text v-if="titType === 1" :nodes="goodsInfo.details | replaceImgStr"></rich-text> -->
+		<view class="detailImgbox" v-if="titType === 1"><image v-for="(item, index) in goodsInfo.detail_image" :key="index" :src="item" mode="widthFix"></image></view>
 		<view v-else class="pingjiaList">
 			<view class="item">
 				<view class="userbox flex align-center">
@@ -143,13 +144,13 @@
 			<view class="cu-dialog bg-white" @click.stop="" v-show="goodsInfo">
 				<view style="padding: 0 30rpx;">
 					<view class="specinfo flex ">
-						<image :src="spaceIndex > -1 ? goodsInfo.specList[spaceIndex].picture : goodsInfo.smallPic" mode="aspectFill"></image>
-						<view class="monrybox flex flex-direction justify-end">
+						<image :src="spaceIndex > -1 ? goodsInfo.specList[spaceIndex].picture : goodsInfo.picture" mode="aspectFill"></image>
+						<view class="monrybox flex flex-direction justify-between">
 							<view class="money">
 								￥
 								<text>{{ spaceIndex > -1 ? goodsInfo.specList[spaceIndex].price : goodsInfo.price }}</text>
 							</view>
-							<view class="kc">销量999件</view>
+							<view class="kc">销量{{ goodsInfo.sale_num }}件</view>
 						</view>
 					</view>
 					<!-- <view class="specList">
@@ -190,31 +191,32 @@
 export default {
 	data() {
 		return {
-			goodsInfo: {
-				bannerList: [
-					{
-						src: '/static/aboutusbg.png'
-					}
-				],
-				productId: 1,
-				smallPic: '/static/goods.jpg',
-				name: '商品1',
-				price: 100,
-				showPrice: 999,
-				stock: 123,
-				saleNum: 233,
-				hot: 1,
-				specList: [
-					{
-						picture: '/static/banner.png',
-						name: '规格1',
-						price: 30,
-						id: 2333
-					}
-				],
-				details: '<p>富文本</p>',
-				canGetShareGoods: false
-			},
+			goodsInfo: {},
+			// goodsInfo: {
+			// 	bannerList: [
+			// 		{
+			// 			src: '/static/aboutusbg.png'
+			// 		}
+			// 	],
+			// 	productId: 1,
+			// 	smallPic: '/static/goods.jpg',
+			// 	name: '商品1',
+			// 	price: 100,
+			// 	showPrice: 999,
+			// 	stock: 123,
+			// 	saleNum: 233,
+			// 	hot: 1,
+			// 	specList: [
+			// 		{
+			// 			picture: '/static/banner.png',
+			// 			name: '规格1',
+			// 			price: 30,
+			// 			id: 2333
+			// 		}
+			// 	],
+			// 	details: '<p>富文本</p>',
+			// 	canGetShareGoods: false
+			// },
 			evaluate: [
 				{
 					userPic: '/static/headerpic.png',
@@ -273,7 +275,7 @@ export default {
 		this.searchUserId && AddsearchNum();
 		console.log('1 普通商品 2团购 3会员 4分享领取---', this.goodsType);
 
-		// this.getGoodsDetail();
+		this.getGoodsDetail();
 		// this.findCommentByProductId();
 		// this.saveFootMark();
 	},
@@ -368,7 +370,7 @@ export default {
 					checkState: true,
 					productId: this.goodsId,
 					productName: this.goodsInfo.name,
-					productPic: this.goodsInfo.smallPic,
+					productPic: this.goodsInfo.picture,
 					price: Number(this.goodsInfo.price),
 					number: this.spaceNum,
 					total: Number(this.goodsInfo.price) * Number(this.spaceNum)
@@ -380,12 +382,11 @@ export default {
 			this.showSpec = false;
 			let url = '/pages/index/confirmOrder?from=1&goodslist=' + JSON.stringify(goodslist);
 			// buyType 1普通 2参与拼图 3发起拼图 4会员 5分享
-			if(buyType === 1){
+			if (buyType === 1) {
 				uni.navigateTo({
 					url: url
 				});
-			}
-			else if (buyType === 2) {
+			} else if (buyType === 2) {
 				url = '/pages/index/confirmOrder?from=1&goodslist=' + JSON.stringify(goodslist) + '&buyType=2' + '&assemble=' + JSON.stringify(assemble);
 				uni.navigateTo({
 					url: url
@@ -526,16 +527,21 @@ export default {
 		getGoodsDetail() {
 			this.showLoading();
 			this.request({
-				url: '/appProduct/findProductById',
-				data: {
-					id: this.goodsId,
-					userId: uni.getStorageSync('userInfo').userId || ''
-				},
+				url: '/product/productShow/' + this.goodsId,
+				data: {},
 				success: res => {
 					console.log('商品详情', res);
 					uni.hideLoading();
-					if (res.data.returnCode === 1) {
-						this.goodsInfo = Object.assign({}, this.goodsInfo, res.data.obj);
+					if (res.data.status === 1) {
+						res.data.product_info.images = res.data.product_info.images.map(i => {
+							return res.data.image_url + i;
+						});
+						res.data.product_info.detail_image = res.data.product_info.detail_image.map(i => {
+							return res.data.image_url + i;
+						});
+						res.data.product_info.picture = res.data.image_url + res.data.product_info.picture;
+						this.goodsInfo = res.data.product_info;
+						// this.goodsInfo = Object.assign({}, this.goodsInfo, res.data.obj);
 					}
 				}
 			});
@@ -779,6 +785,15 @@ export default {
 		.titselect {
 			color: #ff7f69;
 			border-bottom: 1rpx solid #ff7f69;
+		}
+	}
+	.detailImgbox {
+		width: 100%;
+
+		font-size: 0;
+		& > image {
+			width: 100%;
+			display: inline-block;
 		}
 	}
 	.pingjiaList {

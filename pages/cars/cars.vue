@@ -46,7 +46,7 @@ export default {
 			selectEvery: false,
 			goodsList: [
 				{
-					productId: 1,
+					productId: 22,
 					product: {
 						name: '商品1',
 						smallPic: '/static/goods.jpg'
@@ -62,7 +62,7 @@ export default {
 					id: 233
 				},
 				{
-					productId: 1,
+					productId: 33,
 					product: {
 						name: '商品1',
 						smallPic: '/static/goods.jpg'

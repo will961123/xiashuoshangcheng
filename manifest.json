@@ -77,7 +77,7 @@
 			"disableHostCheck": true,
 			"proxy": {
 				"/h5api": {
-					"target": "http://pan.1688qds.com/wap/test",
+					"target": "http://pan.1688qds.com/wap",
 					"changeOrigin": true,
 					"secure": false,
 					"pathRewrite": {

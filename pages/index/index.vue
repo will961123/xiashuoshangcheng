@@ -11,7 +11,7 @@
 		</view> -->
 
 		<swiper class="screen-swiper square-dot" :indicator-dots="true" :autoplay="true">
-			<swiper-item v-for="(item, index) in swiperList" :key="index"><image :src="item.url" mode="aspectFill"></image></swiper-item>
+			<swiper-item v-for="(item, index) in swiperList" :key="index"><image :src="item" mode="aspectFill"></image></swiper-item>
 		</swiper>
 
 		<!-- <view style="padding:  0 30rpx; " class="bg-white">
@@ -58,15 +58,15 @@
 			</view>
 			<view class="listbox  flex justify-between">
 				<view @click="gotoDetail(item.id)" class="item" v-for="(item, index) in hootGoods" :key="index">
-					<image :src="item.smallPic" style="border-radius: 14rpx;" mode="aspectFill"></image>
+					<image :src="item.picture" style="border-radius: 14rpx;" mode="aspectFill"></image>
 					<view class="title textov2">{{ item.name }}</view>
 					<view class="moneybox flex justify-between align-center">
 						<view class="money ">
 							<text>￥</text>
 							{{ item.price }}
-							<text class="oldMoney">￥123</text>
+							<text class="oldMoney">￥{{ item.mark_price }}</text>
 						</view>
-						<view class="num">销量:{{ item.saleNum }}</view>
+						<view class="num">销量:{{ item.sale_num }}</view>
 					</view>
 				</view>
 			</view>
@@ -110,7 +110,7 @@ export default {
 	data() {
 		return {
 			search: '',
-			swiperList: [{ url: '/static/aboutusbg.png' }, { url: '/static/aboutusbg.png' }],
+			swiperList: [],
 			noticeList: [{ content: '公告1' }, { content: '公告2' }],
 			cuIconList: [
 				{ name: '免费试吃>', pic: '/static/indexicon1.png' },
@@ -123,39 +123,18 @@ export default {
 			// cuIconList: ['免费试吃', '超级团购', '幸运转盘', '会员投稿', '视频', '文章'],
 			offset: 1,
 			hootGoods: [
-				{
-					smallPic: '/static/goods.jpg',
-					name: '热门1',
-					price: 100,
-					saleNum: 999,
-					id: 1
-				},
-				{
-					smallPic: '/static/goods.jpg',
-					name: '热门2',
-					price: 80,
-					saleNum: 99,
-					id: 2
-				}
+				// { smallPic: '/static/goods.jpg', name: '热门1', price: 100, saleNum: 999, id: 1 }
 			],
 			showGetAuthor: false,
 			userInfo: {}
 		};
 	},
 	onLoad() {
-		// this.getSwiperList();
-		// this.getHotGoods();
+		this.getSwiperList();
+		this.getHotGoods();
 		// this.getActivity();
 		// this.getCategoryList();
-		// this.findNoticeBySysCode() 
-			
-		this.request({
-			url:'/',
-			data:{},
-			success:res=>{
-				console.log(res)
-			}
-		})
+		// this.findNoticeBySysCode()
 	},
 	onReachBottom() {
 		// this.getHotGoods();
@@ -189,7 +168,7 @@ export default {
 					url = '/pages/index/Integral?type=' + 1;
 					break;
 				case 1:
-					url = '/pages/index/groupPurchase'  ;
+					url = '/pages/index/groupPurchase';
 					break;
 				case 2:
 					url = '/pages/index/luckDraw';
@@ -241,12 +220,14 @@ export default {
 		},
 		getSwiperList() {
 			this.request({
-				url: '',
+				url: '/index/index',
 				data: {},
 				success: res => {
 					console.log('轮播图', res);
-					if (res.data.returnCode === 1) {
-						this.swiperList = res.data.list;
+					if (res.data.status === 1) {
+						this.swiperList = res.data.head_images_list.map(i => {
+							return res.data.image_url + i;
+						});
 					}
 				}
 			});
@@ -264,18 +245,19 @@ export default {
 		},
 
 		getHotGoods() {
+			this.showLoading()
 			this.request({
-				url: '',
-				data: {
-					offset: this.offset,
-					limit: 10,
-					hot: 1
-				},
-				success: res => {
+				url: '/index/productRecommendList',
+				data: {},
+				success: res => { 
 					console.log('查询热门商品', res);
-					if (res.data.returnCode === 1) {
-						this.offset += 1;
-						this.hootGoods.push(...res.data.list);
+					uni.hideLoading()
+					if (res.data.status === 1) {
+						res.data.product_recommend_list = res.data.product_recommend_list.map(i => {
+							i.picture = res.data.image_url + i.picture;
+							return i;
+						}); 
+						this.hootGoods.push(...res.data.product_recommend_list);
 					}
 				}
 			});
@@ -444,14 +426,14 @@ page {
 				.title {
 					font-size: 26rpx;
 					line-height: 36rpx;
-					color: #000000; 
+					color: #000000;
 				}
-				.typeBox{
-					.typeName{
+				.typeBox {
+					.typeName {
 						line-height: 36rpx;
 						padding: 0 6px;
-						border: 1px solid #A7A7A7;
-						color: #A7A7A7;
+						border: 1px solid #a7a7a7;
+						color: #a7a7a7;
 						font-size: 22rpx;
 						text-align: center;
 						margin-right: 8px;
@@ -459,7 +441,7 @@ page {
 				}
 				.moneybox {
 					.money {
-						color: #FF6060;
+						color: #ff6060;
 						font-size: 32rpx;
 						& > text {
 							font-size: 20rpx;

@@ -15,42 +15,44 @@
 					<view v-for="(item, index) in orderList[swiperindex]" :key="index" :class="{ nomargin: index === orderList[swiperindex].length - 1 }" class="item bg-white">
 						<view class="datebox flex justify-between">
 							<view>{{ item.date }}</view>
-							<view class="tip">{{ typelist[item.state - 1] }}</view>
+							<view v-if="item.order_status!=-1" class="tip">{{ typelist[item.order_status - 1] }}</view>
+							<view v-else   class="tip">{{ item.is_back===1?'申请退款':'退款完成' }}</view>
 						</view>
 						<view class="goodsinfoBox">
-							<view @click="gotoOrderDetail(item)" class="goods flex" v-for="(goods, goodsindex) in item.pro_list" :key="goodsindex">
-								<view class="imgbox"><image :src="item.productPic" mode="aspectFill"></image></view>
+							<view @click="gotoOrderDetail(item)" class="goods flex" v-for="(goods, goodsindex) in item.product_order_list" :key="goodsindex">
+								<view class="imgbox"><image :src="goods.product_image" mode="aspectFill"></image></view>
 								<view class="infobox flex flex-direction justify-between">
 									<view class="info">
-										<view class="tetov1">{{ goods.productName }}</view>
+										<view class="tetov1">{{ goods.product_name }}</view>
 										<!-- <view class="gg">规格：{{ goods.productSpecName }}</view> -->
 									</view>
 									<view class="moneybox flex justify-between">
-										<view class="money">￥{{ goods.price }}</view>
+										<view class="money">￥{{ goods.product_price }}</view>
 										<!-- <view v-if="item.orderType !== 5" class="money">￥{{ goods.price }}</view> -->
 										<!-- <view v-else class="money">积分：{{ goods.price }}</view> -->
-										<view class="num">×{{ goods.number }}</view>
+										<view class="num">×{{ goods.product_num }}</view>
 									</view>
 								</view>
 							</view>
 							<view class="totalbox">
-								共{{ item.pro_list.length }}件商品
+								共{{ item.product_order_list | getGoodsNum }}件商品
 								<text style="margin: 0 22rpx;">合计:</text>
-								<text style="color: #f23030;">￥{{ item.price }}</text>
+								<text style="color: #f23030;">￥{{ item.total_money }}</text>
 								<!-- <text v-if="item.orderType !== 5" style="color: #f23030;">￥{{ item.price }}</text> -->
 								<!-- <text v-else style="color: #f23030;">积分：{{ item.price }}</text> -->
 							</view>
 							<view class="btnList flex justify-end flex-wrap">
 								<!-- <button @click="contactUs" v-if="item.state < 4" class="btn bg-white cu-btn">联系卖家</button> -->
-								<button @click="cancelOrder" :data-item="item" v-if="item.state === 1" class="btn bg-white cu-btn">取消订单</button>
-								<button @click="payment" :data-item="item" v-if="item.state === 1" class="btn bg-white cu-btn">确认付款</button>
-								<button @click="refund" :data-item="item" v-if="item.state === 2" class="btn bg-white cu-btn">退款</button>
-								<button @click="receipt" :data-item="item" v-if="item.state === 3" class="btn bg-white cu-btn">确认收货</button>
-								<button @click="gotoEvaluate" :data-item="JSON.stringify(item)" v-if="item.state === 4" class="btn bg-white cu-btn">去评价</button>
+								<button @click="cancelOrder" :data-item="JSON.stringify(item)" v-if="item.order_status === 1" class="btn bg-white cu-btn">取消订单</button>
+								<button @click="payment" :data-item="JSON.stringify(item)" v-if="item.order_status === 1" class="btn bg-white cu-btn">确认付款</button>
+								<button @click="refund" :data-item="JSON.stringify(item)" v-if="item.order_status === 2" class="btn bg-white cu-btn">退款</button>
+								<button @click="receipt" :data-item="JSON.stringify(item)" v-if="item.order_status === 3" class="btn bg-white cu-btn">确认收货</button>
+								<button @click="gotoEvaluate" :data-item="JSON.stringify(item)" v-if="item.order_status === 4" class="btn bg-white cu-btn">去评价</button>
 								<!-- <button @click="changeOrderType2" :data-item="item" v-if="item.state === 5" class="btn bg-white cu-btn">改成待评价</button> -->
 							</view>
 						</view>
 					</view>
+					<view v-if="!orderList[swiperindex].length && canshowNoData" style="padding-top: 40%;"><will-nodata></will-nodata></view>
 				</scroll-view>
 			</swiper-item>
 		</swiper>
@@ -65,166 +67,8 @@ export default {
 			typelist: ['等待买家付款', '等待卖家发货', '卖家已发货', '待评价', '已完成'],
 			type: 0,
 			offser: 1,
-			orderList: [
-				[
-					{
-						productPic: '/static/goods.jpg',
-						price: 400,
-						state: 1,
-						id:'23333',
-						date:"2020-03-06 22:30:31",
-						pro_list: [
-							{ productName: '商品2', productSpecName: '规格1', price: 100,productPic: '/static/goods.jpg', number: 2 },
-							{ productName: '商品2', productSpecName: '规格1', price: 100, productPic: '/static/goods.jpg',number: 2 }
-						],
-						receiver: '收货人',
-						phone: 159999999,
-						province: '河南省',
-						city: '漯河市',
-						area: '郾城区',
-						address: '黄河西路'
-					},
-					{
-						productPic: '/static/goods.jpg',
-						price: 200,
-						state: 2,
-						id:'23333',
-						date:"2020-03-06 22:30:31",
-						receiver: '收货人',
-						phone: 159999999,
-						province: '河南省',
-						city: '漯河市',
-						area: '郾城区',
-						address: '黄河西路',
-						pro_list: [{ productName: '商品2', productSpecName: '规格1', price: 100,productPic: '/static/goods.jpg', number: 2 }]
-					},
-					{
-						productPic: '/static/goods.jpg',
-						price: 200,
-						state: 3,
-						id:'23333',
-						date:"2020-03-06 22:30:31",
-						receiver: '收货人',
-						phone: 159999999,
-						province: '河南省',
-						city: '漯河市',
-						area: '郾城区',
-						address: '黄河西路',
-						pro_list: [{ productName: '商品2', productSpecName: '规格1', price: 100, productPic: '/static/goods.jpg',number: 2 }]
-					},
-					{
-						productPic: '/static/goods.jpg',
-						price: 200,
-						state: 4,
-						date:"2020-03-06 22:30:31",
-						id:'23333',
-						receiver: '收货人',
-						phone: 159999999,
-						province: '河南省',
-						city: '漯河市',
-						area: '郾城区',
-						address: '黄河西路',
-						pro_list: [{ productName: '商品2', productSpecName: '规格1', price: 100, productPic: '/static/goods.jpg',number: 2 }]
-					},
-					{
-						productPic: '/static/goods.jpg',
-						price: 200,
-						state: 5,
-						date:"2020-03-06 22:30:31",
-						id:'23333',
-						receiver: '收货人',
-						phone: 159999999,
-						province: '河南省',
-						city: '漯河市',
-						area: '郾城区',
-						address: '黄河西路',
-						pro_list: [{ productName: '商品2', productSpecName: '规格1', price: 100, productPic: '/static/goods.jpg',number: 2 }]
-					}
-				],
-				[
-					{
-						productPic: '/static/goods.jpg',
-						price: 400,
-						state: 1,
-						date:"2020-03-06 22:30:31",
-						id:'23333',
-						receiver: '收货人',
-						phone: 159999999,
-						province: '河南省',
-						city: '漯河市',
-						area: '郾城区',
-						address: '黄河西路',
-						pro_list: [
-							{ productName: '商品2', productSpecName: '规格1', price: 100, productPic: '/static/goods.jpg',number: 2 },
-							{ productName: '商品2', productSpecName: '规格1', price: 100, productPic: '/static/goods.jpg',number: 2 }
-						]
-					}
-				],
-				[
-					{
-						productPic: '/static/goods.jpg',
-						price: 200,
-						state: 2,
-						id:'23333',
-						date:"2020-03-06 22:30:31",
-						receiver: '收货人',
-						phone: 159999999,
-						province: '河南省',
-						city: '漯河市',
-						area: '郾城区',
-						address: '黄河西路',
-						pro_list: [{ productName: '商品2', productSpecName: '规格1', price: 100, productPic: '/static/goods.jpg',number: 2 }]
-					}
-				],
-				[
-					{
-						productPic: '/static/goods.jpg',
-						price: 200,
-						state: 3,
-						id:'23333',
-						date:"2020-03-06 22:30:31",
-						receiver: '收货人',
-						phone: 159999999,
-						province: '河南省',
-						city: '漯河市',
-						area: '郾城区',
-						address: '黄河西路',
-						pro_list: [{ productName: '商品2', productSpecName: '规格1', price: 100, productPic: '/static/goods.jpg',number: 2 }]
-					}
-				],
-				[
-					{
-						productPic: '/static/goods.jpg',
-						price: 200,
-						state: 4,
-						date:"2020-03-06 22:30:31",
-						id:'23333',
-						receiver: '收货人',
-						phone: 159999999,
-						province: '河南省',
-						city: '漯河市',
-						area: '郾城区',
-						address: '黄河西路',
-						pro_list: [{ productName: '商品2', productSpecName: '规格1', price: 100, productPic: '/static/goods.jpg',number: 2 }]
-					}
-				],
-				[
-					{
-						productPic: '/static/goods.jpg',
-						price: 200,
-						state: 5,
-						id:'23333',
-						date:"2020-03-06 22:30:31",
-						receiver: '收货人',
-						phone: 159999999,
-						province: '河南省',
-						city: '漯河市',
-						area: '郾城区',
-						address: '黄河西路',
-						pro_list: [{ productName: '商品2', productSpecName: '规格1', price: 100, productPic: '/static/goods.jpg',number: 2 }]
-					}
-				]
-			],
+			orderList: [[], [], [], [], []],
+			canshowNoData: false,
 			canPushData: true,
 			offset: 1,
 			contactData: { wxnum: '123', phone: 1599999999 }
@@ -234,8 +78,15 @@ export default {
 		if (option.type) {
 			this.type = Number(option.type);
 		}
-		// this.getOrderList();
+		this.getOrderList();
 		// this.findContact();
+	},
+	filters: {
+		getGoodsNum(e) {
+			return e.reduce((tot, item) => {
+				return (tot += item.product_num);
+			}, 0);
+		}
 	},
 	methods: {
 		// 联系卖家
@@ -264,8 +115,30 @@ export default {
 		},
 		// 取消订单
 		cancelOrder(e) {
-			console.log(e);
-			let item = e.currentTarget.dataset.item;
+			let item = JSON.parse(e.currentTarget.dataset.item);
+			console.log(item);
+			uni.showModal({
+				title: '取消订单',
+				content: '取消后不可恢复。',
+				success: res => {
+					if (res.confirm) {
+						this.showLoading();
+						this.request({
+							url: '/order/delOrder',
+							method: 'post',
+							data: {
+								order_id: item.order_id
+							},
+							success: res => {
+								uni.hideLoading();
+								this.orderList.splice(this.type, 1, []);
+								this.getOrderList();
+								console.log('取消订单', res);
+							}
+						});
+					}
+				}
+			});
 		},
 		// 确认付款
 		payment(e) {
@@ -274,29 +147,71 @@ export default {
 		},
 		// 退款
 		refund(e) {
-			console.log(e);
-			let item = e.currentTarget.dataset.item;
+			let item = JSON.parse(e.currentTarget.dataset.item);
+			console.log(item);
+			uni.showModal({
+				title: '确认退款',
+				content: '确定确认退款吗?',
+				success: res => {
+					if (res.confirm) {
+						this.showLoading();
+						this.request({
+							url: '/order/backGoods',
+							method: 'post',
+							data: {
+								order_id: item.order_id
+							},
+							success: res => {
+								uni.hideLoading();
+								this.orderList.splice(this.type, 1, []);
+								this.getOrderList();
+								console.log('确认退款', res);
+							}
+						});
+					}
+				}
+			});
 		},
 		// 确认收货
 		receipt(e) {
-			console.log(e);
-			let item = e.currentTarget.dataset.item;
+			let item = JSON.parse(e.currentTarget.dataset.item);
+			console.log(item);
+			uni.showModal({
+				title: '确认收货',
+				content: '确定确认收货吗?',
+				success: res => {
+					if (res.confirm) {
+						this.showLoading();
+						this.request({
+							url: '/order/getOrder',
+							method: 'post',
+							data: {
+								order_id: item.order_id
+							},
+							success: res => {
+								uni.hideLoading();
+								this.type =  4
+								this.orderList.splice(this.type, 1, []);
+								this.getOrderList();
+								console.log('确认收货', res);
+							}
+						});
+					}
+				}
+			});
 		},
 		// 去评价
-		gotoEvaluate(e) { 
-			let item = e.currentTarget.dataset.item; 
+		gotoEvaluate(e) {
+			let item = e.currentTarget.dataset.item;
 			uni.navigateTo({
 				url: '/pages/my/addEvaluate?order=' + item
 			});
 		},
 		// 去订单详情
 		gotoOrderDetail(item) {
-			console.log(item);
-			if (item.state > 4) {
-				return;
-			}
+			console.log(item); 
 			uni.navigateTo({
-				url: '/pages/my/orderDetail?order=' + JSON.stringify(item)
+				url: '/pages/my/orderDetail?orderId=' +item.order_id
 			});
 		},
 		changeOrderType2(e) {
@@ -332,48 +247,55 @@ export default {
 			});
 		},
 		getOrderList() {
-			return;
-			let userInfo = uni.getStorageSync('userInfo');
-			if (!userInfo) {
-				this.showToast('请先登录');
-				return;
-			}
+			// let userInfo = uni.getStorageSync('userInfo');
+			// if (!userInfo) {
+			// 	this.showToast('请先登录');
+			// 	return;
+			// }
 			this.showLoading();
 			this.request({
-				url: '',
+				url: '/order/orderList/' + this.type,
 				data: {
-					payUserId: userInfo.userId,
-					state: this.type === 0 ? '' : this.type, //0是全部
-					offset: this.offset,
-					limit: 10,
-					type: this.type
+					// payUserId: userInfo.userId,
+					// state: this.type === 0 ? '' : this.type, //0是全部
+					// offset: this.offset,
+					// limit: 10,
+					// type: this.type
 				},
 				success: res => {
 					console.log('订单列表', res);
+					this.canshowNoData = true;
 					uni.hideLoading();
-					if (res.data.returnCode === 1) {
-						this.offset += 1;
-						this.orderList[this.type].push(...res.data.list);
+					if (res.data.status === 1) {
+						// this.offset += 1;
+						res.data.order_list = res.data.order_list.map(i => {
+							i.product_order_list = i.product_order_list.map(g => {
+								g.product_image = res.data.image_url + g.product_image;
+								return g;
+							});
+							return i;
+						});
+						this.orderList[this.type].push(...res.data.order_list);
 					}
 				}
 			});
 		},
 		scrollBottom() {
 			console.log(this.type);
-			this.getOrderList();
+			// this.getOrderList();
 		},
 		typeChange(type) {
 			this.type = Number(type);
 			this.offset = 1;
-			// this.orderList.splice(this.type, 1, []);
-			// this.getOrderList();
+			this.orderList.splice(this.type, 1, []);
+			this.getOrderList();
 		},
 		swiperChange(e) {
 			if (e.detail.source === 'touch') {
 				this.type = Number(e.detail.current);
 				this.offset = 1;
-				// this.orderList.splice(this.type, 1, []);
-				// this.getOrderList();
+				this.orderList.splice(this.type, 1, []);
+				this.getOrderList();
 			}
 		}
 	}

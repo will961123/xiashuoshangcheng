@@ -1,11 +1,11 @@
 import Vue from 'vue' 
 
-Vue.prototype.imgUrl = 'imgUrl'
+// Vue.prototype.imgUrl = 'imgUrl'
 // #ifdef H5
 Vue.prototype.apiUrl = '/h5api'
 // #endif
 // #ifndef H5
-Vue.prototype.apiUrl = 'http://pan.1688qds.com/wap/test'
+Vue.prototype.apiUrl = 'http://pan.1688qds.com/wap'
 // #endif
 
 // #ifdef MP-WEIXIN

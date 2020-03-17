@@ -71,10 +71,10 @@
 				<!-- <text @click="choosePayStyle" v-if="goodslist[0].hot != 4">{{ payStyle === 1 ? '微信支付' : payStyle === 2 ? '支付宝支付' : '余额支付' }}</text> -->
 				<!-- <text v-else>{{ '积分支付' }}</text> -->
 			</view>
-			<view @click="showCounpAnimation" class="payStyle flex justify-between align-center">
+			<!-- <view @click="showCounpAnimation" class="payStyle flex justify-between align-center">
 				优惠卷
 				<text>{{ selectCounopIdx > -1 ? '选择了第' + selectCounopIdx + '个' : '请选择' }}</text>
-			</view>
+			</view> -->
 			<view class="goodslist">
 				<view v-for="(item, index) in goodslist" :key="index" class="item flex">
 					<image :src="item.productPic" mode="aspectFill"></image>
@@ -92,7 +92,8 @@
 								积分：
 								<text>{{ item.price }}</text>
 							</view>
-							<view class="num">×{{ item.number }}</view>
+							<!-- <view class="num">×{{ item.number }}</view> -->
+							<sunui-stepper class="num" :val="item.number" :min="1" :max="999" @change="stepperChange"></sunui-stepper>
 						</view>
 					</view>
 				</view>
@@ -122,8 +123,8 @@
 			<button @click="saveOrder" class="buynow btn cu-btn">立即购买</button>
 		</view>
 
-		<will-mc @mcClick="closeAnimation" v-if="showCounp" style="padding: 0;">
-			<view :animation="animationData" class="mcCountBox">
+		<will-mc @mcClick="closeAnimation" v-if="showCounp" style="padding: 0 !important;">
+			<view @click.native.stop :animation="animationData" class="mcCountBox">
 				<scroll-view scroll-y="true" class="mcScrollView">
 					<view v-for="(item, index) in 10" :key="index" class="item flex bg-red justify-between align-center">
 						<view class="moneyBox">
@@ -135,7 +136,7 @@
 							<view class="endTime">2020-03-16日到期</view>
 						</view>
 						<view class="selectBox">
-							<label class="radio" @click="changeRadio(index)"><radio :checked="selectCounopIdx === index" color="black" value="" /></label>
+							<label class="radio" @click="changeRadio(index)"><radio :checked="selectCounopIdx === index" :color="'#000000'" value="" /></label>
 						</view>
 					</view>
 				</scroll-view>
@@ -203,12 +204,21 @@ export default {
 		}
 	},
 	methods: {
+		stepperChange(e) {
+			console.log(e);
+			let idx = e.label;
+			let val = e.val;
+			let goodslist = this.goodslist;
+			goodslist[idx].number = val;
+			goodslist[idx].total = goodslist[idx].number * goodslist[idx].price;
+			this.goodslist = goodslist;
+		},
 		changeRadio(idx) {
 			if (this.selectCounopIdx === Number(idx)) {
 				this.selectCounopIdx = -1;
-				console.log(1)
+				console.log(1);
 			} else {
-				console.log(2)
+				console.log(2);
 				this.selectCounopIdx = Number(idx);
 			}
 		},
@@ -242,42 +252,63 @@ export default {
 				return;
 			}
 			let userInfo = uni.getStorageSync('userInfo');
-			if (!userInfo) {
-				this.showToast('请先登录');
-				return;
-			}
-			uni.redirectTo({
-				url: '/pages/index/paymentResult?type=1'
-			});
-			return;
+			// if (!userInfo) {
+			// 	this.showToast('请先登录');
+			// 	return;
+			// }
+
 			let orderType = 2;
+			// let formdata = {
+			// 	payUserId: userInfo.userId,
+			// 	price: this.allPrice,
+			// 	payStyle: this.payStyle, // 支付方式 1微信 2支付宝 3余额
+			// 	state: 1,
+			// 	logisticsType: 1, // 配送方式 1快递
+			// 	receiver: this.addressInfo.name,
+			// 	province: this.addressInfo.province,
+			// 	city: this.addressInfo.city,
+			// 	area: this.addressInfo.area,
+			// 	address: this.addressInfo.province + this.addressInfo.city + this.addressInfo.area + this.addressInfo.address,
+			// 	phone: this.addressInfo.phone,
+			// 	remark: this.message ? this.message : '',
+			// 	orderType: orderType, // 1活动 2普通 3会员 4新人 5积分
+			// 	carts: JSON.stringify(this.goodslist)
+			// };
 			let formdata = {
-				payUserId: userInfo.userId,
-				price: this.allPrice,
-				payStyle: this.payStyle, // 支付方式 1微信 2支付宝 3余额
-				state: 1,
-				logisticsType: 1, // 配送方式 1快递
-				receiver: this.addressInfo.name,
-				province: this.addressInfo.province,
-				city: this.addressInfo.city,
-				area: this.addressInfo.area,
-				address: this.addressInfo.province + this.addressInfo.city + this.addressInfo.area + this.addressInfo.address,
-				phone: this.addressInfo.phone,
-				remark: this.message ? this.message : '',
-				orderType: orderType, // 1活动 2普通 3会员 4新人 5积分
-				carts: JSON.stringify(this.goodslist)
+				product_ids: this.goodslist
+					.map(i => {
+						return i.productId;
+					})
+					.join(','),
+				product_nums: this.goodslist
+					.map(i => {
+						return i.number;
+					})
+					.join(','),
+				consignee: this.addressInfo.userName,
+				phone: this.addressInfo.telNumber,
+				address: this.addressInfo.detailInfo,
+				province_name: this.addressInfo.provinceName,
+				city_name: this.addressInfo.cityName,
+				buy_note: this.message,
+				area_name: this.addressInfo.countyName,
+				is_cart: this.from === 1 ? 0 : 1
 			};
 			this.showLoading();
 			this.request({
-				url: '',
+				url: '/order/addOrder',
+				method: 'POST',
 				data: formdata,
 				success: res => {
-					console.log('生成订单编号', res);
-					if (res.data.returnCode === 1) {
-						this.changeOrderType(res.data.obj.id, 2);
-						this.del();
+					console.log('生成订单编号', res); 
+					if (res.data.status === 1) {
+						uni.redirectTo({
+							url: '/pages/index/paymentResult?type=1'
+						});
+						// this.changeOrderType(res.data.obj.id, 2);
+						// this.del();
 					} else {
-						this.showToast(res.data.returnStr);
+						this.showToast(res.data.info);
 					}
 				}
 			});
@@ -329,12 +360,12 @@ export default {
 		},
 		getWxAddress() {
 			var that = this;
-			wx.getSetting({
+			uni.getSetting({
 				success(res) {
 					console.log(res);
 					if (res.authSetting['scope.address']) {
 						console.log('授权成功');
-						wx.chooseAddress({
+						uni.chooseAddress({
 							success(res) {
 								// console.log(res.userName);
 								// console.log(res.postalCode);
@@ -351,11 +382,11 @@ export default {
 					} else {
 						if (res.authSetting['scope.address'] == false) {
 							console.log('需要打开授权界面');
-							wx.openSetting({
+							uni.openSetting({
 								success(res) {
 									console.log('设置结果', res.authSetting);
 									if (res.authSetting['scope.address']) {
-										wx.chooseAddress({
+										uni.chooseAddress({
 											success(res) {
 												// console.log(res.userName);
 												// console.log(res.postalCode);
@@ -405,6 +436,9 @@ export default {
 </script>
 
 <style lang="scss">
+.tc_mc {
+	padding: 0 !important;
+}
 .confirmOrder {
 	padding-bottom: 126rpx;
 	.topbox {
@@ -608,7 +642,7 @@ export default {
 		height: 55%;
 		background: white;
 		position: absolute;
-		// left: 0; 
+		// left: 0;
 		.btn {
 			background-image: linear-gradient(-90deg, #ff585f 0%, #ff826a 100%);
 			width: calc(100% - 60rpx);
@@ -623,6 +657,7 @@ export default {
 		padding: 10px 30rpx;
 		// height: 50%;
 		width: 100%;
+		border-radius: 10rpx;
 		.item {
 			padding: 8px 16rpx;
 			border-radius: 8rpx;

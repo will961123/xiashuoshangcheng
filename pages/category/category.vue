@@ -26,6 +26,7 @@
 							<text class="cuIcon-title text-green"></text>
 							{{ item.name }}
 						</view>
+						<text @click="gotoCategory(item.id, item.name,2)" style="font-size: 26rpx;margin-right: 15rpx;">查看全部</text>
 					</view>
 					<view class="cu-list menu-avatar">
 						<view class="cu-item2 bg-white " style="height: auto;">
@@ -149,9 +150,9 @@ export default {
 				}
 			});
 		},
-		gotoCategory(id, name) {
+		gotoCategory(id, name,type) {
 			uni.navigateTo({
-				url: '/pages/category/categoryList?id=' + id + '&name=' + name + '&type=2'
+				url: '/pages/category/categoryList?id=' + id + '&name=' + name + '&type='+type
 			});
 		},
 		gotoDetail(id) {

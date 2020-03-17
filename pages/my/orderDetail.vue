@@ -2,38 +2,42 @@
 	<view class="orderDetail">
 		<view class="topbg  flex justify-between align-center">
 			<image class="bg-img" src="/static/orderdetailbg.png"></image>
-			<text style="z-index: 99;" class="text-bold">{{ typelist[Number(order.state) - 1] }}</text>
-			<image v-if="order" :src="'/static/orderdetailtype' + (order.state - 1) + '.png'" mode="aspectFit"></image>
+
+			<text v-if="order.order_status !== -1" style="z-index: 99;" class="text-bold">{{ typelist[Number(order.order_status) - 1] }}</text>
+			<view v-else style="z-index: 99;" class="text-bold">{{ order.is_back === 1 ? '申请退款' : '退款完成' }}</view>
+
+			<image v-if="order && order.order_status != -1" :src="'/static/orderdetailtype' + (order.order_status?order.order_status - 1:1) + '.png'" mode="aspectFit"></image>
+			<image v-if="order && order.order_status == -1" src="/static/orderdetailtype1.png" mode="aspectFit"></image>
 		</view>
 		<view class="uinfo bg-white flex align-center">
 			<image src="/static/addredd.png" mode="widthFix"></image>
 			<view class="infobox">
 				<view class="namebox flex justify-between">
-					<view>收货人：{{ order.receiver }}</view>
+					<view>收货人：{{ order.consignee }}</view>
 					<view>{{ order.phone }}</view>
 				</view>
-				<view class="addressbox">{{ order.province }}-{{ order.city }}-{{ order.area }} {{ order.address }}</view>
+				<view class="addressbox">{{ order.provinceName }}-{{ order.cityName }}-{{ order.areaName }} {{ order.detailInfo }}</view>
 			</view>
 		</view>
 		<view class="goodsinfo bg-white">
-			<view v-for="(item, index) in order.pro_list" :key="index" class="item flex ">
-				<view class="imgbox"><image :src=" item.productPic" mode="aspectFill"></image></view>
+			<view v-for="(item, index) in order.order_product_list" :key="index" class="item flex ">
+				<view class="imgbox"><image :src="item.product_image" mode="aspectFill"></image></view>
 				<view class="rightbox flex flex-direction justify-between">
 					<view class="infobox">
-						<view class="info textov1" style="width: 450rpx;">{{ item.productName }}</view>
+						<view class="info textov1" style="width: 450rpx;">{{ item.product_name }}</view>
 						<!-- <view class="tip">规格：{{ item.productSpecName }}</view> -->
 					</view>
 					<view class="moneybox flex justify-between">
-						<view class="money">￥{{ item.price }}</view>
+						<view class="money">￥{{ item.product_price }}</view>
 						<!-- <view v-if="order.orderType !== 5" class="money">￥{{ item.price }}</view> -->
 						<!-- <view v-else class="money">积分：{{ item.price }}</view> -->
-						<view>×{{ item.number }}</view>
+						<view>×{{ item.product_num }}</view>
 					</view>
 				</view>
 			</view>
 			<view class="totalbox">
 				共计：
-				<text>￥{{ order.price }}</text>
+				<text>￥{{ order.total_money }}</text>
 				<!-- <text v-if="order.orderType !== 5">￥{{ order.price }}</text> -->
 				<!-- <text v-else>积分：{{ order.price }}</text> -->
 			</view>
@@ -45,14 +49,19 @@
 			<view class="item">下单时间：{{ order.date }}</view>
 		</view>
 
-		<view class="btnList bg-white flex justify-end align-center flex-wrap">
-			<!-- <button @click="contactUs" class="btn bg-white cu-btn">联系卖家</button> -->
-			<button @click="cancelOrder" v-if="order.state === 1" class="btn bg-white cu-btn">取消订单</button>
-			<button @click="payment" v-if="order.state === 1" class="btn bg-white cu-btn selectbtn">确认付款</button>
-			<button @click="refund" v-if="order.state === 2" class="btn bg-white cu-btn">退款</button>
-			<button @click="receipt" v-if="order.state === 3" class="btn bg-white cu-btn ">确认收货</button>
-			<button @click="gotoEvaluate" v-if="order.state === 4" class="btn bg-white cu-btn">去评价</button>
+		<view v-if="order.order_status > 3" class="orderinfo bg-white" style="margin-top: 10px;">
+			<view class="item">快递名称： {{ order.express }}</view>
+			<view class="item">快递编号： {{ order.expressNumber }}</view>
 		</view>
+
+		<!-- <view class="btnList bg-white flex justify-end align-center flex-wrap">
+			<button @click="contactUs" class="btn bg-white cu-btn">联系卖家</button>order_id
+			<button @click="cancelOrder" v-if="order.order_status === 1" class="btn bg-white cu-btn">取消订单</button>
+			<button @click="payment" v-if="order.order_status === 1" class="btn bg-white cu-btn selectbtn">确认付款</button>
+			<button @click="refund" v-if="order.order_status === 2" class="btn bg-white cu-btn">退款</button>
+			<button @click="receipt" v-if="order.order_status === 3" class="btn bg-white cu-btn ">确认收货</button>
+			<button @click="gotoEvaluate" v-if="order.order_status === 4" class="btn bg-white cu-btn">去评价</button>
+		</view> -->
 	</view>
 </template>
 
@@ -60,17 +69,38 @@
 export default {
 	data() {
 		return {
-			order: '',
-			typelist: ['等待买家付款', '等待卖家发货', '等待买家收货', '订单详情--待评价']
+			orderId: '',
+			order: {},
+			typelist: ['待付款', '待发货', '待收货', '待评价', '已完成']
 		};
 	},
 	onLoad(options) {
 		if (options.order) {
-			this.order = JSON.parse(options.order);
+			// this.order = JSON.parse(options.order);
+		}
+		if (options.orderId) {
+			this.orderId = options.orderId;
+			this.getOrder();
 		}
 		console.log(this.order);
 	},
 	methods: {
+		getOrder() {
+			this.showLoading();
+			this.request({
+				url: '/order/getOrderOne/' + this.orderId,
+				data: {},
+				success: res => {
+					uni.hideLoading();
+					console.log('订单详情', res);
+					res.data.order_list.order_product_list = res.data.order_list.order_product_list.map(i => {
+						i.product_image = res.data.image_url + i.product_image;
+						return i;
+					});
+					this.order = res.data.order_list;
+				}
+			});
+		},
 		// 联系卖家
 		contactUs() {
 			uni.showActionSheet({
