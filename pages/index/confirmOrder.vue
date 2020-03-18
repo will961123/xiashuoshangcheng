@@ -93,7 +93,7 @@
 								<text>{{ item.price }}</text>
 							</view>
 							<!-- <view class="num">×{{ item.number }}</view> -->
-							<sunui-stepper class="num" :val="item.number" :min="1" :max="999" @change="stepperChange"></sunui-stepper>
+							<sunui-stepper  :label="index" class="num" :val="item.number" :min="1" :max="999" @change="stepperChange"></sunui-stepper>
 						</view>
 					</view>
 				</view>
@@ -208,6 +208,7 @@ export default {
 			console.log(e);
 			let idx = e.label;
 			let val = e.val;
+			console.log('idx:',idx,'val:',val)
 			let goodslist = this.goodslist;
 			goodslist[idx].number = val;
 			goodslist[idx].total = goodslist[idx].number * goodslist[idx].price;
@@ -292,7 +293,7 @@ export default {
 				city_name: this.addressInfo.cityName,
 				buy_note: this.message,
 				area_name: this.addressInfo.countyName,
-				is_cart: this.from === 1 ? 0 : 1
+				is_cart: Number(this.from) === 1 ? 0 : 1
 			};
 			this.showLoading();
 			this.request({

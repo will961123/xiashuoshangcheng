@@ -295,36 +295,37 @@ export default {
 		}
 	},
 	methods: {
-		addCrats() {
-			return;
-			if (this.goodsInfo.hot != '1' && this.goodsInfo.hot != '2') {
-				this.showToast('特殊商品不能添加');
-				return;
-			}
-			if (this.spaceIndex < 0) {
-				this.showToast('请选择规格');
-				return;
-			}
-			let userInfo = uni.getStorageSync('userInfo');
-			if (!userInfo) {
-				this.showToast('请登录');
-				return;
-			}
+		addCrats() { 
+			// if (this.goodsInfo.hot != '1' && this.goodsInfo.hot != '2') {
+			// 	this.showToast('特殊商品不能添加');
+			// 	return;
+			// }
+			// if (this.spaceIndex < 0) {
+			// 	this.showToast('请选择规格');
+			// 	return;
+			// }
+			// let userInfo = uni.getStorageSync('userInfo');
+			// if (!userInfo) {
+			// 	this.showToast('请登录');
+			// 	return;
+			// }
 			this.showLoading();
 			this.request({
-				url: '/appShoppingCart/save',
+				url: '/cart/postAdd',
+				method:"POST",
 				data: {
-					userId: userInfo.userId,
-					productId: this.goodsId,
-					specId: this.goodsInfo.specList[this.spaceIndex].id,
-					num: this.spaceNum
+					product_id:this.goodsId,
+					product_num:this.spaceNum,  
 				},
 				success: res => {
 					uni.hideLoading();
-					if (res.data.returnCode === 1) {
+					if (res.data.status === 1) {
 						this.showToast('添加成功');
+						// uni.switchTab({
+						// 	url:'/pages/cars/cars'
+						// })
 					} else {
-						this.showToast(res.data.returnStr);
+						this.showToast(res.data.info);
 					}
 				}
 			});

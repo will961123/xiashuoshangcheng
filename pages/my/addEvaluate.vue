@@ -1,18 +1,19 @@
 <template>
 	<view class="addEvaluate">
-		<view v-for="(item, index) in order.pro_list" :key="index" class="goodsitem flex align-center bg-white">
-			<image :src="   item.productPic" mode="aspectFit"></image>
-			<view class="textov1">{{ item.productName }}</view>
+		<view v-for="(item, index) in order.product_order_list" :key="index" class="goodsitem flex align-center bg-white">
+			<image :src="item.product_image" mode="aspectFill"></image>
+			<view class="textov1">{{ item.product_name }}</view>
 		</view>
 		<view class="commitbox bg-white">
 			<textarea v-model="commit" maxlength="999" placeholder="说说你使用的心得,分享给更多的朋友吧!" />
 			<view class="cu-form-group" style="padding: 0;">
 				<view class="grid col-4 grid-square flex-sub">
+					<view class="solids" @tap="ChooseImage" v-if="imgList.length < 4"><text class="cuIcon-cameraadd"></text></view>
 					<view class="bg-img" v-for="(item, index) in imgList" :key="index" @tap="ViewImage" :data-url="imgList[index]">
 						<image :src="imgList[index]" mode="aspectFill"></image>
-						<view class="cu-tag bg-red" @tap.stop="DelImg" :data-index="index"><text class="cuIcon-close"></text></view>
+						<view class="cu-tag bg-red" @click.stop="DelImg" :data-index="index"><text class="cuIcon-close"></text></view>
 					</view>
-					<view class="solids" @tap="ChooseImage" v-if="imgList.length < 6"><text class="cuIcon-cameraadd"></text></view>
+				
 				</view>
 			</view>
 		</view>
@@ -37,6 +38,7 @@ export default {
 			order: '',
 			commit: '',
 			imgList: [],
+			imgSrcList:[], // 上传后的路径
 			anonymous: false	
 		};
 	},
@@ -52,11 +54,11 @@ export default {
 				this.showToast('请输入评论内容');
 				return;
 			}
-			let userInfo = uni.getStorageSync('userInfo');
-			if (!userInfo) {
-				this.showToast('请先登录');
-				return;
-			}
+			// let userInfo = uni.getStorageSync('userInfo');
+			// if (!userInfo) {
+			// 	this.showToast('请先登录');
+			// 	return;
+			// }
 			let formdata = { 
 				userId: userInfo.userId,
 				openid: uni.getStorageSync('openId'), 
@@ -154,8 +156,11 @@ export default {
 			});
 		},
 		ChooseImage() {
+			if(this.imgList.length>2){
+				return
+			}
 			uni.chooseImage({
-				count: 6, //默认9
+				count: 1, //默认9
 				sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
 				sourceType: ['album'], //从相册选择
 				success: res => {
@@ -164,6 +169,26 @@ export default {
 					} else {
 						this.imgList = res.tempFilePaths;
 					}
+					uni.uploadFile({
+						url: this.uploadUrl +'/admin/upload', //仅为示例，非真实的接口地址
+						filePath: res.tempFilePaths[0],
+						name: 'file',
+						formData: { 
+						},
+						success:res=>{
+							let resoult = JSON.parse(res.data)
+							console.log('上传图片',resoult); 
+							if(resoult.status===1){
+								this.imgSrcList.push(resoult.url)
+								console.log(this.imgSrcList)
+							}else{
+								this.showToast(resoult.info)
+							}
+						},
+						fail:err=>{
+							console.log(err);
+						}
+					})
 				}
 			});
 		},
@@ -174,7 +199,10 @@ export default {
 			});
 		},
 		DelImg(e) {
+			console.log(1111)
 			this.imgList.splice(e.currentTarget.dataset.index, 1);
+			this.imgSrcList.splice(e.currentTarget.dataset.index, 1);
+			console.log(this.imgSrcList);
 		},
 		switchAnonymous(e) {
 			this.anonymous = e.detail.value;

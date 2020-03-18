@@ -3,7 +3,12 @@
 		onLaunch: function() { 
 		},
 		onShow: function() { 
-			console.log(uni.getStorageSync('userInfo')?'已登录 ':'未登录')
+			console.log(this.isLoad()?'已登录 ':'未登录')
+			// if(!this.isLoad()){
+			// 	uni.redirectTo({
+			// 		url:'/pages/login/wxLogin'
+			// 	})
+			// }
 		},
 		onHide: function() { 
 		}

@@ -5,20 +5,21 @@
 				<image @click="radioChange(index)" :src="selectList[index] ? '/static/select.png' : '/static/noo.png'" mode="aspectFill"></image>
 				<!-- <radio @click="radioChange(index)" style="zoom: 0.8;" :color="'#ff585f'" :value="'' + index" :checked="selectList[index]" /> -->
 			</view>
-			<image @click="gotoDetail(item.productId)" :src="item.spec.picture" mode="aspectFill"></image>
+			<image @click="gotoDetail(item.product_id)" :src="item.picture" mode="aspectFill"></image>
 			<!-- 			<image @click="gotoDetail(item.productId)" :src="imgUrl + item.spec.picture" mode="aspectFill"></image> -->
 			<view class="infobox flex flex-direction  ">
-				<view class="title textov2" style="margin-bottom: 20px;">{{ item.product.name }}</view>
+				<view class="title textov2" style="margin-bottom: 20px;">{{ item.name }}</view>
 				<!-- <view class="gg">{{ item.spec.name }}</view> -->
 				<view class="bottombox flex justify-between align-end">
 					<view class="moneybox">
 						<text>￥</text>
-						{{ item.spec.price }}
+						{{ item.price }}
 					</view>
-					<view><sunui-stepper :label="index" :val="item.num" :min="1" :max="999" @change="stepperChange"></sunui-stepper></view>
+					<view><sunui-stepper :label="index" :val="item.product_num" :min="1" :max="999" @change="stepperChange"></sunui-stepper></view>
 				</view>
 			</view>
 		</view>
+		<view v-if="!goodsList.length" style="padding-top: 120px;"><will-nodata></will-nodata></view>
 
 		<view class="umenu bg-white flex justify-between align-center">
 			<view class="flex align-center">
@@ -42,42 +43,9 @@
 export default {
 	data() {
 		return {
-			selectList: [false, true],
+			selectList: [],
 			selectEvery: false,
-			goodsList: [
-				{
-					productId: 22,
-					product: {
-						name: '商品1',
-						smallPic: '/static/goods.jpg'
-					},
-					spec: {
-						picture: '/static/goods.jpg',
-						name: '规格1',
-						price: 100
-					},
-					specId: 2,
-					num: 3,
-					hot: 1,
-					id: 233
-				},
-				{
-					productId: 33,
-					product: {
-						name: '商品1',
-						smallPic: '/static/goods.jpg'
-					},
-					spec: {
-						picture: '/static/goods.jpg',
-						name: '规格1',
-						price: 100
-					},
-					specId: 2,
-					num: 3,
-					hot: 1,
-					id: 233
-				}
-			],
+			goodsList: [],
 			showGetAuthor: false,
 			userInfo: {}
 		};
@@ -87,12 +55,13 @@ export default {
 			let allprice = 0;
 			if (this.selectEvery) {
 				for (let idx in this.goodsList) {
-					allprice += Number(this.goodsList[idx].spec.price) * Number(this.goodsList[idx].num);
+					allprice += Number(this.goodsList[idx].price) * Number(this.goodsList[idx].product_num);
 				}
 			} else {
 				for (let idx in this.selectList) {
 					if (this.selectList[idx]) {
-						allprice += Number(this.goodsList[idx].spec.price) * Number(this.goodsList[idx].num);
+						console.log(this.goodsList[idx]);
+						allprice += Number(this.goodsList[idx].price) * Number(this.goodsList[idx].product_num);
 					}
 				}
 			}
@@ -109,10 +78,16 @@ export default {
 		// 	this.showGetAuthor = false;
 		// 	// #endif
 		// }
+		this.getGoodsList();
 	},
-	onLoad() {},
-	onShow() {
-		// this.getGoodsList();
+	onLoad() {
+		// uni.showTabBarRedDot({
+		// 	 index: 2,
+		// }) 
+		// uni.setTabBarBadge({
+		//   index: 2,
+		//   text: '233'
+		// })
 	},
 	methods: {
 		// #ifdef MP-WEIXIN
@@ -127,22 +102,19 @@ export default {
 				if (this.selectList[idx]) {
 					selectGoods.push({
 						checkState: true,
-						productId: this.goodsList[idx].productId,
-						productName: this.goodsList[idx].product.name,
-						productPic: this.goodsList[idx].spec.picture ? this.goodsList[idx].spec.picture : this.goodsList[idx].product.smallPic,
-						productSpecId: this.goodsList[idx].specId,
-						productSpecName: this.goodsList[idx].spec.name,
-						price: Number(this.goodsList[idx].spec.price),
-						number: this.goodsList[idx].num,
-						total: Number(this.goodsList[idx].spec.price) * Number(this.goodsList[idx].num),
-						hot: this.goodsList[idx].product.hot
+						productId: this.goodsList[idx].product_id,
+						productName: this.goodsList[idx].name,
+						productPic: this.goodsList[idx].picture , 
+						price: Number(this.goodsList[idx].price),
+						number: this.goodsList[idx].product_num,
+						total: Number(this.goodsList[idx].price) * Number(this.goodsList[idx].product_num), 
 					});
 					cartIds.push(this.goodsList[idx].id);
 				}
 			}
 			if (selectGoods.length) {
 				uni.navigateTo({
-					url: '/pages/index/confirmOrder?from=2&goodslist=' + JSON.stringify(selectGoods) + '&cartIds=' + JSON.stringify(cartIds)
+					url: '/pages/index/confirmOrder?from=2&goodslist=' + JSON.stringify(selectGoods) + '&cartIds=' + JSON.stringify(cartIds)+"&type=2"
 				});
 			}
 		},
@@ -156,14 +128,25 @@ export default {
 			if (!ids.length) {
 				return;
 			}
-			this.showLoading();
-			this.request({
-				url: '',
-				data: {},
+			uni.showModal({
+				title: '删除购物车',
+				content: '删除后不可恢复!',
 				success: res => {
-					console.log('删除购物车', res);
-					this.getGoodsList();
-					this.selectEvery = false;
+					if (res.confirm) {
+						this.showLoading();
+						this.request({
+							url: '/cart/postDel',
+							method: 'POST',
+							data: {
+								cart_ids: ids.join(',')
+							},
+							success: res => {
+								console.log('删除购物车', res);
+								this.getGoodsList();
+								this.selectEvery = false;
+							}
+						});
+					}
 				}
 			});
 		},
@@ -173,25 +156,33 @@ export default {
 			});
 		},
 		getGoodsList() {
-			let userInfo = uni.getStorageSync('userInfo');
-			if (!userInfo) {
-				return;
-			}
+			// let userInfo = uni.getStorageSync('userInfo');
+			// if (!userInfo) {
+			// 	return;
+			// }
 			this.showLoading();
 			this.request({
-				url: '',
+				url: '/cart/postCartList',
+				method: 'POST',
 				data: {
-					userId: userInfo.userId
+					// userId: userInfo.userId
 				},
 				success: res => {
 					console.log('购物车', res);
 					uni.hideLoading();
-					if (res.data.returnCode === 1) {
-						this.goodsList = res.data.obj || [];
+					if (res.data.status === 1) {
+						res.data.list = res.data.list.length
+							? res.data.list.map(i => {
+									i.picture = res.data.image_url + i.picture;
+									return i;
+							  })
+							: res.data.list;
+						this.goodsList = res.data.list || [];
 						this.selectList = [];
 						for (let idx in this.goodsList) {
 							this.selectList.push(false);
 						}
+						this.selectEvery = false;
 					} else {
 						this.goodsList = [];
 						this.selectList = [];
@@ -213,22 +204,32 @@ export default {
 			}
 		},
 		stepperChange(e) {
-			this.$set(this.goodsList, e.label, Object.assign({}, this.goodsList[e.label], { num: e.val }));
-			// this.showLoading();
-			// this.request({
-			// 	url: ' ',
-			// 	data: {
-			// 		id: this.goodsList[e.label].id,
-			// 		num: e.val
-			// 	},
-			// 	success: res => {
-			// 		uni.hideLoading();
-			// 		console.log('修改购物车', res);
-			// 		if (res.data.returnCode === 1) {
-			// 			this.$set(this.goodsList, e.label, Object.assign({}, this.goodsList[e.label], { num: e.val }));
-			// 		}
-			// 	}
-			// });
+			console.log('new：', e.val, 'old：', this.goodsList[e.label].product_num);
+			let old = this.goodsList[e.label].product_num
+			let type = e.val > this.goodsList[e.label].product_num ? 'add' : 'decre';
+			if (e.val === 1 && this.goodsList[e.label].product_num === 1) {
+				return;
+			}
+			this.showLoading();
+			this.request({
+				url: '/cart/postChangeNum',
+				method: 'POST',
+				data: {
+					cart_id: this.goodsList[e.label].id,
+					product_num: 1,
+					type: type
+				},
+				success: res => {
+					uni.hideLoading();
+					console.log('修改购物车', res);
+					if (res.data.status === 2) {
+						this.$set(this.goodsList, e.label, Object.assign({}, this.goodsList[e.label], { product_num: e.val }));
+					} else {
+						// this.$set(this.goodsList, e.label, Object.assign({}, this.goodsList[e.label], { product_num:old}));
+						this.showToast(res.data.info);
+					}
+				}
+			});
 		}
 	}
 };
@@ -242,8 +243,8 @@ export default {
 		padding: 0 30rpx;
 		.radio {
 			& > image {
-				width: 40rpx;
-				height: 40rpx;
+				width: 44rpx;
+				height: 44rpx;
 			}
 		}
 		& > image {
@@ -291,8 +292,8 @@ export default {
 		height: 48px;
 		padding: 0 30rpx;
 		.selectallimg {
-			width: 40rpx;
-			height: 40rpx;
+			width: 44rpx;
+			height: 44rpx;
 			margin-right: 20rpx;
 		}
 		.btn {

@@ -63,6 +63,10 @@
 						<view class="imgbox"><image src="../../static/my_icon6.png" mode="aspectFit"></image></view>
 						<text>优惠卷</text>
 					</view>
+					<view @click="gotoGj(6)" style="width: 25%;" class="item flex flex-direction align-center ">
+						<view class="imgbox"><image src="../../static/my_icon10.png" mode="aspectFit"></image></view>
+						<text>我的奖品</text>
+					</view>
 				</view> 
 			</view>
 			<!-- <view class="mainbox item2  bg-white">
@@ -269,7 +273,7 @@ export default {
 					break;
 				case 6:
 					uni.navigateTo({
-						url: '/pages/my/myEvaluate'
+						url: '/pages/my/myPrize'
 					});
 					break;
 				case 7:

@@ -1,14 +1,14 @@
 <template>
 	<view class="index">
-		<!-- <view class="search bg-white flex align-center">
-			<navigator hover-class="none" url="/pages/index/signIn"><image src="/static/qiandao.png" mode="aspectFit"></image></navigator>
+		<view class="search bg-white flex align-center">
+			<!-- <navigator hover-class="none" url="/pages/index/signIn"><image src="/static/qiandao.png" mode="aspectFit"></image></navigator> -->
 			<view class="searchiptbox flex align-center">
 				<image src="/static/search.png" mode="aspectFill"></image>
 				<navigator hover-class="none" style="flex:1" url="/pages/index/search">
 					<input style="width: 100%;" disabled="true" type="text" placeholder="美妆" value="" />
 				</navigator>
 			</view>
-		</view> -->
+		</view>
 
 		<swiper class="screen-swiper square-dot" :indicator-dots="true" :autoplay="true">
 			<swiper-item v-for="(item, index) in swiperList" :key="index"><image :src="item" mode="aspectFill"></image></swiper-item>
@@ -61,7 +61,7 @@
 					<image :src="item.picture" style="border-radius: 14rpx;" mode="aspectFill"></image>
 					<view class="title textov2">{{ item.name }}</view>
 					<view class="moneybox flex justify-between align-center">
-						<view class="money ">
+						<view class="money flex align-center">
 							<text>￥</text>
 							{{ item.price }}
 							<text class="oldMoney">￥{{ item.mark_price }}</text>

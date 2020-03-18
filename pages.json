@@ -209,6 +209,12 @@
 				"navigationBarTitleText": "钱包"
 			}
         }
+        ,{
+            "path" : "pages/my/myPrize",
+            "style" : {
+				"navigationBarTitleText": "我的奖品"
+			}
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

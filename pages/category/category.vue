@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<view class="search bg-white flex align-center"> 
+		<view class="search bg-white flex align-center">
 			<view class="searchiptbox flex align-center">
 				<image src="/static/search.png" mode="aspectFill"></image>
 				<navigator hover-class="none" style="flex:1" url="/pages/index/search">
@@ -9,14 +9,12 @@
 			</view>
 		</view>
 		<view class="VerticalBox">
-			<scroll-view class="VerticalNav nav" scroll-y scroll-with-animation :scroll-top="verticalNavTop" :style="heightList">
+			<scroll-view class="VerticalNav nav bg-white" scroll-y scroll-with-animation :scroll-top="verticalNavTop"   :style="heightList">
 				<!-- <view class="cu-item" :class="index == tabCur ? 'text-green cur' : ''" v-for="(item, index) in list" :key="index" @tap="TabSelect" :data-id="index">
 					{{ item.name }}
 				</view> -->
-				<view class="cu-item"  v-for="(item, index) in list" :key="index" @tap="TabSelect" :data-id="index">
-					<text :class="index == tabCur ? 'select' : ''">
-						{{ item.name }}
-					</text>
+				<view class="cu-item" v-for="(item, index) in list" :key="index" @tap="TabSelect" :data-id="index">
+					<text style="font-size: 20rpx;" :class="index == tabCur ? 'select' : ''">{{ item.name }}</text>
 				</view>
 			</scroll-view>
 			<scroll-view class="VerticalMain" scroll-y scroll-with-animation :style="heightList" :scroll-into-view="'main-' + mainCur" @scroll="VerticalMain">
@@ -26,22 +24,29 @@
 							<text class="cuIcon-title text-green"></text>
 							{{ item.name }}
 						</view>
-						<text @click="gotoCategory(item.id, item.name,2)" style="font-size: 26rpx;margin-right: 15rpx;">查看全部</text>
+						<text @click="gotoCategory(item.id, item.name, 2)" style="font-size: 26rpx;margin-right: 15rpx;">查看全部</text>
 					</view>
 					<view class="cu-list menu-avatar">
 						<view class="cu-item2 bg-white " style="height: auto;">
 							<view class="flex flex-wrap">
-								<view @click="gotoDetail(item2.id)" class="item2 flex" style=" width: 100%;" v-for="(item2, index2) in item.children" :key="index2">
-									<image :src="item2.smallPic" mode="aspectFill"></image>
+								<view
+									@click="gotoDetail(item2.id)"
+									v-if="index2 < 2"
+									class="item2 flex"
+									style=" width: 100%;"
+									v-for="(item2, index2) in item.product_list"
+									:key="index2"
+								>
+									<image :src="item2.picture" mode="aspectFill"></image>
 									<view class="flex flex-direction justify-between" style="flex: 1;">
 										<view class="title textov2">{{ item2.name }}</view>
 										<view class="moneybox flex justify-between align-center">
 											<view class="money ">
 												<text>￥</text>
 												{{ item2.price }}
-												<text class="oldMoney">￥123</text>
+												<!-- <text class="oldMoney">￥{{item2.mark_price}}</text> -->
 											</view>
-											<view class="num">销量:{{ item2.solid }}</view>
+											<view class="num">销量:{{ item2.sale_num }}</view>
 										</view>
 									</view>
 								</view>
@@ -111,7 +116,7 @@ export default {
 		}
 		this.list = list;
 
-		// this.getCategoryList();
+		this.getCategoryList();
 	},
 	onShow() {
 		// if (!this.isLoad()) {
@@ -139,20 +144,28 @@ export default {
 		getCategoryList() {
 			this.showLoading();
 			this.request({
-				url: '',
+				url: '/product/getProductTypeList',
 				data: {},
 				success: res => {
 					console.log('分类', res);
 					uni.hideLoading();
-					if (res.data.returnCode === 1) {
+					if (res.data.status === 1) {
+						res.data.list = res.data.list.map(i => {
+							i.product_list = i.product_list.map(g => {
+								g.picture = res.data.image_url + g.picture;
+								return g;
+							});
+							return i;
+						});
 						this.list = res.data.list;
+						console.log(this.list);
 					}
 				}
 			});
 		},
-		gotoCategory(id, name,type) {
+		gotoCategory(id, name, type) {
 			uni.navigateTo({
-				url: '/pages/category/categoryList?id=' + id + '&name=' + name + '&type='+type
+				url: '/pages/category/categoryList?id=' + id + '&type=' + type
 			});
 		},
 		gotoDetail(id) {
@@ -216,34 +229,34 @@ export default {
 </script>
 
 <style lang="scss">
-	.search {
-		padding: 10px 30rpx;
-		& > navigator {
-			& > image {
-				width: 20px;
-				height: 20px;
-				margin-right: 15px;
-			}
-		}
-		.searchiptbox {
-			background: #f5f5f5;
-			height: 30px;
-			border-radius: 15px;
-			padding: 0 30rpx;
-			font-size: 26rpx;
-			flex: 1;
-	
-			& > image {
-				width: 16px;
-				height: 16px;
-				margin-right: 20rpx;
-			}
-			input {
-				height: 30px;
-				flex: 1;
-			}
+.search {
+	padding: 10px 30rpx;
+	& > navigator {
+		& > image {
+			width: 20px;
+			height: 20px;
+			margin-right: 15px;
 		}
 	}
+	.searchiptbox {
+		background: #f5f5f5;
+		height: 30px;
+		border-radius: 15px;
+		padding: 0 30rpx;
+		font-size: 26rpx;
+		flex: 1;
+
+		& > image {
+			width: 16px;
+			height: 16px;
+			margin-right: 20rpx;
+		}
+		input {
+			height: 30px;
+			flex: 1;
+		}
+	}
+}
 .fixed {
 	position: fixed;
 	z-index: 99;
@@ -262,9 +275,9 @@ export default {
 	border: none;
 	height: 50px;
 	position: relative;
-	&>text.select{ 
+	& > text.select {
 		width: 90%;
-		line-height:66rpx;
+		line-height: 66rpx;
 		border-radius: 33rpx;
 		display: inline-block;
 		background: black;

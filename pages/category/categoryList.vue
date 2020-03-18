@@ -2,10 +2,13 @@
 	<view class="categoryList bg-white ">
 		<view class="sortbox flex justify-around text-center ">
 			<view class="item" :class="{ select: sortType === 1 }" @click="changeSort(1)">默认</view>
-			<view class="item" :class="{ select: sortType === 2 }" @click="changeSort(2)">销量</view>
-			<view class="item flex align-center" :class="{ select: sortType === 3 || sortType === 4 }" @click="changeSort(3)">
+			<view class="item flex align-center" :class="{ select: sortType === 2 || sortType === 3 }" @click="changeSort(2)">
+				<text>销量</text>
+				<image :src="sortType === 2 ? '/static/sortbottom.png' : sortType === 3 ? '/static/sorttop.png' : '/static/sort.png'" mode="aspectFit"></image>
+			</view>
+			<view class="item flex align-center" :class="{ select: sortType === 4 || sortType === 5 }" @click="changeSort(4)">
 				<text>价格</text>
-				<image :src="sortType === 3 ? '/static/sortbottom.png' : sortType === 4 ? '/static/sorttop.png' : '/static/sort.png'" mode="aspectFit"></image>
+				<image :src="sortType === 4 ? '/static/sortbottom.png' : sortType === 5 ? '/static/sorttop.png' : '/static/sort.png'" mode="aspectFit"></image>
 			</view>
 			<!-- <view class="item" :class="{ select: sortType[0] }" @click="changeSort(0)">综合</view>
 			<view class="item" :class="{ select: sortType[1] }" @click="changeSort(1)">销量</view>
@@ -21,7 +24,7 @@
 
 		<view class="lsitbox">
 			<view @click="gotoDetail(item.id)" v-for="(item, index) in goodsList" :key="index" class="item flex align-center">
-				<image :src="  item.smallPic" mode="aspectFit"></image>
+				<image :src="item.picture" mode="aspectFill"></image>
 				<view class="infobox flex flex-direction justify-between">
 					<view class="info textov2">{{ item.name }}</view>
 					<view class="moneybox flex align-center justify-between">
@@ -29,9 +32,12 @@
 							<text>￥</text>
 							{{ item.price }}
 						</view>
-						<view class="xl">销量： {{ item.saleNum }}</view>
+						<view class="xl">销量： {{ item.sale_num }}</view>
 					</view>
 				</view>
+			</view>
+			<view v-if="!goodsList.length"  style="padding-top: 140px;">
+				<will-nodata></will-nodata>
 			</view>
 		</view>
 
@@ -85,26 +91,11 @@ export default {
 			type: 1, //1搜索来 2分类来
 			name: '',
 			id: '',
-			goodsList: [
-				{
-					smallPic: '/static/goods.jpg',
-					name: '热门1',
-					price: 100,
-					saleNum: 999,
-					id: 1
-				},
-				{
-					smallPic: '/static/goods.jpg',
-					name: '热门2',
-					price: 80,
-					saleNum: 99,
-					id: 2
-				}
-			],
+			goodsList: [],
 
 			// 				默认 销量 价格递减 价格递增
 			// sortType: [true, false, false, false],
-			// 1 默认 2 销量 3价格递减 4价格递增
+			// 1 默认 2 3销量 3 4价格 
 			sortType: 1,
 
 			visible: false, // 抽屉显示的
@@ -138,24 +129,45 @@ export default {
 		// 	title: this.name || '所幕商城'
 		// });
 
-		// this.findProductByCategoryId()
+		this.findProductByCategoryId();
 	},
 	methods: {
-		findProductByCategoryId() {
-			if (this.type != 2) {
-				return;
+		findProductByCategoryId() { 
+			let type_sort = 'desc';
+			let type_field = 'id';
+			if (this.sortType === 2) {
+				type_sort = 'desc';// 升序
+				type_field = 'sale_num';
+			} else if (this.sortType === 3) {
+				type_sort = 'asc'; // 降序
+				type_field = 'sale_num';
+			} else if (this.sortType === 4) {
+				type_sort = 'desc'; // 升序
+				type_field = 'price';
+			} else if (this.sortType === 5) {
+				type_sort = 'asc'; // 降序
+				type_field = 'price';
 			}
+			let formData = {
+				product_name: this.name?this.name:'',
+				product_type_id: this.id ? this.id : '',
+				type_field: type_field,
+				type_sort: type_sort
+			};
+			console.log(formData);
 			this.showLoading();
 			this.request({
-				url: '',
-				data: {
-					categoryId: this.id,
-					sort: this.sortType
-				},
+				url: '/product/productSearch',
+				method: 'POST',
+				data: formData,
 				success: res => {
 					uni.hideLoading();
-					console.log('根据id查找列表', res);
-					if (res.data.returnCode === 1) {
+					console.log('查找列表', res);
+					if (res.data.status === 1) {
+						res.data.list = res.data.list.map(i=>{
+							i.picture =res.data.image_url +i.picture
+							return i
+						})
 						this.goodsList = res.data.list;
 					}
 				}
@@ -179,7 +191,15 @@ export default {
 		},
 		// 排序选择完毕
 		changeSort(type) {
-			type === 3 ? (this.sortType === 3 ? (this.sortType = 4) : (this.sortType = 3)) : (this.sortType = type);
+			if (type === 2) {
+				this.sortType === 2 ? (this.sortType = 3) : (this.sortType = 2);
+			} else if (type === 4) {
+				this.sortType === 4 ? (this.sortType = 5) : (this.sortType = 4);
+			} else {
+				this.sortType = type;
+			}
+			this.findProductByCategoryId();
+			console.log(this.sortType);
 			// this.findProductByCategoryId()
 
 			// switch (type) {
@@ -199,7 +219,6 @@ export default {
 			// 		}
 			// 		break;
 			// }
-			console.log(this.sortType);
 		},
 		// 去详情
 		gotoDetail(id) {
@@ -214,6 +233,7 @@ export default {
 
 <style lang="scss">
 .categoryList {
+	min-height: 100vh;
 	.sortbox {
 		line-height: 44px;
 		border-bottom: 1rpx solid #ededed;
