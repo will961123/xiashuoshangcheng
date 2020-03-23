@@ -16,4 +16,4 @@ components: {
 
 |属性名		|类型		|默认值		|说明	|
 |--				|--			|--				|--		| 
-|tittle		|String			|无		|暂无数据前面追加的字符 选填| 
+|tittle		|String			|无		|标题 选填| 

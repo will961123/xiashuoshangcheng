@@ -5,7 +5,7 @@
 			<view class="searchiptbox flex align-center">
 				<image src="/static/search.png" mode="aspectFill"></image>
 				<navigator hover-class="none" style="flex:1" url="/pages/index/search">
-					<input style="width: 100%;" disabled="true" type="text" placeholder="美妆" value="" />
+					<input style="width: 100%;" disabled="true" type="text" placeholder="请输入关键字" value="" />
 				</navigator>
 			</view>
 		</view>
@@ -131,7 +131,7 @@ export default {
 	},
 	onLoad() {
 		this.getSwiperList();
-		this.getHotGoods();
+		this.getHotGoods(); 
 		// this.getActivity();
 		// this.getCategoryList();
 		// this.findNoticeBySysCode()

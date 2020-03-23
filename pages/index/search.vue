@@ -3,7 +3,7 @@
 		<view class="search bg-white flex align-center">
 			<view class="searchiptbox flex align-center">
 				<image src="/static/search.png" mode="aspectFill"></image>
-				<input v-model="search" type="text" placeholder="美妆" value="" />
+				<input v-model="search" type="text" placeholder="请输入关键字" value="" />
 			</view>
 			<button @click="gotoCategory" class="text-bold cu-btn bg-white">搜索</button>
 		</view>

@@ -28,7 +28,7 @@
 			<view class="guize" style="margin-top: 100upx;">
 				<view class="titbox flex">
 					<view @click="showGuize = true" :class="{ select: showGuize }" class="title ">规则说明</view>
-					<view @click="showGuize = false" :class="{ select: !showGuize }" class="title">我的奖品</view>
+					<view @click="showGuize = false" :class="{ select: !showGuize }" class="title">中奖名单</view>
 				</view>
 
 				<view v-if="showGuize" class="guizeList">
@@ -40,11 +40,22 @@
 						</view>
 					</scroll-view>
 				</view>
-				<view v-else class="goodsList">
+				<view v-else class="goodsList" >
+					<swiper style="height: 30px;" :vertical="true" :autoplay="true" :interval="800" :duration="300">
+						<swiper-item style="height: 100%;" >
+							<view style="line-height: 30px;" class="swiper-item">奖品1</view>
+						</swiper-item>
+						<swiper-item style="height: 100%;" >
+							<view style="line-height: 30px;" class="swiper-item">奖品2</view>
+						</swiper-item>
+						<swiper-item style="height: 100%;" >
+							<view style="line-height: 30px;" class="swiper-item">奖品3</view>
+						</swiper-item>
+					</swiper>
+					<!-- <view class="g_item">奖品1</view>
 					<view class="g_item">奖品1</view>
 					<view class="g_item">奖品1</view>
-					<view class="g_item">奖品1</view>
-					<view class="g_item">奖品1</view>
+					<view class="g_item">奖品1</view> -->
 				</view>
 			</view>
 		</view>

@@ -5,7 +5,7 @@
 			mode="widthFix"
 			class="icon"
 		></image>
-		<view class="tittle">{{tittle}}暂无数据</view>
+		<view class="tittle">{{tittle?tittle:'暂无数据'}}</view>
 	</view>
 </template>
 

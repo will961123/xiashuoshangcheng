@@ -1,9 +1,9 @@
 <template>
 	<view class="addEvaluate">
-		<view v-for="(item, index) in order.product_order_list" :key="index" class="goodsitem flex align-center bg-white">
+		<!-- <view v-for="(item, index) in order.product_order_list" :key="index" class="goodsitem flex align-center bg-white">
 			<image :src="item.product_image" mode="aspectFill"></image>
 			<view class="textov1">{{ item.product_name }}</view>
-		</view>
+		</view> -->
 		<view class="commitbox bg-white">
 			<textarea v-model="commit" maxlength="999" placeholder="说说你使用的心得,分享给更多的朋友吧!" />
 			<view class="cu-form-group" style="padding: 0;">
@@ -60,42 +60,58 @@ export default {
 			// 	return;
 			// }
 			let formdata = { 
-				userId: userInfo.userId,
-				openid: uni.getStorageSync('openId'), 
-				userName: userInfo.wxName || userInfo.name,
-				userPic: userInfo.wxPic || '',
-				toId: this.order.pro_list[0].productId,
-				toName: this.order.pro_list[0].productName,
-				toPic: this.order.pro_list[0].productPic,
-				content: this.commit,
-				anonymous: this.anonymous ? 1 : 2, // 是否匿名 1是 2否
-				orderId: this.order.id
+				// userId: userInfo.userId,
+				// openid: uni.getStorageSync('openId'), 
+				// userName: userInfo.wxName || userInfo.name,
+				// userPic: userInfo.wxPic || '',
+				// toId: this.order.pro_list[0].productId,
+				// toName: this.order.pro_list[0].productName,
+				// toPic: this.order.pro_list[0].productPic,
+				// content: this.commit,
+				// anonymous: this.anonymous ? 1 : 2, // 是否匿名 1是 2否
+				// orderId: this.order.id
+				
+				order_id:this.order.order_id,
+				content:this.commit,
+				images:this.imgSrcList
 			};
 			this.showLoading();
 			this.request({
-				url: '',
+				url: '/comment/postAdd',
 				data: formdata,
+				method:"POST",
 				success: res => {
-					console.log('保存文字', res);
-					if (res.data.returnCode === 1) {
-						if (!this.imgList.length) {
-							this.showSuccess();
-						} else {
-							Promise.all(this.uploadIMGlist(res.data.obj.id)).then(
-								res => {
-									console.log('promise数组全部成功', res);
-									this.showSuccess();
-								},
-								err => {
-									console.log('promise数组没有全部成功', err);
-									this.showSuccess(2);
-								}
-							);
-						}
-					} else {
-						uni.hideLoading();
-						this.showToast(res.data.returnStr);
+					console.log('保存评论', res);
+					uni.hideLoading();
+					if(res.data.status === 1){
+						setTimeout(() => {
+							uni.reLaunch({
+								url: '/pages/my/myOrder?type=5'
+							}) 
+						}, 1000);
+					}else{
+						this.showToast(res.data.info);
 					}
+					
+					// if (res.data.returnCode === 1) {
+					// 	if (!this.imgList.length) {
+					// 		this.showSuccess();
+					// 	} else {
+					// 		Promise.all(this.uploadIMGlist(res.data.obj.id)).then(
+					// 			res => {
+					// 				console.log('promise数组全部成功', res);
+					// 				this.showSuccess();
+					// 			},
+					// 			err => {
+					// 				console.log('promise数组没有全部成功', err);
+					// 				this.showSuccess(2);
+					// 			}
+					// 		);
+					// 	}
+					// } else {
+					// 	uni.hideLoading();
+					// 	this.showToast(res.data.returnStr);
+					// }
 				}
 			});
 		},
@@ -136,6 +152,7 @@ export default {
 			uni.hideLoading();
 			this.showToast(type === 1 ? '评价成功!' : '部分图片上传失败');
 			setTimeout(() => {
+				
 				uni.redirectTo({
 					url: '/pages/my/myOrder?type=0'
 				});
@@ -169,6 +186,7 @@ export default {
 					} else {
 						this.imgList = res.tempFilePaths;
 					}
+					this.showLoading()
 					uni.uploadFile({
 						url: this.uploadUrl +'/admin/upload', //仅为示例，非真实的接口地址
 						filePath: res.tempFilePaths[0],
@@ -176,6 +194,7 @@ export default {
 						formData: { 
 						},
 						success:res=>{
+							uni.hideLoading()
 							let resoult = JSON.parse(res.data)
 							console.log('上传图片',resoult); 
 							if(resoult.status===1){

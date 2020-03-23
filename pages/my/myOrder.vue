@@ -48,6 +48,7 @@
 								<button @click="refund" :data-item="JSON.stringify(item)" v-if="item.order_status === 2" class="btn bg-white cu-btn">退款</button>
 								<button @click="receipt" :data-item="JSON.stringify(item)" v-if="item.order_status === 3" class="btn bg-white cu-btn">确认收货</button>
 								<button @click="gotoEvaluate" :data-item="JSON.stringify(item)" v-if="item.order_status === 4" class="btn bg-white cu-btn">去评价</button>
+								<button @click="cancelOrder" :data-item="JSON.stringify(item)" v-if="item.order_status === 5" class="btn bg-white cu-btn">删除订单</button>
 								<!-- <button @click="changeOrderType2" :data-item="item" v-if="item.state === 5" class="btn bg-white cu-btn">改成待评价</button> -->
 							</view>
 						</view>
@@ -131,9 +132,15 @@ export default {
 							},
 							success: res => {
 								uni.hideLoading();
-								this.orderList.splice(this.type, 1, []);
-								this.getOrderList();
 								console.log('取消订单', res);
+								if(res.data.status===1){
+									this.orderList.splice(this.type, 1, []);
+									this.getOrderList();
+								}else{
+									this.showToast(res.data.info)
+								}
+								
+								
 							}
 						});
 					}

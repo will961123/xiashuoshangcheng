@@ -204,13 +204,19 @@
 				"navigationBarTitleText": "投稿"
 			}
         },{
-            "path" : "pages/my/coupon",
+            "path" : "pages/my/myCouponList",
             "style" : {
-				"navigationBarTitleText": "钱包"
+				"navigationBarTitleText": "我的奖券"
 			}
         }
         ,{
             "path" : "pages/my/myPrize",
+            "style" : {
+				"navigationBarTitleText": "我的奖品"
+			}
+        }
+        ,{
+            "path" : "pages/my/myPrizeList",
             "style" : {
 				"navigationBarTitleText": "我的奖品"
 			}

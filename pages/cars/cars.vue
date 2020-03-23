@@ -222,7 +222,7 @@ export default {
 				success: res => {
 					uni.hideLoading();
 					console.log('修改购物车', res);
-					if (res.data.status === 2) {
+					if (res.data.status === 1) {
 						this.$set(this.goodsList, e.label, Object.assign({}, this.goodsList[e.label], { product_num: e.val }));
 					} else {
 						// this.$set(this.goodsList, e.label, Object.assign({}, this.goodsList[e.label], { product_num:old}));

@@ -95,16 +95,19 @@
 		<!-- <rich-text v-if="titType === 1" :nodes="goodsInfo.details | replaceImgStr"></rich-text> -->
 		<view class="detailImgbox" v-if="titType === 1"><image v-for="(item, index) in goodsInfo.detail_image" :key="index" :src="item" mode="widthFix"></image></view>
 		<view v-else class="pingjiaList">
-			<view class="item">
+			<view v-for="(item, index) in evaluate" :key="index" class="item">
 				<view class="userbox flex align-center">
-					<image :src="evaluate[0].userPic" mode="aspectFill"></image>
-					<text class="name">{{ evaluate[0].userName }}</text>
-					<text>{{ evaluate[0].data }}</text>
+					<image src="/static/headerpic.png" mode="aspectFill"></image>
+					<text class="name">名字</text>
+					<text>{{ item.date }}</text>
 				</view>
-				<view class="commenttxt">{{ evaluate[0].content }}</view>
-				<!-- <view class="commentImgBox flex flex-wrap justify-start ">
-					<view class="imgbox text-center" v-for="(img, idx) in evaluate[0].picList" :key="idx"><image :src="img.commentPic" mode="aspectFill"></image></view>
-				</view> -->
+				<view class="commenttxt">{{ item.content }}</view>
+				<view class="commentImgBox flex flex-wrap justify-start ">
+					<view class="imgbox text-center" v-for="(img, idx) in item.images" :key="idx"><image :data-url="img" :data-list="item.images" @click="viewImage" :src="img" mode="aspectFill"></image></view>
+				</view>
+			</view>
+			<view  v-if="!evaluate.length" class="bg-white" style="padding-top: 30px;" >
+				<will-nodata tittle="暂时没有评价"></will-nodata>
 			</view>
 		</view>
 
@@ -276,7 +279,7 @@ export default {
 		console.log('1 普通商品 2团购 3会员 4分享领取---', this.goodsType);
 
 		this.getGoodsDetail();
-		// this.findCommentByProductId();
+		this.findCommentByProductId();
 		// this.saveFootMark();
 	},
 	onShareAppMessage(e) {
@@ -295,7 +298,13 @@ export default {
 		}
 	},
 	methods: {
-		addCrats() { 
+		viewImage(e) {
+			uni.previewImage({
+				urls: e.currentTarget.dataset.list,
+				current: e.currentTarget.dataset.url
+			});
+		},
+		addCrats() {
 			// if (this.goodsInfo.hot != '1' && this.goodsInfo.hot != '2') {
 			// 	this.showToast('特殊商品不能添加');
 			// 	return;
@@ -312,10 +321,10 @@ export default {
 			this.showLoading();
 			this.request({
 				url: '/cart/postAdd',
-				method:"POST",
+				method: 'POST',
 				data: {
-					product_id:this.goodsId,
-					product_num:this.spaceNum,  
+					product_id: this.goodsId,
+					product_num: this.spaceNum
 				},
 				success: res => {
 					uni.hideLoading();
@@ -549,16 +558,21 @@ export default {
 		},
 		findCommentByProductId() {
 			this.request({
-				url: '	/appComment/findCommentByProductId',
-				data: {
-					toId: this.goodsId,
-					offset: 1,
-					limit: 1
-				},
+				url: '/comment/getCommentList/' + this.goodsId,
+				data: {},
 				success: res => {
-					console.log('评论信息', res);
-					if (res.data.returnCode === 1) {
+					console.log('评论信息', res.data); 
+					if (res.data.status === 1) {
+						res.data.list = res.data.list.map(i => {
+							i.images = JSON.parse(i.images).map(g => {
+								g = res.data.image_url + g;
+								return g;
+							});
+							return i;
+						});
 						this.evaluate = res.data.list;
+					} else {
+						this.evaluate = [];
 					}
 				}
 			});
@@ -831,9 +845,11 @@ export default {
 				.imgbox {
 					margin-top: 10px;
 					width: calc(100% / 3);
+					// width: 200rpx;
+					// height: 200rpx;
 					& > image {
-						width: 220rpx;
-						height: 220rpx;
+						width: 200rpx;
+						height: 200rpx;
 					}
 				}
 			}
