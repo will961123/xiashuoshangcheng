@@ -1,23 +1,18 @@
 <template>
 	<view class="Integral">
-		<view class="titBox flex ">
-			<view style="margin-right: 50rpx;" @click="changeType(0)" :class="[{ select: freeTitType === 0 }]" class="tit">待发货</view>
-			<view @click="changeType(1)" :class="[{ select: freeTitType === 1 }]" class="tit">待收货</view>
-		</view>
 		<view class="lsitbox " style="border: none;">
-			<view v-if="item.status === freeTitType" v-for="(item, index) in goodsList" :key="index" class="itemFree  flex align-center">
-				<image :src="item.smallPic" mode="aspectFill"></image>
+			<view v-for="(item, index) in goodsList" :key="index" class="itemFree  flex align-center">
+				<image :src="item.prize_picture" mode="aspectFill"></image>
 				<view style="height: auto;" class="infobox flex flex-direction justify-between">
-					<view class="info textov2">{{ item.name }}此标题最多显示2行此标题最多显示2行此标题最多</view>
+					<view class="info textov2">{{ item.prize_name }}</view>
 					<view class="moneybox flex align-center justify-between">
-						<view class="money">￥123</view>
+						<view class="money">￥0</view>
 						<!-- <view class="xl">剩余{{ item.saleNum }}份</view> -->
-						<button v-if="item.status === 0" @click="clickBtn(item.id, item.status)" class="btn cu-btn  ">填写地址</button>
-						<button v-else @click="clickBtn(item.id, item.status)" class="btn cu-btn  ">确认收货</button>
+						<button @click="clickBtn(item)" class="btn cu-btn  ">填写地址</button>
 					</view>
 				</view>
 			</view>
-		</view> 
+		</view>
 	</view>
 </template>
 
@@ -25,76 +20,48 @@
 export default {
 	data() {
 		return {
-			goodsList: [
-				{
-					smallPic: '/static/goods.jpg',
-					name: '0元',
-					price: 100,
-					saleNum: 999,
-					id: 1,
-					status: 0
-				},
-				{
-					smallPic: '/static/goods.jpg',
-					name: '会员免费',
-					price: 100,
-					saleNum: 999,
-					id: 2,
-					status: 1
-				}
-			], 
-			freeTitType: 0,  
+			goodsList: [],
+			addressInfo: null
 		};
 	},
-	onLoad(options) {},
+	onLoad(options) {
+		this.getList();
+	},
 	methods: {
-		changeType(type) {
-			if (type === this.freeTitType) {
-				return;
-			}
-			this.freeTitType = type;
+		getList() {
+			this.showLoading();
+			this.request({
+				url: '/prize/myPrizeList',
+				data: {},
+				success: res => {
+					uni.hideLoading();
+					console.log('奖品列表', res);
+					if (res.data.status === 1) {
+						res.data.list = res.data.list.map(i => {
+							i.prize_picture = res.data.image_url + i.prize_picture;
+							return i;
+						});
+						this.goodsList = res.data.list;
+					}
+				}
+			});
 		},
-		clickBtn(id, type) {
-			if (type === 0) {
-				var that = this;
-				uni.getSetting({
-					success(res) { 
-						if (res.authSetting['scope.address']) {
-							uni.chooseAddress({
-								success(res) {
-									console.log(res);
-									that.addressInfo = res;
-								}
-							});
-						} else {
-							if (res.authSetting['scope.address'] == false) {
-								uni.openSetting({
-									success(res) {
-										if (res.authSetting['scope.address']) {
-											uni.chooseAddress({
-												success(res) {
-													console.log(res);
-													that.addressInfo = res;
-												}
-											});
-										}
-									}
-								});
-							}
-						}
-					}
-				});
-			} else if (type === 1) {
-				uni.showModal({
-					title:'确认收货',
-					content:'确定要确认收货吗？',
-					success:res=>{
-						if(res.confirm){
-							this.showToast('确认收货');
-						}
-					}
-				})
-			}
+		clickBtn(item) {
+			let goodslist = [
+				{
+					checkState: true,
+					productId: item.id,
+					productName: item.prize_name,
+					productPic: item.prize_picture,
+					price: 0,
+					number: 1,
+					total: 0
+				}
+			];
+			let url = '/pages/index/confirmOrder?from=3&goodslist=' + JSON.stringify(goodslist) + '&buyType=6'; 
+			uni.navigateTo({
+				url: url
+			});  
 		}
 	}
 };

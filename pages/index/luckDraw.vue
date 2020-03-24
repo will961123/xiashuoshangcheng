@@ -15,7 +15,7 @@
 							<view class="canvas-item" :style="{ transform: 'rotate(' + index * width + 'deg)', zIndex: index }" v-for="(iteml, index) in list" :key="index">
 								<view class="canvas-item-text" :style="'transform:rotate(' + index + ')'">
 									<text class="b" style="font-size: 32upx;">{{ iteml.name }}</text>
-									<image style="width: 30px ; height: 30px;margin-top: 30px;" src="/static/cars.png" mode="aspectFill"></image>
+									<image style="width: 30px ; height: 30px;margin-top: 30px;" :src="iteml.picture" mode="aspectFill"></image>
 								</view>
 							</view>
 						</view>
@@ -40,22 +40,19 @@
 						</view>
 					</scroll-view>
 				</view>
-				<view v-else class="goodsList" >
-					<swiper style="height: 30px;" :vertical="true" :autoplay="true" :interval="800" :duration="300">
-						<swiper-item style="height: 100%;" >
-							<view style="line-height: 30px;" class="swiper-item">奖品1</view>
+				<view v-else class="goodsList">
+					<swiper style="height: 50px;" :vertical="true" :autoplay="true" :interval="1400" :duration="300">
+						<swiper-item v-for="(item, index) in peopleList" :key="index" style="height: 100%;width: 100%;" class="flex align-center">
+							<view  class="swiper-item flex justify-between align-center" style="width: 100%;" >
+								<view class="userinfo flex">
+									<image :src="item.avatar" style="width: 40rpx;height: 40rpx;margin-right: 10rpx;border-radius: 50%;" mode="aspectFill"></image>
+									<!-- <image src="/static/headerpic.png" style="width: 40rpx;height: 40rpx;margin-right: 10rpx;border-radius: 50%;" mode="aspectFill"></image> -->
+									<text>{{ item.nickName }}</text>
+								</view>
+								<text>{{ item.prize_name }}</text>
+							</view>
 						</swiper-item>
-						<swiper-item style="height: 100%;" >
-							<view style="line-height: 30px;" class="swiper-item">奖品2</view>
-						</swiper-item>
-						<swiper-item style="height: 100%;" >
-							<view style="line-height: 30px;" class="swiper-item">奖品3</view>
-						</swiper-item>
-					</swiper>
-					<!-- <view class="g_item">奖品1</view>
-					<view class="g_item">奖品1</view>
-					<view class="g_item">奖品1</view>
-					<view class="g_item">奖品1</view> -->
+					</swiper> 
 				</view>
 			</view>
 		</view>
@@ -66,43 +63,18 @@
 export default {
 	data() {
 		return {
-			list: [
-				{
-					name: '谢谢',
-					value: '5'
-				},
-				{
-					name: '试吃羊肉一份',
-					value: '6'
-				},
-				{
-					name: '试吃牛肉一份',
-					value: '7'
-				},
-				{
-					name: '试吃小野菜一份',
-					value: '8'
-				},
-				{
-					name: '优惠卷20元',
-					value: '9'
-				},
-				{
-					name: '优惠卷50元',
-					value: '10'
-				}
-			],
+			list: [],
+			peopleList: [],
 			width: 0,
 			animationData: {},
 			btnDisabled: '',
 			showGuize: true,
-
 			timer: null
 		};
 	},
 	onLoad: function() {
-		// 获取奖品列表
-		this.width = 360 / this.list.length;
+		this.getGoodsList();
+		this.getPeopleList();
 	},
 	onUnload() {
 		if (this.timer) {
@@ -112,10 +84,54 @@ export default {
 	},
 
 	methods: {
+		getGoodsList() {
+			this.showLoading();
+			this.request({
+				url: '/prize/getPrizeList',
+				data: {},
+				success: res => {
+					uni.hideLoading();
+					console.log('奖品列表', res);
+					if (res.data.status === 1) {
+						let index = 0;
+						res.data.list.find((val, idx) => {
+							if (val.type === 3) {
+								index = idx;
+							}
+						});
+						res.data.list.unshift(...res.data.list.splice(index, 1));
+						res.data.list = res.data.list.map(i => {
+							i.picture = res.data.image_url + i.picture;
+							return i;
+						});
+						this.list = res.data.list;
+						this.width = 360 / this.list.length;
+					}
+				}
+			});
+		},
+		getPeopleList() {
+			this.request({
+				url: '/prize/getUserPrizeList',
+				data: {},
+				success: res => {
+					console.log('中奖名单', res);
+					if (res.data.status === 1) {
+						res.data.list = res.data.list.map(i => {
+							if(i.avatar){
+								i.avatar = i.avatar.indexOf('http') === -1 ? res.data.image_url + i.avatar : i.avatar;
+							}
+							
+							return i;
+						});
+						this.peopleList = res.data.list;
+					}
+				}
+			});
+		},
 		animation(index, duration) {
 			//中奖index
 			var list = this.list;
-			// var awardIndex = 1 || Math.round(Math.random() * (awardsNum.length - 1)); //随机数
 			var runNum = 4; //旋转8周
 
 			// 旋转角度
@@ -132,14 +148,34 @@ export default {
 		},
 		//发起抽奖
 		playReward() {
-			let index = 1;
-			let duration = 4000;
-			this.animation(index, duration);
-			this.timer = setTimeout(() => {
-				uni.showModal({ content: this.list[index].name });
-				this.btnDisabled = '';
-				// document.getElementById('zhuanpano').style=''
-			}, duration + 1000);
+			this.showLoading();
+			this.request({
+				url: '/prize/postUserPrize',
+				method: 'POST',
+				data: {},
+				success: res => {
+					console.log('中奖id', res);
+					uni.hideLoading();
+					if (res.data.status === 1) {
+						let id = res.data.prize_id;
+						let index = 0;
+						this.list.find((val, idx, arr) => {
+							if (val.id === id) {
+								index = idx;
+							}
+						});
+						console.log(index);
+						let duration = 4000;
+						this.animation(index, duration);
+						this.timer = setTimeout(() => {
+							uni.showModal({ content: this.list[index].name, showCancel: false, title: '中奖结果' });
+							this.btnDisabled = '';
+						}, duration + 1000);
+					} else {
+						this.showToast(res.data.info);
+					}
+				}
+			});
 		}
 	}
 };

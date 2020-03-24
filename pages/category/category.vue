@@ -104,17 +104,17 @@ export default {
 		this.heightList = 'height: calc(100vh - 50px )';
 		// #endif
 
-		let list = [{}];
-		for (let i = 0; i < 16; i++) {
-			list[i] = {};
-			list[i].name = '分类' + i;
-			list[i].id = i;
-			list[i].children = [
-				{ smallPic: '/static/goods.jpg', id: 233, price: 999, name: '商品名称12313313', solid: 999 },
-				{ smallPic: '/static/goods.jpg', id: 233, price: 999, name: '商品名称12313313', solid: 999 }
-			];
-		}
-		this.list = list;
+		// let list = [{}];
+		// for (let i = 0; i < 16; i++) {
+		// 	list[i] = {};
+		// 	list[i].name = '分类' + i;
+		// 	list[i].id = i;
+		// 	list[i].children = [
+		// 		{ smallPic: '/static/goods.jpg', id: 233, price: 999, name: '商品名称12313313', solid: 999 },
+		// 		{ smallPic: '/static/goods.jpg', id: 233, price: 999, name: '商品名称12313313', solid: 999 }
+		// 	];
+		// }
+		// this.list = list;
 
 		this.getCategoryList();
 	},

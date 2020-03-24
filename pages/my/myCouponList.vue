@@ -1,29 +1,29 @@
 <template>
 	<view class="counpon bg-white">
 		<view class="titbox flex justify-between">
-			<view @click="titType = 1" :class="titType === 1 ? 'item select' : 'item'"><text>可使用</text></view>
-			<view @click="titType = 2" :class="titType === 2 ? 'item select' : 'item'"><text>已使用</text></view>
-			<view @click="titType = 3" :class="titType === 3 ? 'item select' : 'item'"><text>已过期</text></view>
+			<view @click="chageTit(1)" :class="titType === 1 ? 'item select' : 'item'"><text>可使用</text></view>
+			<view @click="chageTit(2)" :class="titType === 2 ? 'item select' : 'item'"><text>已使用</text></view>
+			<view @click="chageTit(3)" :class="titType === 3 ? 'item select' : 'item'"><text>已过期</text></view>
 		</view>
 		<view class="counponListBox">
+			<will-nodata v-if="counponList[titType - 1].length === 0" style="padding-top: 30px;"></will-nodata>
 			<view
-				v-if="titType === item.status"
-				v-for="(item, index) in counponList"
+				v-for="(item, index) in counponList[titType - 1]"
 				:key="index"
-				:style="{ background: item.status === 1 ? '#ff6f72' : '#c9c9c9' }"
+				:style="{ background: titType === 1 ? '#ff6f72' : '#c9c9c9' }"
 				class="item  pulse flex align-center"
 			>
 				<view class="content flex  align-center">
 					<view class="price flex  align-center">
 						<text>￥</text>
-						<text class="num">{{ item.price }}</text>
+						<text class="num">{{ item.discount_money }}</text>
 					</view>
 					<view class="right flex align-center justify-around">
 						<view>
-							<view class="name">{{ item.name }}</view>
-							<view class="data">2020-0-02到期</view>
+							<view class="name">满{{ item.start_money }}减{{ item.discount_money }}</view>
+							<view class="data">{{ item.over_date.split(' ')[0] }}到期</view>
 						</view>
-						<button class="btn cu-btn">{{ item.status === 1 ? '立即使用' : item.status === 2 ? '已使用' : '已过期' }}</button>
+						<!-- <button class="btn cu-btn">{{ titType === 1 ? '立即使用' : titType=== 2 ? '已使用' : '已过期' }}</button> -->
 					</view>
 				</view>
 			</view>
@@ -36,29 +36,34 @@ export default {
 	data() {
 		return {
 			titType: 1,
-			counponList: [
-				{ name: '无门槛', status: 1, getDate: '2020-03-08 15:15:15', price: 20, tit: '优惠卷说明', id: 123 },
-				{ name: '满20元减10', status: 2, getDate: '2020-03-08 15:15:15', price: 10, tit: '优惠卷说明', id: 1223 },
-				{ name: '满20元减10', status: 3, getDate: '2020-03-08 15:15:15', price: 10, tit: '优惠卷说明', id: 1223 }
-			]
+			counponList: [[], [], []]
 		};
 	},
 	onLoad() {
-		// this.getList()
+		this.getList();
 	},
 	methods: {
+		chageTit(type) {
+			if (Number(type) === this.titType) {
+				return;
+			}
+			this.titType = Number(type);
+			this.getList();
+		},
 		getList() {
 			this.showLoading();
 			this.request({
-				url: '',
+				url: '/prize/myCouponList',
+				method: 'POST',
 				data: {
-					id: uni.getStorageSync('userInfo').id
+					coupon_type: this.titType
 				},
 				success: res => {
 					uni.hideLoading();
 					console.log('优惠卷列表', res);
-					if (res.data.returnCode === 1) {
-						this.counponList = res.data.list;
+					if (res.data.status === 1) {
+						this.counponList.splice(this.titType - 1, 1, res.data.list);
+						console.log(this.counponList);
 					}
 				}
 			});

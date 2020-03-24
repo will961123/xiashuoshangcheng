@@ -10,13 +10,13 @@
 		</view>
 
 		<swiper @change="swiperChange" :current="type" class="orderList" style="height: calc(100% - 100rpx);">
-			<swiper-item v-for="(swiperitem, swiperindex) in orderList" :key="swiperindex" class="orderList">
+			<swiper-item v-for="(swiperitem, swiperindex) in orderList" :key="swiperindex" class="orderList" style="padding: 0 30rpx;box-sizing: border-box;">
 				<scroll-view @scrolltolower="scrollBottom" :scroll-y="true" style="width: 100%;height: 100%;">
 					<view v-for="(item, index) in orderList[swiperindex]" :key="index" :class="{ nomargin: index === orderList[swiperindex].length - 1 }" class="item bg-white">
 						<view class="datebox flex justify-between">
 							<view>{{ item.date }}</view>
-							<view v-if="item.order_status!=-1" class="tip">{{ typelist[item.order_status - 1] }}</view>
-							<view v-else   class="tip">{{ item.is_back===1?'申请退款':'退款完成' }}</view>
+							<view v-if="item.order_status != -1" class="tip">{{ typelist[item.order_status - 1] }}</view>
+							<view v-else class="tip">{{ item.is_back === 1 ? '申请退款' : '退款完成' }}</view>
 						</view>
 						<view class="goodsinfoBox">
 							<view @click="gotoOrderDetail(item)" class="goods flex" v-for="(goods, goodsindex) in item.product_order_list" :key="goodsindex">
@@ -34,6 +34,13 @@
 									</view>
 								</view>
 							</view>
+							
+							<view class="totalbox" style=" border-bottom: 1rpx solid #ededed;  text-align:  left;padding: 10px 0;margin-top: 0;" >
+								商品类型：
+								<text v-if="item.order_type===0" >普通商品</text>
+								<text v-else-if="item.order_type===1">中奖商品</text>
+								<text v-else-if="item.order_type===1">拼团商品</text>
+							</view>
 							<view class="totalbox">
 								共{{ item.product_order_list | getGoodsNum }}件商品
 								<text style="margin: 0 22rpx;">合计:</text>
@@ -45,9 +52,13 @@
 								<!-- <button @click="contactUs" v-if="item.state < 4" class="btn bg-white cu-btn">联系卖家</button> -->
 								<button @click="cancelOrder" :data-item="JSON.stringify(item)" v-if="item.order_status === 1" class="btn bg-white cu-btn">取消订单</button>
 								<button @click="payment" :data-item="JSON.stringify(item)" v-if="item.order_status === 1" class="btn bg-white cu-btn">确认付款</button>
-								<button @click="refund" :data-item="JSON.stringify(item)" v-if="item.order_status === 2" class="btn bg-white cu-btn">退款</button>
+								<button @click="refund" :data-item="JSON.stringify(item)" v-if="item.order_status === 2 && item.order_type !== 1" class="btn bg-white cu-btn">
+									退款
+								</button> 
 								<button @click="receipt" :data-item="JSON.stringify(item)" v-if="item.order_status === 3" class="btn bg-white cu-btn">确认收货</button>
-								<button @click="gotoEvaluate" :data-item="JSON.stringify(item)" v-if="item.order_status === 4" class="btn bg-white cu-btn">去评价</button>
+								<button @click="gotoEvaluate" :data-item="JSON.stringify(item)" v-if="item.order_status === 4 && item.order_type !== 1" class="btn bg-white cu-btn">
+									去评价
+								</button>
 								<button @click="cancelOrder" :data-item="JSON.stringify(item)" v-if="item.order_status === 5" class="btn bg-white cu-btn">删除订单</button>
 								<!-- <button @click="changeOrderType2" :data-item="item" v-if="item.state === 5" class="btn bg-white cu-btn">改成待评价</button> -->
 							</view>
@@ -133,14 +144,12 @@ export default {
 							success: res => {
 								uni.hideLoading();
 								console.log('取消订单', res);
-								if(res.data.status===1){
+								if (res.data.status === 1) {
 									this.orderList.splice(this.type, 1, []);
 									this.getOrderList();
-								}else{
-									this.showToast(res.data.info)
+								} else {
+									this.showToast(res.data.info);
 								}
-								
-								
 							}
 						});
 					}
@@ -197,7 +206,7 @@ export default {
 							},
 							success: res => {
 								uni.hideLoading();
-								this.type =  4
+								this.type = 4;
 								this.orderList.splice(this.type, 1, []);
 								this.getOrderList();
 								console.log('确认收货', res);
@@ -216,9 +225,9 @@ export default {
 		},
 		// 去订单详情
 		gotoOrderDetail(item) {
-			console.log(item); 
+			console.log(item);
 			uni.navigateTo({
-				url: '/pages/my/orderDetail?orderId=' +item.order_id
+				url: '/pages/my/orderDetail?orderId=' + item.order_id
 			});
 		},
 		changeOrderType2(e) {
@@ -345,6 +354,8 @@ page {
 
 	.orderList {
 		.item {
+			border-radius: 10rpx;
+			box-sizing: border-box;
 			padding: 0 30rpx 30rpx 30rpx;
 			margin-bottom: 10px;
 			&.nomargin {
@@ -361,6 +372,7 @@ page {
 			}
 
 			.goodsinfoBox {
+				
 				.goods {
 					padding: 20rpx 0;
 					width: 100%;
@@ -377,8 +389,10 @@ page {
 
 					.infobox {
 						flex: 1;
-						margin-left: 32rpx;
-						padding: 16rpx 0;
+						// margin-left: 32rpx;
+						padding: 16rpx 0rpx;
+						box-sizing: border-box;
+						padding-left: 30rpx;
 						.info {
 							font-size: 26rpx;
 							color: #333333;
@@ -386,7 +400,7 @@ page {
 								overflow: hidden;
 								text-overflow: ellipsis;
 								white-space: nowrap;
-								width: 450rpx;
+								width: 400rpx;
 							}
 							.gg {
 								font-size: 22rpx;

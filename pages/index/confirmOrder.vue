@@ -65,7 +65,7 @@
 		</view>
 
 		<view class="mainbox bg-white">
-			<view class="payStyle flex justify-between align-center">
+			<view v-if="from !== 3" class="payStyle flex justify-between align-center">
 				支付方式
 				<text>微信支付</text>
 				<!-- <text @click="choosePayStyle" v-if="goodslist[0].hot != 4">{{ payStyle === 1 ? '微信支付' : payStyle === 2 ? '支付宝支付' : '余额支付' }}</text> -->
@@ -84,16 +84,17 @@
 							<view class="gg">{{ item.productSpecName }}</view>
 						</view>
 						<view class="moneybox flex justify-between">
-							<view v-if="goodslist[0].hot != 4" class="money">
+							<view v-if="from != 3" class="money">
 								￥
 								<text>{{ item.price }}</text>
 							</view>
-							<view v-else class="money">
+							<view v-else class="money"><text>中奖商品</text></view>
+							<!-- <view v-else class="money">
 								积分：
 								<text>{{ item.price }}</text>
-							</view>
+							</view> -->
 							<!-- <view class="num">×{{ item.number }}</view> -->
-							<sunui-stepper  :label="index" class="num" :val="item.number" :min="1" :max="999" @change="stepperChange"></sunui-stepper>
+							<sunui-stepper :label="index" class="num" :val="item.number" :min="1" :max="from === 3 ? 1 : 999" @change="stepperChange"></sunui-stepper>
 						</view>
 					</view>
 				</view>
@@ -105,21 +106,22 @@
 					<image src="/static/aroow.png" mode="aspectFill"></image>
 				</view>
 			</view> -->
-			<view class="message flex  align-center">
+			<view v-if="from !== 3" class="message flex  align-center">
 				买家留言
 				<input type="text" v-model="message" placeholder="对本次交易的说明 " />
 			</view>
 			<view class="totbox">
 				共{{ goodslist.length }}件商品
-				<text class="ff">共计：</text>
-				<text v-if="goodslist[0].hot != 4" class="money">￥{{ allPrice }}</text>
-				<text v-else class="money">积分：{{ allPrice }}</text>
+				<text v-if="from !== 3" class="ff">共计：</text>
+				<text v-if="from !== 3" class="money">￥{{ allPrice }}</text>
+				<!-- <text v-else class="money">积分：{{ allPrice }}</text> -->
 			</view>
 		</view>
 
 		<view class="buynowbox flex">
-			<view v-if="goodslist[0].hot != 4" class="tot btn bg-white">￥{{ allPrice }}</view>
-			<view v-else class="tot btn bg-white">积分：{{ allPrice }}</view>
+			<view v-if="from !== 3" class="tot btn bg-white">￥{{ allPrice }}</view>
+			<view v-else class="tot btn bg-white">中奖商品</view>
+			<!-- <view v-else class="tot btn bg-white">积分：{{ allPrice }}</view> -->
 			<button @click="saveOrder" class="buynow btn cu-btn">立即购买</button>
 		</view>
 
@@ -150,7 +152,7 @@
 export default {
 	data() {
 		return {
-			from: 1, // 1 详情来 2 购物车来
+			from: 1, // 1 详情来 2 购物车来 3 我的奖品
 			goodslist: [],
 			cartIds: [],
 			addressInfo: '',
@@ -161,7 +163,7 @@ export default {
 			assemble: {},
 			assembleByself: false,
 
-			buyType: 1, // 1 普通 2 参与拼团 3 发起拼团 4 会员领取 5分享领取
+			buyType: 1, // 1 普通 2 参与拼团 3 发起拼团 4 会员领取 5分享领取 6我的奖品
 
 			showCounp: false,
 			animationData: {},
@@ -172,7 +174,7 @@ export default {
 		this.buyType = options.buyType ? Number(options.buyType) : 1;
 		console.log(this.buyType, '----1 普通 2 参与拼团 3 发起拼团 4 会员领取 5分享领取');
 		if (options.from) {
-			this.from = Number(options.type) || 1;
+			this.from = Number(options.from) || 1;
 			this.goodslist = JSON.parse(options.goodslist);
 			this.cartIds = options.cartIds ? JSON.parse(options.cartIds) : [];
 			console.log('商品', this.goodslist, '购物车', this.cartIds);
@@ -182,11 +184,12 @@ export default {
 			this.assemble = JSON.parse(options.assemble);
 			this.isAssemble = true;
 			console.log('参与拼团', this.assemble);
-		}
-		if (options.buyType == 3) {
+		} else if (options.buyType == 3) {
 			this.isAssemble = true;
 			this.assembleByself = true;
 			console.log('发起拼团');
+		} else if (options.buyType == 6) {
+			console.log('我的奖品 ');
 		}
 		this.animationShow();
 	},
@@ -208,7 +211,7 @@ export default {
 			console.log(e);
 			let idx = e.label;
 			let val = e.val;
-			console.log('idx:',idx,'val:',val)
+			console.log('idx:', idx, 'val:', val);
 			let goodslist = this.goodslist;
 			goodslist[idx].number = val;
 			goodslist[idx].total = goodslist[idx].number * goodslist[idx].price;
@@ -252,67 +255,88 @@ export default {
 				this.showToast(请重新选择商品);
 				return;
 			}
-			let userInfo = uni.getStorageSync('userInfo');
-			// if (!userInfo) {
-			// 	this.showToast('请先登录');
-			// 	return;
-			// }
 
 			let orderType = 2;
-			// let formdata = {
-			// 	payUserId: userInfo.userId,
-			// 	price: this.allPrice,
-			// 	payStyle: this.payStyle, // 支付方式 1微信 2支付宝 3余额
-			// 	state: 1,
-			// 	logisticsType: 1, // 配送方式 1快递
-			// 	receiver: this.addressInfo.name,
-			// 	province: this.addressInfo.province,
-			// 	city: this.addressInfo.city,
-			// 	area: this.addressInfo.area,
-			// 	address: this.addressInfo.province + this.addressInfo.city + this.addressInfo.area + this.addressInfo.address,
-			// 	phone: this.addressInfo.phone,
-			// 	remark: this.message ? this.message : '',
-			// 	orderType: orderType, // 1活动 2普通 3会员 4新人 5积分
-			// 	carts: JSON.stringify(this.goodslist)
-			// };
-			let formdata = {
-				product_ids: this.goodslist
-					.map(i => {
-						return i.productId;
-					})
-					.join(','),
-				product_nums: this.goodslist
-					.map(i => {
-						return i.number;
-					})
-					.join(','),
-				consignee: this.addressInfo.userName,
-				phone: this.addressInfo.telNumber,
-				address: this.addressInfo.detailInfo,
-				province_name: this.addressInfo.provinceName,
-				city_name: this.addressInfo.cityName,
-				buy_note: this.message,
-				area_name: this.addressInfo.countyName,
-				is_cart: Number(this.from) === 1 ? 0 : 1
-			};
-			this.showLoading();
-			this.request({
-				url: '/order/addOrder',
-				method: 'POST',
-				data: formdata,
-				success: res => {
-					console.log('生成订单编号', res); 
-					if (res.data.status === 1) {
-						uni.redirectTo({
-							url: '/pages/index/paymentResult?type=1'
-						});
-						// this.changeOrderType(res.data.obj.id, 2);
-						// this.del();
-					} else {
-						this.showToast(res.data.info);
+			if (this.from === 3) {
+				let formdata = {
+					prize_log_id: this.goodslist
+						.map(i => {
+							return i.productId;
+						})
+						.join(','),
+					product_nums: this.goodslist
+						.map(i => {
+							return i.number;
+						})
+						.join(','),
+					consignee: this.addressInfo.userName,
+					phone: this.addressInfo.telNumber,
+					address: this.addressInfo.detailInfo,
+					province_name: this.addressInfo.provinceName,
+					city_name: this.addressInfo.cityName,
+					buy_note: this.message,
+					area_name: this.addressInfo.countyName,
+					is_cart: Number(this.from) === 1 ? 0 : 1
+				};
+				console.log(formdata) 
+				this.showLoading();
+				this.request({
+					url: '/prize/addPrizeOrder',
+					method: 'POST',
+					data: formdata,
+					success: res => {
+						console.log('我的奖品--生成订单编号', res);
+						if (res.data.status === 1) {
+							uni.redirectTo({
+								url: '/pages/index/paymentResult?type=1'
+							});
+							// this.changeOrderType(res.data.obj.id, 2);
+							// this.del();
+						} else {
+							this.showToast(res.data.info);
+						}
 					}
-				}
-			});
+				});
+			} else {
+				let formdata = {
+					product_ids: this.goodslist
+						.map(i => {
+							return i.productId;
+						})
+						.join(','),
+					product_nums: this.goodslist
+						.map(i => {
+							return i.number;
+						})
+						.join(','),
+					consignee: this.addressInfo.userName,
+					phone: this.addressInfo.telNumber,
+					address: this.addressInfo.detailInfo,
+					province_name: this.addressInfo.provinceName,
+					city_name: this.addressInfo.cityName,
+					buy_note: this.message,
+					area_name: this.addressInfo.countyName,
+					is_cart: Number(this.from) === 1 ? 0 : 1
+				};
+				this.showLoading();
+				this.request({
+					url: '/order/addOrder',
+					method: 'POST',
+					data: formdata,
+					success: res => {
+						console.log('生成订单编号', res);
+						if (res.data.status === 1) {
+							uni.redirectTo({
+								url: '/pages/index/paymentResult?type=1'
+							});
+							// this.changeOrderType(res.data.obj.id, 2);
+							// this.del();
+						} else {
+							this.showToast(res.data.info);
+						}
+					}
+				});
+			}
 		},
 		// 改变订单状态
 		changeOrderType(id, state) {
@@ -363,45 +387,36 @@ export default {
 			var that = this;
 			uni.getSetting({
 				success(res) {
-					console.log(res);
 					if (res.authSetting['scope.address']) {
-						console.log('授权成功');
+						console.log('用户已经同意接口不会弹窗询问');
 						uni.chooseAddress({
 							success(res) {
-								// console.log(res.userName);
-								// console.log(res.postalCode);
-								// console.log(res.provinceName);
-								// console.log(res.cityName);
-								// console.log(res.countyName);
-								// console.log(res.detailInfo);
-								// console.log(res.nationalCode);
-								// console.log(res.telNumber);
 								console.log(res);
 								that.addressInfo = res;
 							}
 						});
 					} else {
 						if (res.authSetting['scope.address'] == false) {
-							console.log('需要打开授权界面');
+							console.log('拒绝了授权，主动打开授权');
 							uni.openSetting({
 								success(res) {
-									console.log('设置结果', res.authSetting);
+									console.log(res.authSetting);
 									if (res.authSetting['scope.address']) {
-										uni.chooseAddress({
+										wx.chooseAddress({
 											success(res) {
-												// console.log(res.userName);
-												// console.log(res.postalCode);
-												// console.log(res.provinceName);
-												// console.log(res.cityName);
-												// console.log(res.countyName);
-												// console.log(res.detailInfo);
-												// console.log(res.nationalCode);
-												// console.log(res.telNumber);
 												console.log(res);
 												that.addressInfo = res;
 											}
 										});
 									}
+								}
+							});
+						} else {
+							console.log('第一次授权');
+							uni.chooseAddress({
+								success(res) {
+									console.log(res);
+									that.addressInfo = res;
 								}
 							});
 						}

@@ -63,6 +63,10 @@
 						<view class="imgbox"><image src="../../static/my_icon6.png" mode="aspectFit"></image></view>
 						<text>我的奖品</text>
 					</view> 
+					<view @click="gotoGj(7)" style="width: 25%;" class="item flex flex-direction align-center ">
+						<view class="imgbox"><image src="../../static/my_icon9.png" mode="aspectFit"></image></view>
+						<text>我的投稿</text>
+					</view> 
 				</view> 
 			</view>
 			<!-- <view class="mainbox item2  bg-white">
@@ -274,7 +278,7 @@ export default {
 					break;
 				case 7:
 					uni.navigateTo({
-						url: '/pages/my/myAddress'
+						url: '/pages/my/myContributionList'
 					});
 					break;
 				case 8:

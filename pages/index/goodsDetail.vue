@@ -299,6 +299,7 @@ export default {
 	},
 	methods: {
 		viewImage(e) {
+			console.log(e.currentTarget.dataset )
 			uni.previewImage({
 				urls: e.currentTarget.dataset.list,
 				current: e.currentTarget.dataset.url
@@ -391,7 +392,7 @@ export default {
 			}
 			this.showSpec = false;
 			let url = '/pages/index/confirmOrder?from=1&goodslist=' + JSON.stringify(goodslist);
-			// buyType 1普通 2参与拼图 3发起拼图 4会员 5分享
+			// buyType 1普通 2参与拼图 3发起拼图 4会员 5分享 6我的奖品
 			if (buyType === 1) {
 				uni.navigateTo({
 					url: url

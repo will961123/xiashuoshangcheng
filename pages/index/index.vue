@@ -174,7 +174,7 @@ export default {
 					url = '/pages/index/luckDraw';
 					break;
 				case 3:
-					url = '/pages/index/uploadProdect';
+					url = '/pages/index/categoryList';
 					break;
 				case 4:
 					url = '/pages/index/prodectList?type=' + 1;
