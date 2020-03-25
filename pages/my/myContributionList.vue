@@ -10,28 +10,31 @@
 				<text>删除</text>
 			</view>
 		</view>
-		<view v-for="(item, index) in list" class="item">
-			<view @click="gotoAddCategory(2, item)" class="topbox flex align-center justify-end">
+		<view v-for="(item, index) in list" :key="index" class="item">
+			<!-- <view @click="gotoAddCategory(2, item)" class="topbox flex align-center justify-end">
 				<image src="/static/xiugai.png" mode="aspectFill"></image>
 				<text>修改</text>
-			</view>
+			</view> -->
 			<view class="infoBox flex align-center">
 				<view class="left flex align-center">
-					<image @click="changeRadio(index)" class="select" :src="selectIdx[index] ? '/static/select.png' : '/static/noo.png'" mode="aspectFill"></image>
-					<image class="pic" :src="item.pic" mode="aspectFill"></image>
+					<view @click="changeRadio(index)" style="padding-right:24rpx ;">
+						<image class="select" :src="selectIdx[index] ? '/static/select.png' : '/static/noo.png'" mode="aspectFill"></image>
+					</view>
+					<image class="pic" :src="item.picture" mode="aspectFill"></image>
 				</view>
 				<view class="right flex flex-direction  ">
 					<view class="titbox">
-						<view class="tit1 textov1 ">{{ item.tit1 }}</view>
-						<view class="tit2  textov1 ">{{ item.tit2 }}</view>
+						<view class="tit1 textov1 ">{{ item.title }}</view>
+						<view class="tit2  textov1 ">{{ item.desc }}</view>
 					</view>
 					<view class="viewbox">
-						<image src="../../static/eye.png" mode="aspectFill"></image>
-						<text>{{ item.view }}</text>
+						<image src="/static/eye.png" mode="aspectFill" style="margin-right: 6px;"></image>
+						<text>{{ item.see_num }}</text>
 					</view>
 				</view>
 			</view>
 		</view>
+		<will-nodata v-if="list.length==0" ></will-nodata>
 	</view>
 </template>
 
@@ -39,15 +42,38 @@
 export default {
 	data() {
 		return {
-			list: [
-				{ pic: '/static/aboutusbg.png', tit1: '标题标题标题标题标题标', tit2: '标题标题标题标题标题标', id: 123, view: 3333 },
-				{ pic: '/static/aboutusbg.png', tit1: '标题标题标题标题标题标', tit2: '标题标题标题标题标题标', id: 233, view: 444 }
-			],
-			selectIdx: [true, false]
+			list: [],
+			selectIdx: []
 		};
 	},
+	onShow() {
+		this.getList();
+	},
 	methods: {
-		gotoAddCategory(type, item) { 
+		getList() {
+			this.showLoading();
+			this.request({
+				url: '/works/getMyList',
+				data: {},
+				success: res => {
+					uni.hideLoading();
+					console.log('投稿列表', res);
+					if (res.data.status === 1) {
+						res.data.list = res.data.list.map(i => {
+							i.picture = res.data.image_url + i.picture;
+							return i;
+						});
+						this.list = res.data.list;
+						let newSelect = new Array(res.data.list.length).fill(false);
+						this.selectIdx = newSelect;
+					} else {
+						this.list = [];
+						this.selectIdx = [];
+					}
+				}
+			});
+		},
+		gotoAddCategory(type, item) {
 			if (type === 1) {
 				uni.navigateTo({
 					url: '/pages/my/upLoadContribution'
@@ -81,6 +107,27 @@ export default {
 					this.showToast('请勾选文稿');
 					return;
 				}
+				uni.showModal({
+					title: '删除文稿',
+					content: '确定删除吗?',
+					success: res => {
+						if (res.confirm) {
+							this.showLoading();
+							this.request({
+								url: '/works/postDelete',
+								method: 'POST',
+								data: {
+									works_ids: idArr.join(',')
+								},
+								success: res => {
+									uni.hideLoading();
+									console.log('删除结果', res);
+									this.getList();
+								}
+							});
+						}
+					}
+				});
 			}
 		}
 	}
@@ -122,7 +169,7 @@ export default {
 				.select {
 					width: 34rpx;
 					height: 34rpx;
-					margin-right: 24rpx;
+					// margin-right: 24rpx;
 				}
 				.pic {
 					width: 220rpx;

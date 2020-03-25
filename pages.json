@@ -177,14 +177,9 @@
 				"navigationBarTitleText": "商品评价"
 			}
 		}, {
-			"path": "pages/index/prodectList",
+			"path": "pages/index/categoryDetail",
 			"style": {
-				"navigationBarTitleText": "文章列表"
-			}
-		}, {
-			"path": "pages/index/prodectDetail",
-			"style": {
-				"navigationBarTitleText": "文章详情"
+				"navigationBarTitleText": "文稿详情"
 			}
 		},
 		{

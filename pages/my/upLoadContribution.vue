@@ -5,9 +5,9 @@
 				<text>标题：</text>
 				<input v-model="itemInfo.tit1" type="text" placeholder="请输入文稿标题" />
 			</view>
-			<view class="item flex align-center">
+			<view class="item  item2  ">
 				<text>描述：</text>
-				<input v-model="itemInfo.tit2" type="text" placeholder="请输入文稿副标题" />
+				<view class=""><textarea style=" height: 80px;width: 100%;" maxlength="-1" v-model="itemInfo.tit2" type="text" placeholder="请输入文稿描述" /></view>
 			</view>
 		</view>
 
@@ -18,9 +18,9 @@
 					<text class="tip">（最多上传1个视频）</text>
 				</view>
 				<view @click="chooseVideo" class="imgBox">
-					<video v-if="itemInfo.videoSrc" :src="itemInfo.videoSrc" src="" controls></video>
+					<video v-if="itemInfo.temporaryVideo" :src="itemInfo.temporaryVideo" src="" controls></video>
 					<view v-else class="noImg flex flex-direction align-center justify-between">
-						<image src="/static/aboutusbg.png" mode="aspectFill"></image>
+						<image src="/static/uploadVideo.png" mode="aspectFill"></image>
 						<text>上传视频</text>
 					</view>
 				</view>
@@ -31,15 +31,15 @@
 					<text class="tip">（最多上传1张）</text>
 				</view>
 				<view @click="chooseImg" class="imgBox">
-					<image v-if="itemInfo.imgSrc" :src="itemInfo.imgSrc" mode="aspectFill"></image>
+					<image v-if="itemInfo.temporaryImg" :src="itemInfo.temporaryImg" mode="aspectFill"></image>
 					<view v-else class="noImg flex flex-direction align-center justify-between">
-						<image src="/static/aboutusbg.png" mode="aspectFill"></image>
+						<image src="/static/uploadPic.png" mode="aspectFill"></image>
 						<text>上传封面</text>
 					</view>
 				</view>
 			</view>
 		</view>
-		<view class="flex justify-center">
+		<view class="flex justify-center" style="padding-bottom: 40px;">
 			<button @click="saveCategory" class="btn cu-btn bg-green">{{ type === 1 ? '确定修改' : '确定发布' }}</button>
 		</view>
 	</view>
@@ -54,7 +54,9 @@ export default {
 				tit1: '',
 				tit2: '',
 				videoSrc: '',
-				imgSrc: ''
+				imgSrc: '',
+				temporaryVideo: '',
+				temporaryImg: ''
 			}
 		};
 	},
@@ -75,7 +77,7 @@ export default {
 				return;
 			}
 			if (!this.itemInfo.tit2) {
-				this.showToast('请输入副标题');
+				this.showToast('请输入描述');
 				return;
 			}
 			if (!this.itemInfo.videoSrc) {
@@ -86,14 +88,67 @@ export default {
 				this.showToast('请上传封面');
 				return;
 			}
+			this.showLoading();
+			this.request({
+				url: '/works/postAdd',
+				method: 'POST',
+				data: {
+					title: this.itemInfo.tit1,
+					desc: this.itemInfo.tit2,
+					picture: this.itemInfo.imgSrc,
+					video: this.itemInfo.videoSrc
+				},
+				success: res => {
+					uni.hideLoading();
+					console.log('保存结果', res);
+					if (res.data.status == 1) {
+						this.showToast('保存成功');
+						setTimeout(() => {
+							uni.navigateBack({
+								delta: 1
+							});
+						}, 500);
+					} else {
+						this.showToast(res.data.info);
+					}
+				}
+			});
 		},
 		chooseVideo() {
 			uni.chooseVideo({
 				count: 1,
 				sourceType: ['camera', 'album'],
 				success: res => {
-					console.log(res.tempFilePath);
-					this.itemInfo.videoSrc = res.tempFilePath;
+					console.log('临时路径', res);
+					this.itemInfo.temporaryVideo = res.tempFilePath;
+					if (res.size > 1024 * 1024 * 24) {
+						this.showToast('视频需要在24MB以内!');
+						return;
+					}
+					this.showLoading();
+					uni.uploadFile({
+						url: this.uploadUrl + '/admin/upload',
+						filePath: res.tempFilePath,
+						name: 'file',
+						formData: {},
+						success: res => {
+							uni.hideLoading();
+							console.log('上传视频', res);
+							let resoult = JSON.parse(res.data);
+							if (resoult.status === 1) {
+								this.itemInfo.videoSrc = resoult.url;
+								console.log(this.itemInfo);
+							} else {
+								this.showToast(resoult.info);
+								this.itemInfo.temporaryVideo = '';
+							}
+						},
+						fail: err => {
+							this.showToast('上传失败!');
+							this.itemInfo.temporaryVideo = '';
+							console.log(err);
+						}
+					});
 				},
 				fail: err => {
 					console.log(err);
@@ -104,8 +159,28 @@ export default {
 			uni.chooseImage({
 				count: 1,
 				success: res => {
-					console.log(res.tempFilePaths[0]);
-					this.itemInfo.imgSrc = res.tempFilePaths[0];
+					this.itemInfo.temporaryImg = res.tempFilePaths[0];
+					uni.uploadFile({
+						url: this.uploadUrl + '/admin/upload',
+						filePath: res.tempFilePaths[0],
+						name: 'file',
+						formData: {},
+						success: res => {
+							uni.hideLoading();
+							let resoult = JSON.parse(res.data);
+							console.log('上传图片', resoult);
+							if (resoult.status === 1) {
+								this.itemInfo.imgSrc = resoult.url;
+								console.log(this.itemInfo);
+							} else {
+								this.showToast(resoult.info);
+								this.itemInfo.temporaryImg = '';
+							}
+						},
+						fail: err => {
+							console.log(err);
+						}
+					});
 				}
 			});
 		}

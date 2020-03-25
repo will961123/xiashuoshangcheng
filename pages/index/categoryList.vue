@@ -1,40 +1,29 @@
 <template>
 	<view class="categoryList">
-		<view class="search bg-white flex align-center"> 
+		<view class="search bg-white flex align-center">
 			<view class="searchiptbox flex align-center">
 				<image src="/static/search.png" mode="aspectFill"></image>
 				<input v-model="searchName" type="text" placeholder="请输入关键字" value="" />
-				<view style="width: 40px;height: 100%;line-height: 30px;margin-left: 10px;" >搜索</view>
+				<view  @click="getList" style="width: 40px;height: 100%;line-height: 30px;margin-left: 10px;">搜索</view>
 			</view>
 		</view>
 
 		<view style="background: #fff;padding: 0 30rpx;">
-			<view class="item flex">
-				<image class="pic" src="/static/aboutusbg.png" mode="aspectFill"></image>
+			<view @click="gotoCategoryDetail(item.id)" v-for="(item, index) in list" :key="index" class="item flex">
+				<image class="pic" :src="item.picture" mode="aspectFill"></image>
 				<view class="right flex flex-direction justify-between">
 					<view class="titbox">
-						<view class="tit1 textov1">标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题</view>
-						<view class="tit2 textov1">标题标题标题标题标题标题标题标题标题标题标题标题</view>
+						<view class="tit1 textov1">{{ item.title }}</view>
+						<view class="tit2 textov1">{{ item.desc }}</view>
 					</view>
 					<view>
-						<image class="icon" src="/static/eye.png" mode="widthFix"></image>
-						<text>123</text>
+						<image class="icon" src="/static/eye.png" style="margin-right: 6px;" mode="widthFix"></image>
+						<text>{{ item.see_num }}</text>
 					</view>
 				</view>
 			</view>
-			<view class="item flex">
-				<image class="pic" src="/static/aboutusbg.png" mode="aspectFill"></image>
-				<view class="right flex flex-direction justify-between">
-					<view class="titbox">
-						<view class="tit1 textov1">标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题</view>
-						<view class="tit2 textov1">标题标题标题标题标题标题标题标题标题标题标题标题</view>
-					</view>
-					<view>
-						<image class="icon" src="/static/eye.png" mode="widthFix"></image>
-						<text>123</text>
-					</view>
-				</view>
-			</view>
+			
+			<will-nodata v-if="list.length==0" ></will-nodata>
 		</view>
 	</view>
 </template>
@@ -43,15 +32,45 @@
 export default {
 	data() {
 		return {
-			searchName:''
+			searchName: '',
+			list: []
 		};
+	},
+	onLoad() {
+		this.getList();
+	},
+	methods: {
+		getList() {
+			this.showLoading();
+			this.request({
+				url: '/works/getList/'+this.searchName , 
+				data: {},
+				success: res => {
+					uni.hideLoading();
+					console.log('投稿列表', res);
+					if(res.data.status===1){
+						res.data.list = res.data.list.map(i => {
+							i.picture = res.data.image_url + i.picture;
+							return i;
+						});
+						this.list = res.data.list;
+					}
+					
+				}
+			});
+		},
+		gotoCategoryDetail(id) {
+			uni.navigateTo({
+				url: '/pages/index/categoryDetail?id=' + id
+			});
+		}
 	}
 };
 </script>
 
 <style lang="less">
 page {
-	background: #f5f2f5;
+	background: #fff;
 }
 .categoryList {
 	.search {
@@ -87,7 +106,7 @@ page {
 		width: 100%;
 		padding: 15px 0;
 		border-bottom: 1rpx solid #dbd8db;
-		&:last-child{
+		&:last-child {
 			border-bottom: none !important;
 		}
 		.pic {
