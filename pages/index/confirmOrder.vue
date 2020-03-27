@@ -65,7 +65,7 @@
 		</view>
 
 		<view class="mainbox bg-white">
-			<view v-if="from !== 3" class="payStyle flex justify-between align-center">
+			<view v-if="from !== 3 && from !== 4" class="payStyle flex justify-between align-center">
 				支付方式
 				<text>微信支付</text>
 				<!-- <text @click="choosePayStyle" v-if="goodslist[0].hot != 4">{{ payStyle === 1 ? '微信支付' : payStyle === 2 ? '支付宝支付' : '余额支付' }}</text> -->
@@ -84,17 +84,18 @@
 							<view class="gg">{{ item.productSpecName }}</view>
 						</view>
 						<view class="moneybox flex justify-between">
-							<view v-if="from != 3" class="money">
+							<view v-if="from !== 3 && from !== 4" class="money">
 								￥
 								<text>{{ item.price }}</text>
 							</view>
-							<view v-else class="money"><text>中奖商品</text></view>
+							<view v-else-if="from == 3" class="money"><text>中奖商品</text></view>
+							<view v-else-if="from == 4" class="money"><text>零元抢购</text></view>
 							<!-- <view v-else class="money">
 								积分：
 								<text>{{ item.price }}</text>
 							</view> -->
 							<!-- <view class="num">×{{ item.number }}</view> -->
-							<sunui-stepper :label="index" class="num" :val="item.number" :min="1" :max="from === 3 ? 1 : 999" @change="stepperChange"></sunui-stepper>
+							<sunui-stepper :label="index" class="num" :val="item.number" :min="1" :max="from === 3 || from == 4 ? 1 : 999" @change="stepperChange"></sunui-stepper>
 						</view>
 					</view>
 				</view>
@@ -106,21 +107,22 @@
 					<image src="/static/aroow.png" mode="aspectFill"></image>
 				</view>
 			</view> -->
-			<view v-if="from !== 3" class="message flex  align-center">
+			<view v-if="from !== 3 && from !== 4" class="message flex  align-center">
 				买家留言
 				<input type="text" v-model="message" placeholder="对本次交易的说明 " />
 			</view>
 			<view class="totbox">
-				共{{ goodslist.length }}件商品
-				<text v-if="from !== 3" class="ff">共计：</text>
-				<text v-if="from !== 3" class="money">￥{{ allPrice }}</text>
+				共{{ goodsLength }}件商品
+				<text v-if="from !== 3 && from !== 4" class="ff">共计：</text>
+				<text v-if="from !== 3 && from !== 4" class="money">￥{{ allPrice }}</text>
 				<!-- <text v-else class="money">积分：{{ allPrice }}</text> -->
 			</view>
 		</view>
 
 		<view class="buynowbox flex">
-			<view v-if="from !== 3" class="tot btn bg-white">￥{{ allPrice }}</view>
-			<view v-else class="tot btn bg-white">中奖商品</view>
+			<view v-if="from !== 3 && from !== 4" class="tot btn bg-white">￥{{ allPrice }}</view>
+			<view v-else-if="from == 3" class="tot btn bg-white">中奖商品</view>
+			<view v-else-if="from == 4" class="tot btn bg-white">零元抢购</view>
 			<!-- <view v-else class="tot btn bg-white">积分：{{ allPrice }}</view> -->
 			<button @click="saveOrder" class="buynow btn cu-btn">立即购买</button>
 		</view>
@@ -152,7 +154,7 @@
 export default {
 	data() {
 		return {
-			from: 1, // 1 详情来 2 购物车来 3 我的奖品
+			from: 1, // 1 详情来 2 购物车来 3 我的奖品(转盘抽的)  4 零元枪来
 			goodslist: [],
 			cartIds: [],
 			addressInfo: '',
@@ -163,7 +165,7 @@ export default {
 			assemble: {},
 			assembleByself: false,
 
-			buyType: 1, // 1 普通 2 参与拼团 3 发起拼团 4 会员领取 5分享领取 6我的奖品
+			buyType: 1, // 1 普通 2 参与拼团 3 发起拼团 4 会员领取 5分享领取 6我的奖品 7零元枪
 
 			showCounp: false,
 			animationData: {},
@@ -172,7 +174,7 @@ export default {
 	},
 	onLoad(options) {
 		this.buyType = options.buyType ? Number(options.buyType) : 1;
-		console.log(this.buyType, '----1 普通 2 参与拼团 3 发起拼团 4 会员领取 5分享领取');
+		console.log(this.buyType, '----1 普通 2 参与拼团 3 发起拼团 4 会员领取 5分享领取 6我的奖品 7零元枪');
 		if (options.from) {
 			this.from = Number(options.from) || 1;
 			this.goodslist = JSON.parse(options.goodslist);
@@ -198,6 +200,15 @@ export default {
 		// addressInfo ? (this.addressInfo = addressInfo) : '';
 	},
 	computed: {
+		goodsLength() {
+			return this.goodslist
+				.map(i => {
+					return i.number;
+				})
+				.reduce((tot, next) => {
+					return tot + next;
+				}, 0);
+		},
 		allPrice() {
 			let allPrice = 0;
 			for (let idx in this.goodslist) {
@@ -276,9 +287,9 @@ export default {
 					city_name: this.addressInfo.cityName,
 					buy_note: this.message,
 					area_name: this.addressInfo.countyName,
-					is_cart: Number(this.from) === 1 ? 0 : 1
+					is_cart:0
 				};
-				console.log(formdata) 
+				console.log(formdata);
 				this.showLoading();
 				this.request({
 					url: '/prize/addPrizeOrder',
@@ -286,6 +297,51 @@ export default {
 					data: formdata,
 					success: res => {
 						console.log('我的奖品--生成订单编号', res);
+						if (res.data.status === 1) {
+							uni.redirectTo({
+								url: '/pages/index/paymentResult?type=1'
+							});
+							// this.changeOrderType(res.data.obj.id, 2);
+							// this.del();
+						} else {
+							this.showToast(res.data.info);
+						}
+					}
+				});
+			} else if (this.from === 4) { 
+				let formdata = {
+					product_id:this.goodslist
+						.map(i => {
+							return i.productId;
+						})
+						.join(','),
+					prize_log_id: this.goodslist
+						.map(i => {
+							return i.prize_log_id;
+						})
+						.join(','),
+					product_nums: this.goodslist
+						.map(i => {
+							return i.number;
+						})
+						.join(','),
+					consignee: this.addressInfo.userName,
+					phone: this.addressInfo.telNumber,
+					address: this.addressInfo.detailInfo,
+					province_name: this.addressInfo.provinceName,
+					city_name: this.addressInfo.cityName,
+					buy_note: this.message,
+					area_name: this.addressInfo.countyName,
+					is_cart: 0
+				};
+				console.log(formdata);
+				this.showLoading();
+				this.request({
+					url: '/tryAssemble/postAddOrder',
+					method: 'POST',
+					data: formdata,
+					success: res => {
+						console.log('零元抢购--生成订单编号', res);
 						if (res.data.status === 1) {
 							uni.redirectTo({
 								url: '/pages/index/paymentResult?type=1'
@@ -316,7 +372,7 @@ export default {
 					city_name: this.addressInfo.cityName,
 					buy_note: this.message,
 					area_name: this.addressInfo.countyName,
-					is_cart: Number(this.from) === 1 ? 0 : 1
+					is_cart: Number(this.from) === 2 ? 1 : 0
 				};
 				this.showLoading();
 				this.request({

@@ -34,12 +34,12 @@
 									</view>
 								</view>
 							</view>
-							
-							<view class="totalbox" style=" border-bottom: 1rpx solid #ededed;  text-align:  left;padding: 10px 0;margin-top: 0;" >
+
+							<view class="totalbox" style=" border-bottom: 1rpx solid #ededed;  text-align:  left;padding: 10px 0;margin-top: 0;">
 								商品类型：
-								<text v-if="item.order_type===0" >普通商品</text>
-								<text v-else-if="item.order_type===1">中奖商品</text>
-								<text v-else-if="item.order_type===1">拼团商品</text>
+								<text v-if="item.order_type === 0">普通商品</text>
+								<text v-else-if="item.order_type === 1">中奖商品</text>
+								<text v-else-if="item.order_type === 2">零元商品</text>
 							</view>
 							<view class="totalbox">
 								共{{ item.product_order_list | getGoodsNum }}件商品
@@ -52,11 +52,21 @@
 								<!-- <button @click="contactUs" v-if="item.state < 4" class="btn bg-white cu-btn">联系卖家</button> -->
 								<button @click="cancelOrder" :data-item="JSON.stringify(item)" v-if="item.order_status === 1" class="btn bg-white cu-btn">取消订单</button>
 								<button @click="payment" :data-item="JSON.stringify(item)" v-if="item.order_status === 1" class="btn bg-white cu-btn">确认付款</button>
-								<button @click="refund" :data-item="JSON.stringify(item)" v-if="item.order_status === 2 && item.order_type !== 1" class="btn bg-white cu-btn">
+								<button
+									@click="refund"
+									:data-item="JSON.stringify(item)"
+									v-if="item.order_status === 2 && item.order_type !== 1 && item.order_type !== 2"
+									class="btn bg-white cu-btn"
+								>
 									退款
-								</button> 
+								</button>
 								<button @click="receipt" :data-item="JSON.stringify(item)" v-if="item.order_status === 3" class="btn bg-white cu-btn">确认收货</button>
-								<button @click="gotoEvaluate" :data-item="JSON.stringify(item)" v-if="item.order_status === 4 && item.order_type !== 1" class="btn bg-white cu-btn">
+								<button
+									@click="gotoEvaluate"
+									:data-item="JSON.stringify(item)"
+									v-if="item.order_status === 4 && item.order_type !== 1 && item.order_type !== 2"
+									class="btn bg-white cu-btn"
+								>
 									去评价
 								</button>
 								<button @click="cancelOrder" :data-item="JSON.stringify(item)" v-if="item.order_status === 5" class="btn bg-white cu-btn">删除订单</button>
@@ -372,7 +382,6 @@ page {
 			}
 
 			.goodsinfoBox {
-				
 				.goods {
 					padding: 20rpx 0;
 					width: 100%;

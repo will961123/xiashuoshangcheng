@@ -9,66 +9,19 @@
 			<view @click="changeFreeGoodsType(2)" :class="{ select: freeGoodsType === 2 }" class="tit">会员免费</view>
 			<view @click="changeFreeGoodsType(3)" :class="{ select: freeGoodsType === 3 }" class="tit">分享免费</view>
 		</view>
-		<!-- <view v-if="type === 1" class="lsitbox bg-white "> -->
-		<view v-if="type === 1" class="lsitbox " style="border: none;">
-			<view v-if="freeGoodsType === 0 ? true : item.type === freeGoodsType" v-for="(item, index) in goodsList" :key="index" class="itemFree  flex align-center">
-				<image :src="item.smallPic" mode="aspectFill"></image>
+		<view class="lsitbox " style="border: none;">
+			<view v-if="freeGoodsType === 0 ? true : item.product_type === freeGoodsType" v-for="(item, index) in goodsList" :key="index" class="itemFree  flex align-center">
+				<image :src="item.picture" mode="aspectFill"></image>
 				<view style="height: auto;" class="infobox flex flex-direction justify-between">
 					<view class="info textov2">
-						<text :class="'typeName' + item.type" class="typeName">{{ item.type === 1 ? '0元抢' : item.type === 2 ? '会员免费' : '分享免费' }}</text>
-						{{ item.name }}此标题最多显示2行此标题最多显示2行此标题最多
+						<text :class="'typeName' + item.product_type" class="typeName">{{ item.product_type === 1 ? '0元抢' : item.product_type === 2 ? '会员免费' : '分享免费' }}</text>
+						{{ item.name }}
 					</view>
 					<view class="moneybox flex align-center justify-between">
-						<view class="money">￥123</view>
-						<view class="xl">剩余{{ item.saleNum }}份</view>
-						<button v-if="item.type === 1" @click="ClickfreeBtn(item.id, item.type)" class="btn cu-btn  ">0元抢</button>
-						<button v-else @click="ClickfreeBtn(item.id, item.type)" class="btn cu-btn  ">免费领取</button>
-					</view>
-				</view>
-			</view>
-
-			<!-- <view class="titview text-center text-bold">零元试吃</view>
-			<view v-for="(item, index) in goodsList" :key="index" class="item flex align-center">
-				<image :src="item.smallPic" mode="aspectFill"></image>
-				<view class="infobox flex flex-direction justify-between">
-					<view class="info textov2">{{ item.name }}</view>
-					<view class="moneybox flex align-center justify-between">
-						<view class="xl">剩余数量： {{ item.saleNum }}</view>
-						<button @click="showTrialView(item.id)" class="btn cu-btn bg-cyan">零元试吃</button>
-					</view>
-				</view>
-			</view>
-			<view class="titview text-center text-bold">免费试吃</view>
-			<view v-for="(item, index) in goodsList" :key="100 + index" class="item flex align-center">
-				<image :src="item.smallPic" mode="aspectFill"></image>
-				<view class="infobox flex flex-direction justify-between">
-					<view class="info textov2">{{ item.name }}</view>
-					<view class="moneybox flex align-center justify-between">
-						<view class="xl">分享人数： {{ item.saleNum }} / 20</view>
-						<button open-type="share" :data-goodsid="item.id" class="btn cu-btn bg-cyan">分享好友</button>
-					</view>
-				</view>
-			</view>
-			<view class="titview text-center text-bold">升级会员试吃</view>
-			<view v-for="(item, index) in goodsList" :key="1000 + index" class="item flex align-center">
-				<image :src="item.smallPic" mode="aspectFill"></image>
-				<view class="infobox flex flex-direction justify-between">
-					<view class="info textov2">{{ item.name }}</view>
-					<view class="moneybox flex align-center justify-between">
-						<view class="xl">未领取</view>
-						<button @click="buyVip(item.id)" class="btn cu-btn bg-cyan">升级会员</button>
-					</view>
-				</view>
-			</view> -->
-		</view>
-		<view v-if="type === 2" class="lsitbox bg-white ">
-			<view @click="gotoDetail(item.id)" v-for="(item, index) in goodsList" :key="index" class="item flex align-center">
-				<image :src="item.smallPic" mode="aspectFill"></image>
-				<view class="infobox flex flex-direction justify-between">
-					<view class="info textov2">{{ item.name }}</view>
-					<view class="moneybox flex align-center justify-between">
-						<view class="xl">销量： {{ item.saleNum }}</view>
-						<view class="money">￥ {{ item.price }}</view>
+						<view class="money">￥{{item.price}}</view>
+						<view class="xl">剩余{{ item.left_num }}份</view>
+						<button v-if="item.product_type === 1" @click="ClickfreeBtn(item.id, item.product_type)" class="btn cu-btn  ">0元抢</button>
+						<button v-else @click="ClickfreeBtn(item.id, item.product_type)" class="btn cu-btn  ">免费领取</button>
 					</view>
 				</view>
 			</view>
@@ -96,34 +49,7 @@
 export default {
 	data() {
 		return {
-			goodsList: [
-				{
-					smallPic: '/static/goods.jpg',
-					name: '0元',
-					price: 100,
-					saleNum: 999,
-					id: 1,
-					type: 1
-				},
-				{
-					smallPic: '/static/goods.jpg',
-					name: '会员免费',
-					price: 100,
-					saleNum: 999,
-					id: 2,
-					type: 2
-				},
-				{
-					smallPic: '/static/goods.jpg',
-					name: '分享免费',
-					price: 100,
-					saleNum: 999,
-					id: 2,
-					type: 3
-				}
-			],
-			offset: 1,
-			type: 1, //1 免费试用 2 团购
+			goodsList: [],
 			freeGoodsType: 0, // 0全部 1零元 2会员免费 3分享免费
 			showTrial: false,
 			trialId: null,
@@ -131,29 +57,7 @@ export default {
 		};
 	},
 	onLoad(options) {
-		this.type = Number(options.type) || 1;
-		switch (this.type) {
-			case 1:
-				console.log('免费试吃');
-				uni.setNavigationBarTitle({
-					title: '免费试吃'
-				});
-				break;
-			case 2:
-				console.log('团购');
-				uni.setNavigationBarTitle({
-					title: '团购'
-				});
-				break;
-			default:
-				this.type = 1;
-				console.log('免费试吃', this.type);
-				uni.setNavigationBarTitle({
-					title: '免费试吃'
-				});
-				break;
-		}
-		// this.getList();
+		this.getList();
 	},
 	onShareAppMessage(e) {
 		if (e.from === 'button') {
@@ -170,18 +74,21 @@ export default {
 			//1 免费试吃 2 团购
 			this.showLoading();
 			this.request({
-				url: '/appProduct/findByLink',
+				url: '/tryAssemble/postTryAssembleList',
+				method: 'POST',
 				data: {
-					offset: this.offset,
-					limit: 10,
-					type: this.type
+					type_id: 2, // 2免费 3拼团
+					product_type: this.freeGoodsType // 全部 0元 会员 分享
 				},
 				success: res => {
 					uni.hideLoading();
-					console.log(this.type == 1 ? '查询免费试吃' : '查询团购', res);
-					if (res.data.returnCode === 1) {
-						this.offset += 1;
-						this.goodsList.push(...res.data.list);
+					console.log('查询免费试吃', res);
+					if (res.data.status === 1) {
+						res.data.list = res.data.list.map(i => {
+							i.picture = res.data.image_url + i.picture;
+							return i;
+						});
+						this.goodsList = res.data.list;
 					}
 				}
 			});
@@ -191,6 +98,7 @@ export default {
 				return;
 			}
 			this.freeGoodsType = type;
+			this.getList()
 		},
 		ClickfreeBtn(id, type) {
 			if (type === 1) {
@@ -223,16 +131,27 @@ export default {
 			}
 			this.showLoading();
 			this.request({
-				url: '',
-				data: {},
+				url: '/tryAssemble/postAddProductApply',
+				method:"POST",
+				data: {
+					product_id:this.trialId,
+					content:this.trialText
+				},
 				success: res => {
+					uni.hideLoading();
+					this.showTrial = false;
+					this.trialId = null;
 					console.log('申请试吃', res);
-					if (res.data.returnCode === 1) {
-						this.zeroTrial();
+					if (res.data.status === 1) { 
+						this.showToast('申请成功!');
+						setTimeout(()=>{
+							uni.navigateTo({
+								url:"/pages/my/freeGoods"
+							})
+						},800)
 					} else {
-						uni.hideLoading();
 						this.showToast(res.data.returnStr);
-					}
+					} 
 				}
 			});
 		},
@@ -298,6 +217,7 @@ export default {
 
 		// 去详情
 		gotoDetail(id) {
+			return;
 			if (this.type === 1) {
 				return;
 			}

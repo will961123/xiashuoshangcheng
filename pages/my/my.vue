@@ -54,20 +54,24 @@
 			<view class="mainbox item1  bg-white" style="margin-top: 0;">
 				<view class="titbox flex justify-between"><view class="itemTit">我的工具</view></view>
 				<view class="item1list flex  ">
-					<view  class="item flex flex-direction align-center " style="position: relative;width: 25%;">
-						<button open-type="contact" style="width: 100%;height: 100%;opacity: 0;position: absolute;left: 0;top: 0;z-index: 2;" ></button>
-						<view class="imgbox"><image src="../../static/my_icon5.png" mode="aspectFit"></image></view>
+					<view class="item flex flex-direction align-center " style="position: relative;width: 25%;">
+						<button open-type="contact" style="width: 100%;height: 100%;opacity: 0;position: absolute;left: 0;top: 0;z-index: 2;"></button>
+						<view class="imgbox"><image src="/static/my_icon5.png" mode="aspectFit"></image></view>
 						<text>联系客服</text>
 					</view>
 					<view @click="gotoGj(6)" style="width: 25%;" class="item flex flex-direction align-center ">
-						<view class="imgbox"><image src="../../static/my_icon6.png" mode="aspectFit"></image></view>
+						<view class="imgbox"><image src="/static/my_icon6.png" mode="aspectFit"></image></view>
 						<text>我的奖品</text>
-					</view> 
+					</view>
 					<view @click="gotoGj(7)" style="width: 25%;" class="item flex flex-direction align-center ">
-						<view class="imgbox"><image src="../../static/my_icon9.png" mode="aspectFit"></image></view>
+						<view class="imgbox"><image src="/static/my_icon9.png" mode="aspectFit"></image></view>
 						<text>我的投稿</text>
-					</view> 
-				</view> 
+					</view>
+					<view @click="gotoGj(8)" style="width: 25%;" class="item flex flex-direction align-center ">
+						<view class="imgbox"><image src="/static/lingyuanchanpin.png" mode="aspectFit"></image></view>
+						<text>零元抢购</text>
+					</view>
+				</view>
 			</view>
 			<!-- <view class="mainbox item2  bg-white">
 				<view class="titbox flex justify-between"><view class="itemTit">我的工具</view></view>
@@ -283,7 +287,7 @@ export default {
 					break;
 				case 8:
 					uni.navigateTo({
-						url: '/pages/my/feedback'
+						url: '/pages/my/freeGoods'
 					});
 					break;
 				case 9:

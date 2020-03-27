@@ -103,12 +103,12 @@
 				</view>
 				<view class="commenttxt">{{ item.content }}</view>
 				<view class="commentImgBox flex flex-wrap justify-start ">
-					<view class="imgbox text-center" v-for="(img, idx) in item.images" :key="idx"><image :data-url="img" :data-list="item.images" @click="viewImage" :src="img" mode="aspectFill"></image></view>
+					<view class="imgbox text-center" v-for="(img, idx) in item.images" :key="idx">
+						<image :data-url="img" :data-list="item.images" @click="viewImage" :src="img" mode="aspectFill"></image>
+					</view>
 				</view>
 			</view>
-			<view  v-if="!evaluate.length" class="bg-white" style="padding-top: 30px;" >
-				<will-nodata tittle="暂时没有评价"></will-nodata>
-			</view>
+			<view v-if="!evaluate.length" class="bg-white" style="padding-top: 30px;"><will-nodata tittle="暂时没有评价"></will-nodata></view>
 		</view>
 
 		<!-- <view class="fuwenbenbox">
@@ -116,7 +116,7 @@
 			<rich-text :nodes="goodsInfo.details | replaceImgStr"></rich-text>
 		</view> -->
 
-		<view class="bottombox flex bg-white">
+		<view class="bottombox flex bg-white align-center">
 			<view class="left flex align-center justify-around">
 				<view class="item flex flex-direction align-center" style="position: relative;">
 					<image src="/static/detailkf.png" mode=""></image>
@@ -132,14 +132,12 @@
 					<text>收藏</text>
 				</view> -->
 			</view>
-			<button @click="showSpec = true" class=" cu-btn add">加入购物车</button>
-			<button v-if="goodsType === 2" @click="showSpec = true" class=" cu-btn buy">发起拼团</button>
-			<button v-if="goodsType === 3" @click="showSpec = true" class=" cu-btn buy">{{ userInfo.isVip ? '免费领取' : '升级会员' }}</button>
-			<button v-if="goodsType === 4 && goodsInfo.canGetShareGoods" @click="showSpec = true" class=" cu-btn buy">免费领取</button>
+			<button @click="showSpecFN(1, 1)" class=" cu-btn add">加入购物车</button>
+			<button v-if="goodsType === 1" @click="showSpecFN(2, 1)" class=" cu-btn buy">立即购买</button>
+			<button v-if="goodsType === 2" @click="showSpecFN(2, 2)" class=" cu-btn buy">发起拼团</button>
+			<button v-if="goodsType === 3" @click="showSpecFN(2, 3)" class=" cu-btn buy">{{ userInfo.isVip ? '免费领取' : '升级会员' }}</button>
+			<button v-if="goodsType === 4 && goodsInfo.canGetShareGoods" @click="showSpecFN(2, 4)" class=" cu-btn buy">免费领取</button>
 			<button v-if="goodsType === 4 && !goodsInfo.canGetShareGoods" open-type="share" class=" cu-btn buy">立即分享</button>
-			<button v-if="goodsType === 1" @click="showSpec = true" class=" cu-btn buy">立即购买</button>
-			<!-- <button v-if="goodsType === 2" @click="showSpec = true" class=" cu-btn buy">发起拼团</button>
-			<button v-else @click="showSpec = true" class=" cu-btn buy">立即购买</button> -->
 		</view>
 
 		<!-- 规格 -->
@@ -176,14 +174,16 @@
 					<view style="height: 20px;width: 100%;"></view>
 				</view>
 				<view class="btnbox">
-					<button @click="addCrats" class=" cu-btn add">加入购物车</button>
+					<!-- <button @click="addCrats" class=" cu-btn add">加入购物车</button> -->
 					<!-- // buyType 1普通 2参与拼图 3发起拼图 4会员 5分享 -->
 					<!-- // goodsType 1 普通商品 2团购 3会员 4分享领取 -->
-					<button v-if="goodsType === 2" @click="buyNow(3)" class=" cu-btn buy">发起拼团</button>
+					<!-- <button v-if="goodsType === 2" @click="buyNow(3)" class=" cu-btn buy">发起拼团</button>
 					<button v-if="goodsType === 3" @click="buyNow(4)" class=" cu-btn buy">{{ userInfo.isVip ? '免费领取' : '升级会员' }}</button>
 					<button v-if="goodsType === 4 && goodsInfo.canGetShareGoods" @click="buyNow(5)" class=" cu-btn buy">免费领取</button>
 					<button v-if="goodsType === 4 && !goodsInfo.canGetShareGoods" open-type="share" class=" cu-btn buy">立即分享</button>
-					<button v-if="goodsType === 1" @click="buyNow(1)" class=" cu-btn buy">立即购买</button>
+					<button v-if="goodsType === 1" @click="buyNow(1)" class=" cu-btn buy">立即购买</button> -->
+
+					<button @click="clickSave" class="saveBtn cu-btn">确定</button>
 				</view>
 			</view>
 		</view>
@@ -195,40 +195,7 @@ export default {
 	data() {
 		return {
 			goodsInfo: {},
-			// goodsInfo: {
-			// 	bannerList: [
-			// 		{
-			// 			src: '/static/aboutusbg.png'
-			// 		}
-			// 	],
-			// 	productId: 1,
-			// 	smallPic: '/static/goods.jpg',
-			// 	name: '商品1',
-			// 	price: 100,
-			// 	showPrice: 999,
-			// 	stock: 123,
-			// 	saleNum: 233,
-			// 	hot: 1,
-			// 	specList: [
-			// 		{
-			// 			picture: '/static/banner.png',
-			// 			name: '规格1',
-			// 			price: 30,
-			// 			id: 2333
-			// 		}
-			// 	],
-			// 	details: '<p>富文本</p>',
-			// 	canGetShareGoods: false
-			// },
-			evaluate: [
-				{
-					userPic: '/static/headerpic.png',
-					userName: '用户名',
-					data: '2020-03-06 21:20:20',
-					content: '评价内容',
-					picList: [{ commentPic: '/static/goods.jpg' }]
-				}
-			],
+			evaluate: [],
 			assembleList: [
 				{
 					user: {
@@ -268,7 +235,9 @@ export default {
 			},
 			searchUserId: '',
 
-			titType: 1 //1 图文 2 评价
+			titType: 1, //1 图文 2 评价
+
+			btnType: 1 // 1加购物车 2购买
 		};
 	},
 	onLoad(options) {
@@ -299,7 +268,7 @@ export default {
 	},
 	methods: {
 		viewImage(e) {
-			console.log(e.currentTarget.dataset )
+			console.log(e.currentTarget.dataset);
 			uni.previewImage({
 				urls: e.currentTarget.dataset.list,
 				current: e.currentTarget.dataset.url
@@ -329,6 +298,7 @@ export default {
 				},
 				success: res => {
 					uni.hideLoading();
+					this.showSpec = false;
 					if (res.data.status === 1) {
 						this.showToast('添加成功');
 						// uni.switchTab({
@@ -355,27 +325,43 @@ export default {
 				}
 			});
 		},
+		showSpecFN(btnType,goodsType){
+			if(btnType===1){
+				this.btnType = 1
+				this.showSpec = true
+			}else if(btnType===2){
+				this.btnType =2
+				this.showSpec = true
+			}
+		},
+		clickSave() {
+			if (this.btnType === 1) {
+				this.addCrats();
+			} else if (this.btnType === 2) { 
+				// goodsType 商品类型 1 普通商品 2团购 3会员 4分享领取
+				// buyType 购买类型 1普通 2参与拼图 3发起拼图 4会员 5分享
+				if (this.goodsType === 1) {
+					this.buyNow(1);
+				} else if (this.goodsType === 2) {
+					// 参与拼团在此页面不选择数量 直接去结算 这个是发起拼团按钮
+					this.buyNow(3);
+				} else if (this.goodsType === 3) {
+					this.buyNow(4);
+				} else if (this.goodsType === 4) {
+					this.buyNow(5)
+				}
+			}
+		},
+		/**
+		 * @param {number} buyType	购买类型
+		 * @param {Object} assemble 拼团团队成员
+		 */
 		buyNow(buyType, assemble) {
 			// buyType 1普通 2参与拼图 3发起拼图 4会员 5分享
 			// if (this.spaceIndex < 0) {
 			// 	this.showToast('请选择规格');
 			// 	return;
 			// }
-			// let goodslist = [
-			// 	{
-			// 		checkState: true,
-			// 		productId: this.goodsId,
-			// 		productName: this.goodsInfo.name,
-			// 		productPic: this.goodsInfo.specList[this.spaceIndex].picture ? this.goodsInfo.specList[this.spaceIndex].picture : this.goodsInfo.smallPic,
-			// 		productSpecId: this.goodsInfo.specList[this.spaceIndex].id,
-			// 		productSpecName: this.goodsInfo.specList[this.spaceIndex].name,
-			// 		price: Number(this.goodsInfo.specList[this.spaceIndex].price),
-			// 		number: this.spaceNum,
-			// 		total: Number(this.goodsInfo.specList[this.spaceIndex].price) * Number(this.spaceNum),
-			// 		hot: this.goodsInfo.hot
-			// 	}
-			// ];
-
 			let goodslist = [
 				{
 					checkState: true,
@@ -562,7 +548,7 @@ export default {
 				url: '/comment/getCommentList/' + this.goodsId,
 				data: {},
 				success: res => {
-					console.log('评论信息', res.data); 
+					console.log('评论信息', res.data);
 					if (res.data.status === 1) {
 						res.data.list = res.data.list.map(i => {
 							i.images = JSON.parse(i.images).map(g => {
@@ -863,10 +849,11 @@ export default {
 	}
 	.bottombox {
 		width: 100%;
-		height: 48px;
+		height: 55px;
 		position: fixed;
 		left: 0;
 		bottom: 0;
+		box-shadow: rgba(0, 0, 0, 0.15) 0 -1px 0;
 		.left {
 			flex: 1;
 			.item {
@@ -879,17 +866,22 @@ export default {
 		}
 
 		.cu-btn {
-			line-height: 48px;
-			height: 100%;
+			line-height: 40px;
+			height: 40px;
 			width: 260rpx;
 			color: #fff;
 			border-radius: 0;
 		}
 		.add {
-			background: #000;
+			background-image: linear-gradient(to right, #ffc500, #ff9402);
+			border-top-left-radius: 20px;
+			border-bottom-left-radius: 20px;
 		}
 		.buy {
-			background-image: linear-gradient(-90deg, #ff826a 0%, #ff585f 100%);
+			background-image: linear-gradient(to right, #ff7a00, #fe560a);
+			border-top-right-radius: 20px;
+			border-bottom-right-radius: 20px;
+			margin-right: 4px;
 		}
 	}
 
@@ -973,6 +965,16 @@ export default {
 			}
 			.buy {
 				background-image: linear-gradient(-90deg, #ff826a 0%, #ff585f 100%);
+			}
+			.saveBtn {
+				background-image: linear-gradient(to right, #ff9a02, #ff710c);
+				color: #fff;
+				width: calc(100% - 60rpx);
+				margin-left: 30rpx;
+				line-height: 36px;
+				height: 36px;
+				border-radius: 18px;
+				margin-bottom: 8px;
 			}
 		}
 	}
