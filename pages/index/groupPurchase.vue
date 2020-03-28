@@ -10,16 +10,14 @@
 			<view @click="gotoDetail(item.id)" v-if="groupGoodsType === 0 ? true : item.type === groupGoodsType" v-for="(item, index) in goodsList" :key="index" class="itemFree  ">
 				<image :src="item.smallPic" mode="aspectFill"></image>
 				<view style="height: auto;" class="infobox  ">
-					<view class="info textov2"> 
-						{{ item.name }}此标题最多显示2行此标题最多显示2行此标题最多
-					</view>
+					<view class="info textov2">{{ item.name }}此标题最多显示2行此标题最多显示2行此标题最多</view>
 					<!-- <view class="typeBox flex">
 						<view class="typeName">折扣</view>
 						<view class="typeName">保真</view>
 					</view> -->
 					<view class="moneybox flex align-center justify-between">
 						<view class="money">￥123</view>
-						<view class="xl">销量{{ item.saleNum }}份</view> 
+						<view class="xl">销量{{ item.saleNum }}份</view>
 					</view>
 				</view>
 			</view>
@@ -31,74 +29,35 @@
 export default {
 	data() {
 		return {
-			goodsList: [
-				{
-					smallPic: '/static/goods.jpg',
-					name: '团购',
-					price: 100,
-					saleNum: 999,
-					id: 1,
-					type: 1
-				},
-				{
-					smallPic: '/static/goods.jpg',
-					name: '限时',
-					price: 100,
-					saleNum: 999,
-					id: 2,
-					type: 2
-				},
-				{
-					smallPic: '/static/goods.jpg',
-					name: '新品',
-					price: 100,
-					saleNum: 999,
-					id: 2,
-					type: 3
-				}
-			],
-			offset: 1, 
-			groupGoodsType: 0, // 0全部 1零元 2会员免费 3分享免费  
+			goodsList: []
 		};
 	},
 	onLoad(options) {
-		// this.getList();
-	},
-	onShareAppMessage(e) {
-		if (e.from === 'button') {
-			console.log(e.target);
-			return {
-				title: '免费试吃',
-				path: '/pages/index/Integral?type=1&searchUserId=' + uni.getStorageSync('userInfo').id + '&goodsId=' + e.dataset.goodsid
-				// imageUrl:'/static/goods.jpg'
-			};
-		}
+		this.getList();
 	},
 	methods: {
-		getList() {
+		getList() { 
 			this.showLoading();
 			this.request({
-				url: '/appProduct/findByLink',
+				url: '/tryAssemble/postTryAssembleList',
+				method: 'POST',
 				data: {
-					offset: this.offset,
-					limit: 10
+					type_id: 3, // 2免费 3拼团
+					product_type: 0 
 				},
 				success: res => {
 					uni.hideLoading();
-					console.log('查询团购', res);
-					if (res.data.returnCode === 1) {
-						this.offset += 1;
-						this.goodsList.push(...res.data.list);
+					console.log('查询拼团', res);
+					if (res.data.status === 1) {
+						res.data.list = res.data.list.map(i => {
+							i.picture = res.data.image_url + i.picture;
+							return i;
+						});
+						this.goodsList = res.data.list;
 					}
 				}
 			});
 		},
-		changeGroupGoodsType(type) {
-			if (type === this.groupGoodsType) {
-				return;
-			}
-			this.groupGoodsType = type;
-		}, 
 
 		// 去详情
 		gotoDetail(id) {
@@ -173,19 +132,19 @@ export default {
 				}
 			}
 		}
-		.itemFree { 
+		.itemFree {
 			width: 330rpx;
 			margin-bottom: 30rpx;
-			background: #ffffff; 
+			background: #ffffff;
 			& > image {
 				width: 330rpx;
 				height: 330rpx;
 			}
-			.infobox { 
+			.infobox {
 				flex: 1;
 				height: 260rpx;
 				padding: 16rpx;
-				
+
 				.info {
 					font-size: 28rpx;
 					line-height: 36rpx;
@@ -210,13 +169,13 @@ export default {
 						}
 					}
 				}
-				.typeBox{
+				.typeBox {
 					margin-top: 20rpx;
-					.typeName{
+					.typeName {
 						line-height: 36rpx;
 						padding: 0 6px;
-						border: 1px solid #A7A7A7;
-						color: #A7A7A7;
+						border: 1px solid #a7a7a7;
+						color: #a7a7a7;
 						font-size: 22rpx;
 						text-align: center;
 						margin-right: 8px;
@@ -226,7 +185,7 @@ export default {
 					margin-top: 20rpx;
 					.money {
 						font-size: 32rpx;
-						color: #FF6060;
+						color: #ff6060;
 						& > text {
 							font-size: 32rpx;
 						}

@@ -150,7 +150,7 @@ export default {
 							})
 						},800)
 					} else {
-						this.showToast(res.data.returnStr);
+						this.showToast(res.data.info);
 					} 
 				}
 			});

@@ -83,6 +83,14 @@
 					"pathRewrite": {
 						"^/h5api": "/"
 					}
+				},
+				"/h5upload":{
+					"target": "http://pan.1688qds.com",
+					"changeOrigin": true,
+					"secure": false,
+					"pathRewrite": {
+						"^/h5upload": "/"
+					}
 				}
 			}
 		}

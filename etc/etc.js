@@ -1,12 +1,14 @@
 import Vue from 'vue' 
 
 // Vue.prototype.imgUrl = 'imgUrl'
-Vue.prototype.uploadUrl = 'http://pan.1688qds.com'
+
 // #ifdef H5
 Vue.prototype.apiUrl = '/h5api'
+Vue.prototype.uploadUrl = '/h5upload'
 // #endif
 // #ifndef H5
 Vue.prototype.apiUrl = 'http://pan.1688qds.com/wap'
+Vue.prototype.uploadUrl = 'http://pan.1688qds.com'
 // #endif
 
 

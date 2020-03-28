@@ -23,7 +23,7 @@
 		}, {
 			"path": "pages/index/Integral",
 			"style": {
-				"navigationBarTitleText": "积分商城"
+				"navigationBarTitleText": "免费试吃"
 			}
 		}, {
 			"path": "pages/index/goodsDetail",
@@ -229,7 +229,13 @@
 				"navigationBarTitleText": "发布文稿"
 			}
 		}
-	],
+	    ,{
+            "path" : "pages/my/freeGoods",
+            "style" : {
+				"navigationBarTitleText": "0元抢购"
+			}
+        }
+    ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "商城",
