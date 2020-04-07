@@ -64,9 +64,9 @@
 						<view class="money flex align-center">
 							<text>￥</text>
 							{{ item.price }}
-							<text class="oldMoney">￥{{ item.mark_price }}</text>
+							<!-- <text class="oldMoney">￥{{ item.mark_price }}</text> -->
 						</view>
-						<view class="num">销量:{{ item.sale_num }}</view>
+						<!-- <view class="num">销量:{{ item.sale_num }}</view> -->
 					</view>
 				</view>
 			</view>
@@ -131,7 +131,7 @@ export default {
 	},
 	onLoad() {
 		this.getSwiperList();
-		this.getHotGoods(); 
+		this.getHotGoods();
 		// this.getActivity();
 		// this.getCategoryList();
 		// this.findNoticeBySysCode()
@@ -150,7 +150,23 @@ export default {
 		// 	// #endif
 		// }
 	},
+	onShareAppMessage(res) {
+		return {
+			title: '苍都牧场',
+			path: '/pages/index/index?parentId=' + this.getUserId() || ''
+			// imageUrl: '测试图片'
+		};
+	},
 	methods: {
+		shaerApp(options = {}) {
+			let { title, path, imageUrl } = { ...options };
+			var obj = {
+				title,
+				path,
+				imageUrl
+			};
+			console.log(obj);
+		},
 		// #ifdef MP-WEIXIN
 		getOpenId_btn(e) {
 			this.getOpenId(e, this);
@@ -166,6 +182,7 @@ export default {
 			switch (type) {
 				case 0:
 					url = '/pages/index/Integral?type=' + 1;
+					// url = '/pages/index/Integral?type=' + 1 + '&parentId=' + (this.getUserId() || '') + '&goodsId=73';
 					break;
 				case 1:
 					url = '/pages/index/groupPurchase';
@@ -245,18 +262,18 @@ export default {
 		},
 
 		getHotGoods() {
-			this.showLoading()
+			this.showLoading();
 			this.request({
 				url: '/index/productRecommendList',
 				data: {},
-				success: res => { 
+				success: res => {
 					console.log('查询热门商品', res);
-					uni.hideLoading()
+					uni.hideLoading();
 					if (res.data.status === 1) {
 						res.data.product_recommend_list = res.data.product_recommend_list.map(i => {
 							i.picture = res.data.image_url + i.picture;
 							return i;
-						}); 
+						});
 						this.hootGoods.push(...res.data.product_recommend_list);
 					}
 				}

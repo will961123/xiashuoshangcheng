@@ -34,7 +34,7 @@
 				</view>
 			</view>
 		</view>
-		<will-nodata v-if="list.length==0" ></will-nodata>
+		<will-nodata v-if="list.length == 0"></will-nodata>
 	</view>
 </template>
 
@@ -51,26 +51,31 @@ export default {
 	},
 	methods: {
 		getList() {
-			this.showLoading();
-			this.request({
-				url: '/works/getMyList',
-				data: {},
-				success: res => {
-					uni.hideLoading();
-					console.log('投稿列表', res);
-					if (res.data.status === 1) {
-						res.data.list = res.data.list.map(i => {
-							i.picture = res.data.image_url + i.picture;
-							return i;
-						});
-						this.list = res.data.list;
-						let newSelect = new Array(res.data.list.length).fill(false);
-						this.selectIdx = newSelect;
-					} else {
-						this.list = [];
-						this.selectIdx = [];
+			this.checkLogin().then(reslove => {
+				this.showLoading();
+				this.request({
+					url: '/works/getMyList',
+					method: 'POST',
+					data: {
+						user_mark_id: this.getUserId()
+					},
+					success: res => {
+						uni.hideLoading();
+						console.log('投稿列表', res);
+						if (res.data.status === 1) {
+							res.data.list = res.data.list.map(i => {
+								i.picture = res.data.image_url + i.picture;
+								return i;
+							});
+							this.list = res.data.list;
+							let newSelect = new Array(res.data.list.length).fill(false);
+							this.selectIdx = newSelect;
+						} else {
+							this.list = [];
+							this.selectIdx = [];
+						}
 					}
-				}
+				});
 			});
 		},
 		gotoAddCategory(type, item) {

@@ -51,22 +51,32 @@ export default {
 			this.getList();
 		},
 		getList() {
-			this.showLoading();
-			this.request({
-				url: '/prize/myCouponList',
-				method: 'POST',
-				data: {
-					coupon_type: this.titType
+			this.checkLogin().then(
+				reslove => {
+					this.showLoading();
+					this.request({
+						url: '/prize/myCouponList',
+						method: 'POST',
+						data: {
+							coupon_type: this.titType,
+							user_mark_id: this.getUserId()
+						},
+						success: res => {
+							uni.hideLoading();
+							console.log('优惠卷列表', res);
+							if (res.data.status === 1) {
+								this.counponList.splice(this.titType - 1, 1, res.data.list);
+								console.log(this.counponList);
+							} else {
+								this.counponList.splice(this.titType - 1, 1, []);
+							}
+						}
+					});
 				},
-				success: res => {
-					uni.hideLoading();
-					console.log('优惠卷列表', res);
-					if (res.data.status === 1) {
-						this.counponList.splice(this.titType - 1, 1, res.data.list);
-						console.log(this.counponList);
-					}
+				err => {
+					console.log('走进了而然');
 				}
-			});
+			);
 		}
 	}
 };

@@ -39,6 +39,13 @@ export default {
 	onLoad() {
 		this.getList();
 	},
+	onShareAppMessage(res) {
+		return {
+			title: '苍都牧场',
+			path: '/pages/index/categoryList?parentId=' + this.getUserId() || ''
+			// imageUrl: '测试图片'
+		};
+	},
 	methods: {
 		getList() {
 			this.showLoading();
@@ -54,6 +61,8 @@ export default {
 							return i;
 						});
 						this.list = res.data.list;
+					}else{
+						this.list =[]
 					}
 					
 				}

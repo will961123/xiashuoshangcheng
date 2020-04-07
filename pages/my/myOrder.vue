@@ -9,7 +9,7 @@
 			</view>
 		</view>
 
-		<swiper @change="swiperChange" :current="type" class="orderList" style="height: calc(100% - 100rpx);">
+		<swiper @change="swiperChange" :current="type" class="orderList" style="height: calc(100% - 100rpx); box-sizing: border-box; ">
 			<swiper-item v-for="(swiperitem, swiperindex) in orderList" :key="swiperindex" class="orderList" style="padding: 0 30rpx;box-sizing: border-box;">
 				<scroll-view @scrolltolower="scrollBottom" :scroll-y="true" style="width: 100%;height: 100%;">
 					<view v-for="(item, index) in orderList[swiperindex]" :key="index" :class="{ nomargin: index === orderList[swiperindex].length - 1 }" class="item bg-white">
@@ -39,7 +39,10 @@
 								商品类型：
 								<text v-if="item.order_type === 0">普通商品</text>
 								<text v-else-if="item.order_type === 1">中奖商品</text>
-								<text v-else-if="item.order_type === 2">零元商品</text>
+								<text v-else-if="item.order_type === 2 && item.try_product_type === 1">零元商品</text>
+								<text v-else-if="item.order_type === 2 && item.try_product_type === 2">会员免费</text>
+								<text v-else-if="item.order_type === 2 && item.try_product_type === 3">分享免费</text>
+								<text v-else-if="item.order_type === 3">拼团商品</text>
 							</view>
 							<view class="totalbox">
 								共{{ item.product_order_list | getGoodsNum }}件商品
@@ -55,7 +58,7 @@
 								<button
 									@click="refund"
 									:data-item="JSON.stringify(item)"
-									v-if="item.order_status === 2 && item.order_type !== 1 && item.order_type !== 2"
+									v-if="item.order_status === 2 && item.order_type !== 1 && item.order_type !== 2 && item.order_type !== 3"
 									class="btn bg-white cu-btn"
 								>
 									退款
@@ -229,6 +232,8 @@ export default {
 		// 去评价
 		gotoEvaluate(e) {
 			let item = e.currentTarget.dataset.item;
+			this.type = 5;
+			this.orderList.splice(this.type, 1, []);
 			uni.navigateTo({
 				url: '/pages/my/addEvaluate?order=' + item
 			});
@@ -278,32 +283,35 @@ export default {
 			// 	this.showToast('请先登录');
 			// 	return;
 			// }
-			this.showLoading();
-			this.request({
-				url: '/order/orderList/' + this.type,
-				data: {
-					// payUserId: userInfo.userId,
-					// state: this.type === 0 ? '' : this.type, //0是全部
-					// offset: this.offset,
-					// limit: 10,
-					// type: this.type
-				},
-				success: res => {
-					console.log('订单列表', res);
-					this.canshowNoData = true;
-					uni.hideLoading();
-					if (res.data.status === 1) {
-						// this.offset += 1;
-						res.data.order_list = res.data.order_list.map(i => {
-							i.product_order_list = i.product_order_list.map(g => {
-								g.product_image = res.data.image_url + g.product_image;
-								return g;
+			this.checkLogin().then(reslove => {
+				this.showLoading();
+				let uid = this.getUserId();
+				this.request({
+					url: '/order/orderList/',
+					method: 'POST',
+					data: {
+						order_status: this.type,
+						user_mark_id: this.getUserId()
+					},
+					success: res => {
+						console.log('订单列表', res);
+						this.canshowNoData = true;
+						uni.hideLoading();
+						if (res.data.status === 1) {
+							this.showLoading()
+							// this.offset += 1;
+							res.data.order_list = res.data.order_list.map(i => {
+								i.product_order_list = i.product_order_list.map(g => {
+									g.product_image = res.data.image_url + g.product_image;
+									return g;
+								});
+								return i;
 							});
-							return i;
-						});
-						this.orderList[this.type].push(...res.data.order_list);
+							this.orderList[this.type].push(...res.data.order_list);
+							uni.hideLoading()
+						}
 					}
-				}
+				});
 			});
 		},
 		scrollBottom() {
@@ -337,6 +345,7 @@ page {
 	.titbox {
 		border-bottom: 1rpx solid #ededed;
 		padding: 0 30rpx;
+		// margin-bottom: 18rpx;
 		.item {
 			padding-top: 14px;
 			& > view {
@@ -364,7 +373,7 @@ page {
 
 	.orderList {
 		.item {
-			border-radius: 10rpx;
+			border-radius: 14rpx;
 			box-sizing: border-box;
 			padding: 0 30rpx 30rpx 30rpx;
 			margin-bottom: 10px;

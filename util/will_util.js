@@ -2,16 +2,32 @@ import Vue from 'vue'
 import App from '@/App'
 
 Vue.prototype.isLoad = function() {
-	// #ifdef MP-WEIXIN
-	if (!uni.getStorageSync('userInfo')) {
+	if (!uni.getStorageSync('user_mark_id')) {
 		return false
 	} else {
 		return true
 	}
-	// #endif
+}
+Vue.prototype.checkLogin = function() {
+	return new Promise((reslove, reject) => {
+		if (uni.getStorageSync('user_mark_id')) {
+			reslove()
+			console.log('已登录')
+		} else {
+			reject()
+			console.log('未登录')
+			uni.redirectTo({
+				url: '/pages/login/wxLogin'
+			})
+		}
+	})
+
+}
+Vue.prototype.getUserId = function() { 
+	return uni.getStorageSync('user_mark_id') || ''
 }
 // 请求
-Vue.prototype.request = function(obj) {  
+Vue.prototype.request = function(obj) {
 	var header = obj.header || {}
 	if (uni.getStorageSync('token')) {
 		// header['token'] = uni.getStorageSync("token");

@@ -3,12 +3,12 @@
 		<view class="topUinfo">
 			<image class="bg" src="/static/my_bg.png" mode="aspectFill"></image>
 			<view class="userbox flex justify-between align-center">
-				<view class="headerbox flex align-center">
-					<image :src="userInfo ? userInfo.wxPic || '/static/headerpic.png' : ''" mode="aspectFill" style="border-radius:50%;"></image>
+				<view class="headerbox flex align-center"> 
+					<image :src="user_info ? user_info.avatar : '/static/headerpic.png'" mode="aspectFill" style="border-radius:50%;"></image>
 					<view>
-						<view class="uname">{{ userInfo ? userInfo.account || userInfo.wxName : '' }}</view>
+						<view class="uname">{{ user_info.nickName || '请登录' }}</view>
 						<!-- <view class="uphone">{{ userInfo ? userInfo.phone || '暂未设置' : '暂未设置' }}</view> -->
-						<view class="uVipLv bg-black">普通会员</view>
+						<!-- <view class="uVipLv bg-black">普通会员</view> -->
 					</view>
 				</view>
 				<!-- 	<view @click="gotoQrcode" class="ewmbox flex align-center">
@@ -133,10 +133,10 @@ export default {
 				toSend: 3,
 				done: 4
 			},
-			userInfo: {
-				wxName: '用户名',
-				phone: 12345697,
-				wxPic: '/static/goods.jpg'
+			user_info: {
+				nickName: '请登录',
+				id: '',
+				avatar: '/static/headerpic.jpg'
 			},
 			showGetAuthor: false,
 			showQrcode: false,
@@ -144,8 +144,11 @@ export default {
 			footMarkNum: 0
 		};
 	},
-	onLoad() {},
+	onLoad() {
+		this.getUserInfoById();
+	},
 	onShow() {
+		this.checkLogin();
 		// if (!this.isLoad()) {
 		// 	// #ifdef MP-WEIXIN
 		// 	this.showGetAuthor = true;
@@ -163,7 +166,33 @@ export default {
 		// this.getFootMarkNum();
 		// this.userInfo = uni.getStorageSync('userInfo') || {};
 	},
+	onShareAppMessage(res) {
+		return {
+			title: '苍都牧场',
+			path: '/pages/my/my?parentId=' + this.getUserId() || ''
+			// imageUrl: '测试图片'
+		};
+	},
 	methods: {
+		getUserInfoById() {
+			this.checkLogin().then(reslove => {
+				this.showLoading();
+				this.request({
+					url: '/users/personal',
+					method: 'POST',
+					data: {
+						user_mark_id: this.getUserId()
+					},
+					success: res => {
+						uni.hideLoading();
+						console.log('用户信息', res);
+						if (res.data.status === 1) {
+							this.user_info = res.data.user_info;
+						}
+					}
+				});
+			});
+		},
 		signIn() {
 			uni.showModal({
 				title: '签到结果',

@@ -83,11 +83,19 @@ export default {
 	onLoad() {
 		// uni.showTabBarRedDot({
 		// 	 index: 2,
-		// }) 
+		// })
 		// uni.setTabBarBadge({
 		//   index: 2,
 		//   text: '233'
 		// })
+	},
+	onShareAppMessage(res) {
+		let path = '/pages/cars/cars?parentId=' + this.getUserId() || ''; 
+		return {
+			title: '苍都牧场',
+			path
+			// imageUrl: '测试图片'
+		};
 	},
 	methods: {
 		// #ifdef MP-WEIXIN
@@ -104,17 +112,17 @@ export default {
 						checkState: true,
 						productId: this.goodsList[idx].product_id,
 						productName: this.goodsList[idx].name,
-						productPic: this.goodsList[idx].picture , 
+						productPic: this.goodsList[idx].picture,
 						price: Number(this.goodsList[idx].price),
 						number: this.goodsList[idx].product_num,
-						total: Number(this.goodsList[idx].price) * Number(this.goodsList[idx].product_num), 
+						total: Number(this.goodsList[idx].price) * Number(this.goodsList[idx].product_num)
 					});
 					cartIds.push(this.goodsList[idx].id);
 				}
 			}
 			if (selectGoods.length) {
 				uni.navigateTo({
-					url: '/pages/index/confirmOrder?from=2&goodslist=' + JSON.stringify(selectGoods) + '&cartIds=' + JSON.stringify(cartIds)+"&type=2"
+					url: '/pages/index/confirmOrder?from=2&goodslist=' + JSON.stringify(selectGoods) + '&cartIds=' + JSON.stringify(cartIds) + '&type=2'
 				});
 			}
 		},
@@ -160,34 +168,36 @@ export default {
 			// if (!userInfo) {
 			// 	return;
 			// }
-			this.showLoading();
-			this.request({
-				url: '/cart/postCartList',
-				method: 'POST',
-				data: {
-					// userId: userInfo.userId
-				},
-				success: res => {
-					console.log('购物车', res);
-					uni.hideLoading();
-					if (res.data.status === 1) {
-						res.data.list = res.data.list.length
-							? res.data.list.map(i => {
-									i.picture = res.data.image_url + i.picture;
-									return i;
-							  })
-							: res.data.list;
-						this.goodsList = res.data.list || [];
-						this.selectList = [];
-						for (let idx in this.goodsList) {
-							this.selectList.push(false);
+			this.checkLogin().then(reslove => {
+				this.showLoading();
+				this.request({
+					url: '/cart/postCartList',
+					method: 'POST',
+					data: {
+						user_mark_id: this.getUserId()
+					},
+					success: res => {
+						console.log('购物车', res);
+						uni.hideLoading();
+						if (res.data.status === 1) {
+							res.data.list = res.data.list.length
+								? res.data.list.map(i => {
+										i.picture = res.data.image_url + i.picture;
+										return i;
+								  })
+								: res.data.list;
+							this.goodsList = res.data.list || [];
+							this.selectList = [];
+							for (let idx in this.goodsList) {
+								this.selectList.push(false);
+							}
+							this.selectEvery = false;
+						} else {
+							this.goodsList = [];
+							this.selectList = [];
 						}
-						this.selectEvery = false;
-					} else {
-						this.goodsList = [];
-						this.selectList = [];
 					}
-				}
+				});
 			});
 		},
 		radioChange(idx) {
@@ -205,7 +215,7 @@ export default {
 		},
 		stepperChange(e) {
 			console.log('new：', e.val, 'old：', this.goodsList[e.label].product_num);
-			let old = this.goodsList[e.label].product_num
+			let old = this.goodsList[e.label].product_num;
 			let type = e.val > this.goodsList[e.label].product_num ? 'add' : 'decre';
 			if (e.val === 1 && this.goodsList[e.label].product_num === 1) {
 				return;

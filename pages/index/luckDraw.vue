@@ -34,16 +34,16 @@
 				<view v-if="showGuize" class="guizeList">
 					<scroll-view scroll-y="true" style="height: 180px;padding: 10px 0;">
 						<view>
-							<view class="g_item">1.用户每天登录即送1次抽奖机会，分享好友则多赠1次机会</view>
-							<view class="g_item">2.用户点击大转盘抽奖按钮，有积分和现金两种方式可参与抽奖，没抽一次消耗1次抽奖机会</view>
-							<view class="g_item">3.用户获得的奖品，可在我的道具里查看</view>
+							<!-- <view class="g_item">1.用户每天登录即送1次抽奖机会，分享好友则多赠1次机会</view> -->
+							<view class="g_item">1.用户点击大转盘抽奖按钮，，每天1次抽奖机会</view>
+							<view class="g_item">2.用户获得的奖品，可在我的道具里查看</view>
 						</view>
 					</scroll-view>
 				</view>
 				<view v-else class="goodsList">
 					<swiper style="height: 50px;" :vertical="true" :autoplay="true" :interval="1400" :duration="300">
 						<swiper-item v-for="(item, index) in peopleList" :key="index" style="height: 100%;width: 100%;" class="flex align-center">
-							<view  class="swiper-item flex justify-between align-center" style="width: 100%;" >
+							<view class="swiper-item flex justify-between align-center" style="width: 100%;">
 								<view class="userinfo flex">
 									<image :src="item.avatar" style="width: 40rpx;height: 40rpx;margin-right: 10rpx;border-radius: 50%;" mode="aspectFill"></image>
 									<!-- <image src="/static/headerpic.png" style="width: 40rpx;height: 40rpx;margin-right: 10rpx;border-radius: 50%;" mode="aspectFill"></image> -->
@@ -52,7 +52,7 @@
 								<text>{{ item.prize_name }}</text>
 							</view>
 						</swiper-item>
-					</swiper> 
+					</swiper>
 				</view>
 			</view>
 		</view>
@@ -82,7 +82,13 @@ export default {
 			clearTimeout(this.timer);
 		}
 	},
-
+	onShareAppMessage(res) {
+		return {
+			title: '苍都牧场',
+			path: '/pages/index/luckDraw?parentId=' + this.getUserId() || ''
+			// imageUrl: '测试图片'
+		};
+	},
 	methods: {
 		getGoodsList() {
 			this.showLoading();
@@ -118,10 +124,10 @@ export default {
 					console.log('中奖名单', res);
 					if (res.data.status === 1) {
 						res.data.list = res.data.list.map(i => {
-							if(i.avatar){
+							if (i.avatar) {
 								i.avatar = i.avatar.indexOf('http') === -1 ? res.data.image_url + i.avatar : i.avatar;
 							}
-							
+
 							return i;
 						});
 						this.peopleList = res.data.list;
@@ -148,33 +154,57 @@ export default {
 		},
 		//发起抽奖
 		playReward() {
-			this.showLoading();
-			this.request({
-				url: '/prize/postUserPrize',
-				method: 'POST',
-				data: {},
-				success: res => {
-					console.log('中奖id', res);
-					uni.hideLoading();
-					if (res.data.status === 1) {
-						let id = res.data.prize_id;
-						let index = 0;
-						this.list.find((val, idx, arr) => {
-							if (val.id === id) {
-								index = idx;
-							}
-						});
-						console.log(index);
-						let duration = 4000;
-						this.animation(index, duration);
-						this.timer = setTimeout(() => {
-							uni.showModal({ content: this.list[index].name, showCancel: false, title: '中奖结果' });
-							this.btnDisabled = '';
-						}, duration + 1000);
-					} else {
-						this.showToast(res.data.info);
+			this.checkLogin().then(reslove => {
+				this.showLoading();
+				this.request({
+					url: '/prize/postUserPrize',
+					method: 'POST',
+					data: {
+						user_mark_id: this.getUserId()
+					},
+					success: res => {
+						console.log('中奖id', res);
+						uni.hideLoading();
+						if (res.data.status === 1) {
+							let id = res.data.prize_id;
+							let index = 0;
+							this.list.find((val, idx, arr) => {
+								if (val.id === id) {
+									index = idx;
+								}
+							});
+							console.log(index);
+							let duration = 4000;
+							this.animation(index, duration);
+							this.timer = setTimeout(() => {
+								uni.showModal({
+									content: this.list[index].name,
+									showCancel: false,
+									title: '中奖结果',
+									confirmText: res.data.type !== 3 ? '去领奖' : '谢谢惠顾',
+									success: modelRes => {
+										console.log(modelRes, modelRes.confirm && res.data.type !== 3);
+										if (modelRes.confirm && res.data.type !== 3) {
+											let url = '/pages/my/myCouponList';
+											if (res.data.type === 1) {
+												url = '/pages/my/myPrizeList';
+											} else if (res.data.type === 2) {
+												url = '/pages/my/myCouponList';
+											}
+											console.log(url);
+											uni.navigateTo({
+												url: url
+											});
+										}
+									}
+								});
+								this.btnDisabled = '';
+							}, duration + 1000);
+						} else {
+							this.showToast(res.data.info);
+						}
 					}
-				}
+				});
 			});
 		}
 	}

@@ -7,17 +7,17 @@
 			<view @click="changeGroupGoodsType(3)" :class="{ select: groupGoodsType === 3 }" class="tit">新品优惠</view>
 		</view> -->
 		<view class="lsitbox flex justify-between flex-wrap" style="border-radius: 0;">
-			<view @click="gotoDetail(item.id)" v-if="groupGoodsType === 0 ? true : item.type === groupGoodsType" v-for="(item, index) in goodsList" :key="index" class="itemFree  ">
-				<image :src="item.smallPic" mode="aspectFill"></image>
+			<view @click="gotoDetail(item.id)" v-for="(item, index) in goodsList" :key="index" class="itemFree  ">
+				<image :src="item.picture" mode="aspectFill"></image>
 				<view style="height: auto;" class="infobox  ">
-					<view class="info textov2">{{ item.name }}此标题最多显示2行此标题最多显示2行此标题最多</view>
+					<view class="info textov2">{{ item.name }}</view>
 					<!-- <view class="typeBox flex">
 						<view class="typeName">折扣</view>
 						<view class="typeName">保真</view>
 					</view> -->
 					<view class="moneybox flex align-center justify-between">
 						<view class="money">￥123</view>
-						<view class="xl">销量{{ item.saleNum }}份</view>
+						<view class="xl"> {{ item.assemble_num }}人拼</view>
 					</view>
 				</view>
 			</view>
@@ -35,15 +35,22 @@ export default {
 	onLoad(options) {
 		this.getList();
 	},
+	onShareAppMessage(res) {
+		return {
+			title: '苍都牧场',
+			path: '/pages/index/groupPurchase?parentId=' + this.getUserId() || ''
+			// imageUrl: '测试图片'
+		};
+	},
 	methods: {
-		getList() { 
+		getList() {
 			this.showLoading();
 			this.request({
 				url: '/tryAssemble/postTryAssembleList',
 				method: 'POST',
 				data: {
 					type_id: 3, // 2免费 3拼团
-					product_type: 0 
+					product_type: 0
 				},
 				success: res => {
 					uni.hideLoading();

@@ -40,7 +40,7 @@
 			</view>
 		</view>
 		<view class="flex justify-center" style="padding-bottom: 40px;">
-			<button @click="saveCategory" class="btn cu-btn bg-green">{{ type === 1 ? '确定修改' : '确定发布' }}</button>
+			<button @click="saveCategory" class="btn cu-btn bg-green">确定发布</button>
 		</view>
 	</view>
 </template>
@@ -88,30 +88,33 @@ export default {
 				this.showToast('请上传封面');
 				return;
 			}
-			this.showLoading();
-			this.request({
-				url: '/works/postAdd',
-				method: 'POST',
-				data: {
-					title: this.itemInfo.tit1,
-					desc: this.itemInfo.tit2,
-					picture: this.itemInfo.imgSrc,
-					video: this.itemInfo.videoSrc
-				},
-				success: res => {
-					uni.hideLoading();
-					console.log('保存结果', res);
-					if (res.data.status == 1) {
-						this.showToast('保存成功');
-						setTimeout(() => {
-							uni.navigateBack({
-								delta: 1
-							});
-						}, 500);
-					} else {
-						this.showToast(res.data.info);
+			this.checkLogin().then(reslove => {
+				this.showLoading();
+				this.request({
+					url: '/works/postAdd',
+					method: 'POST',
+					data: {
+						title: this.itemInfo.tit1,
+						desc: this.itemInfo.tit2,
+						picture: this.itemInfo.imgSrc,
+						video: this.itemInfo.videoSrc,
+						user_mark_id: this.getUserId()
+					},
+					success: res => {
+						uni.hideLoading();
+						console.log('保存结果', res);
+						if (res.data.status == 1) {
+							this.showToast('保存成功');
+							setTimeout(() => {
+								uni.navigateBack({
+									delta: 1
+								});
+							}, 500);
+						} else {
+							this.showToast(res.data.info);
+						}
 					}
-				}
+				});
 			});
 		},
 		chooseVideo() {

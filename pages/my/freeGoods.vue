@@ -13,7 +13,10 @@
 						<view class="money">零元抢购</view>
 						<!-- <view class="xl">剩余{{ item.saleNum }}份</view> -->
 						<button v-if="item.status === 0" class="btn cu-btn  bg-cancel">待审核</button>
-						<button v-if="item.status === 1" @click="clickBtn(item)" class="btn cu-btn  ">填写地址</button>
+						<!--type 0 0元 1 分享  clickBtn 1 0元 2 分享 -->
+						<button v-if="item.status === 1 && item.type === 0" @click="clickBtn(item, 1)" class="btn cu-btn  ">立即领取</button>
+						<button v-if="item.status === 0 && item.type === 1" @click="gotoDetail(item, 2)" class="btn cu-btn  ">查看详情</button>
+						<button v-if="item.status === 1 && item.type === 1" @click="clickBtn(item, 2)" class="btn cu-btn  ">立即领取</button>
 						<button v-if="item.status === -1" @click="showCancelInfo(item.name)" class="btn cu-btn bg-cancel">审核失败</button>
 					</view>
 				</view>
@@ -62,27 +65,40 @@ export default {
 		},
 		changeFreeGoodsType(type) {
 			this.freeGoodsType = type;
+			this.getList();
 		},
 		getList() {
-			this.showLoading();
-			this.request({
-				url: '/tryAssemble/myList',
-				method: 'POST',
-				data: {},
-				success: res => {
-					uni.hideLoading();
-					console.log('奖品列表', res);
-					if (res.data.list.length > 0) {
-						res.data.list = res.data.list.map(i => {
-							i.picture = res.data.image_url + i.picture;
-							return i;
-						});
-						this.goodsList = res.data.list;
+			this.checkLogin().then(reslove => {
+				this.showLoading();
+				this.request({
+					url: '/tryAssemble/myList',
+					method: 'POST',
+					data: {
+						user_mark_id: this.getUserId(),
+						type: this.freeGoodsType - 1
+					},
+					success: res => {
+						uni.hideLoading();
+						console.log('奖品列表', res);
+						if (res.data.status !== 0 && res.data.list.length > 0) {
+							res.data.list = res.data.list.map(i => {
+								i.picture = res.data.image_url + i.picture;
+								return i;
+							});
+							this.goodsList = res.data.list;
+						} else {
+							this.goodsList = [];
+						}
 					}
-				}
+				});
 			});
 		},
-		clickBtn(item) {
+		gotoDetail(item) {
+			uni.navigateTo({
+				url: '/pages/my/searchGoodsDetail?id=' + item.product_id
+			});
+		},
+		clickBtn(item, type) { 
 			let goodslist = [
 				{
 					checkState: true,
@@ -96,6 +112,9 @@ export default {
 				}
 			];
 			let url = '/pages/index/confirmOrder?from=4&goodslist=' + JSON.stringify(goodslist) + '&buyType=7';
+			if (type === 2) { 
+				url = '/pages/index/confirmOrder?from=6&goodslist=' + JSON.stringify(goodslist) + '&buyType=7';
+			}
 			uni.navigateTo({
 				url: url
 			});

@@ -36,9 +36,7 @@
 					</view>
 				</view>
 			</view>
-			<view v-if="!goodsList.length"  style="padding-top: 140px;">
-				<will-nodata></will-nodata>
-			</view>
+			<view v-if="!goodsList.length" style="padding-top: 140px;"><will-nodata></will-nodata></view>
 		</view>
 
 		<uni-drawer v-if="visible" :visible="visible" mode="right" @close="visible = false">
@@ -95,7 +93,7 @@ export default {
 
 			// 				默认 销量 价格递减 价格递增
 			// sortType: [true, false, false, false],
-			// 1 默认 2 3销量 3 4价格 
+			// 1 默认 2 3销量 3 4价格
 			sortType: 1,
 
 			visible: false, // 抽屉显示的
@@ -121,22 +119,29 @@ export default {
 	},
 	onLoad(options) {
 		console.log(options);
-		this.id = options.id;
-		this.name = options.name;
+		this.id = options.id || '';
+		this.name = options.name || '';
 		//1搜索 2分类
-		this.type = options.type;
+		this.type = options.type || 1;
 		// uni.setNavigationBarTitle({
 		// 	title: this.name || '所幕商城'
 		// });
 
 		this.findProductByCategoryId();
 	},
+	onShareAppMessage(res) {
+		return {
+			title: '苍都牧场',
+			path: '/pages/category/categoryList?parentId=' + (this.getUserId() || '') + '&id=' + this.id + '&name=' + this.name + '&type=' + this.type
+			// imageUrl: '测试图片'
+		};
+	},
 	methods: {
-		findProductByCategoryId() { 
+		findProductByCategoryId() {
 			let type_sort = 'desc';
 			let type_field = 'id';
 			if (this.sortType === 2) {
-				type_sort = 'desc';// 升序
+				type_sort = 'desc'; // 升序
 				type_field = 'sale_num';
 			} else if (this.sortType === 3) {
 				type_sort = 'asc'; // 降序
@@ -149,7 +154,7 @@ export default {
 				type_field = 'price';
 			}
 			let formData = {
-				product_name: this.name?this.name:'',
+				product_name: this.name ? this.name : '',
 				product_type_id: this.id ? this.id : '',
 				type_field: type_field,
 				type_sort: type_sort
@@ -164,10 +169,10 @@ export default {
 					uni.hideLoading();
 					console.log('查找列表', res);
 					if (res.data.status === 1) {
-						res.data.list = res.data.list.map(i=>{
-							i.picture =res.data.image_url +i.picture
-							return i
-						})
+						res.data.list = res.data.list.map(i => {
+							i.picture = res.data.image_url + i.picture;
+							return i;
+						});
 						this.goodsList = res.data.list;
 					}
 				}

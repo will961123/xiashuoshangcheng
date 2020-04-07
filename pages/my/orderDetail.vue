@@ -49,7 +49,7 @@
 			<view class="item">下单时间：{{ order.date }}</view>
 		</view>
 
-		<view v-if="order.order_status > 3" class="orderinfo bg-white" style="margin-top: 10px;">
+		<view v-if="order.order_status >= 3" class="orderinfo bg-white" style="margin-top: 10px;">
 			<view class="item">快递名称： {{ order.express }}</view>
 			<view class="item">快递编号： {{ order.expressNumber }}</view>
 		</view>

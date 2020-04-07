@@ -1,9 +1,12 @@
 <script>
 	export default {
 		onLaunch: function() { 
+			// #ifdef H5
+				uni.setStorageSync('user_mark_id','eyJpdiI6IjY3MGRNMEVpeFROV2VxN012dWZseHc9PSIsInZhbHVlIjoiQlg2R1RyZWJQMDZFTFJ3SU4zZndwZz09IiwibWFjIjoiY2RhZmM1NDA0ZGI2YzdkNDU3ZTExMThjZDI0MmIzYWFkZjkzMDNiOTdjOTVkNzJkZjk4NWFmOTBlZjkzYjJjMyJ9')
+			// #endif
 		},
 		onShow: function() { 
-			console.log(this.isLoad()?'已登录 ':'未登录')
+			// console.log(this.isLoad()?'已登录 ':'未登录')
 			// if(!this.isLoad()){
 			// 	uni.redirectTo({
 			// 		url:'/pages/login/wxLogin'
@@ -41,7 +44,7 @@
 			width: 600rpx;
 			border-radius: 20rpx;
 			margin: 0 auto;
-			margin-top: 200px;
+			margin-top: 20%;
 			padding-bottom: 36px;
 			& > image {
 				width: 12px;

@@ -14,14 +14,17 @@
 				<image :src="item.picture" mode="aspectFill"></image>
 				<view style="height: auto;" class="infobox flex flex-direction justify-between">
 					<view class="info textov2">
-						<text :class="'typeName' + item.product_type" class="typeName">{{ item.product_type === 1 ? '0元抢' : item.product_type === 2 ? '会员免费' : '分享免费' }}</text>
+						<text :class="'typeName' + item.product_type" class="typeName">
+							{{ item.product_type === 1 ? '0元抢' : item.product_type === 2 ? '会员免费' : '分享免费' }}
+						</text>
 						{{ item.name }}
 					</view>
 					<view class="moneybox flex align-center justify-between">
-						<view class="money">￥{{item.price}}</view>
+						<view class="money">￥{{ item.price }}</view>
 						<view class="xl">剩余{{ item.left_num }}份</view>
-						<button v-if="item.product_type === 1" @click="ClickfreeBtn(item.id, item.product_type)" class="btn cu-btn  ">0元抢</button>
-						<button v-else @click="ClickfreeBtn(item.id, item.product_type)" class="btn cu-btn  ">免费领取</button>
+						<button v-if="item.product_type === 1" @click="ClickfreeBtn(item.id, item.product_type, item)" class="btn cu-btn  ">0元抢</button>
+						<button v-else-if="item.product_type === 2" @click="ClickfreeBtn(item.id, item.product_type, item)" class="btn cu-btn  ">会员免费</button>
+						<button open-type="share" v-else-if="item.product_type === 3" :data-pid="item.id" class="btn cu-btn  ">分享免费</button>
 					</view>
 				</view>
 			</view>
@@ -58,18 +61,61 @@ export default {
 	},
 	onLoad(options) {
 		this.getList();
+		console.log('options', options);
+		// this.addShareNum({
+		// 	parentId:decodeURI(encodeURI('eyJpdiI6InRKMmtNMjBvRElBOGR2NjkrQkczNkE9PSIsInZhbHVlIjoiQ3prM0pseVJcL3JxbGI4RzVoTllOU0E9PSIsIm1hYyI6ImJiOTA4MjNjOTcxNDM1ZDQ3NmVlOWI1OTJhYTkwMWE0YzU1Y2M3MmJkZWUxM2VlNDM0ODdiYmUyMmEzMWI1MGEifQ=='))
+		// 	,searchGoodsId:'73'
+		// })
+		// if (options.goodsId || options.parentId) {
+		if (options.goodsId && options.parentId) {
+			let searchGoodsInfo = {
+				parentId: decodeURI(options.parentId),
+				searchGoodsId: options.goodsId
+			};
+			console.log('searchGoodsInfo', searchGoodsInfo);
+			this.checkLogin().then(
+				reslove => {
+					this.addShareNum(searchGoodsInfo);
+				},
+				reject => {
+					uni.setStorageSync('searchGoodsInfo', searchGoodsInfo);
+				}
+			);
+		}
 	},
 	onShareAppMessage(e) {
 		if (e.from === 'button') {
-			console.log(e.target);
+			let parentId = encodeURI(this.getUserId());
+			let path = '/pages/index/Integral?type=1&parentId=' + parentId + '&goodsId=' + e.target.dataset.pid;
+			console.log(path);
 			return {
-				title: '免费试吃',
-				path: '/pages/index/Integral?type=1&searchUserId=' + uni.getStorageSync('userInfo').id + '&goodsId=' + e.dataset.goodsid
+				title: '苍都牧场',
+				path: path
 				// imageUrl:'/static/goods.jpg'
+			};
+		} else if (e.from === 'menu') {
+			return {
+				title: '苍都牧场',
+				path: '/pages/index/Integral?parentId=' + (this.getUserId() || '')
+				// imageUrl: '测试图片'
 			};
 		}
 	},
 	methods: {
+		addShareNum(searchInfo) {
+			this.request({
+				url: '/tryAssemble/postShareTryProduct',
+				method: 'POST',
+				data: {
+					user_mark_id: searchInfo.parentId,
+					target_mark_user_id: this.getUserId(),
+					product_id: searchInfo.searchGoodsId
+				},
+				success: res => {
+					console.log('分享信息', res);
+				}
+			});
+		},
 		getList() {
 			//1 免费试吃 2 团购
 			this.showLoading();
@@ -98,22 +144,74 @@ export default {
 				return;
 			}
 			this.freeGoodsType = type;
-			this.getList()
+			this.getList();
 		},
-		ClickfreeBtn(id, type) {
+		ClickfreeBtn(id, type, item) {
 			if (type === 1) {
 				this.showTrialView(id);
 			} else if (type === 2) {
 				// type 1零元 2会员 3分享
 				// goodsType 2团购 3会员 4分享领取
-				uni.navigateTo({
-					url: '/pages/index/goodsDetail?goodsId=' + id + '&goodsType=3'
+				// uni.navigateTo({
+				// 	url: '/pages/index/goodsDetail?goodsId=' + id + '&goodsType=3'
+				// });
+
+				this.checkLogin().then(reslove => {
+					this.checkVip(id, item);
 				});
 			} else if (type === 3) {
 				uni.navigateTo({
 					url: '/pages/index/goodsDetail?goodsId=' + id + '&goodsType=4'
 				});
 			}
+		},
+		// checkVip
+		checkVip(pid, item) {
+			this.showLoading();
+			this.request({
+				url: '/tryAssemble/postMemberRushProduct',
+				method: 'POST',
+				data: {
+					product_id: pid,
+					user_mark_id: this.getUserId()
+				},
+				success: res => {
+					uni.hideLoading();
+					console.log('检查vip', res);
+					if (res.data.status == 1) {
+						console.log(item);
+						let goodslist = [
+							{
+								checkState: true,
+								productId: item.id, // 商品id
+								productName: item.name,
+								productPic: item.picture,
+								price: 0,
+								number: 1,
+								total: 0
+							}
+						];
+						let url = '/pages/index/confirmOrder?from=5&goodslist=' + JSON.stringify(goodslist) + '&buyType=7';
+						uni.navigateTo({
+							url: url
+						});
+					} else if (res.data.status == 0) {
+						uni.showModal({
+							title: '开通会员',
+							content: '请先开通会员',
+							success: res => {
+								if (res.confirm) {
+									uni.switchTab({
+										url: '/pages/my/my'
+									});
+								}
+							}
+						});
+					} else {
+						this.showToast(res.data.info);
+					}
+				}
+			});
 		},
 		// 显示申请0元试吃界面
 		showTrialView(id) {
@@ -129,30 +227,33 @@ export default {
 				this.showToast('请输入申请理由');
 				return;
 			}
-			this.showLoading();
-			this.request({
-				url: '/tryAssemble/postAddProductApply',
-				method:"POST",
-				data: {
-					product_id:this.trialId,
-					content:this.trialText
-				},
-				success: res => {
-					uni.hideLoading();
-					this.showTrial = false;
-					this.trialId = null;
-					console.log('申请试吃', res);
-					if (res.data.status === 1) { 
-						this.showToast('申请成功!');
-						setTimeout(()=>{
-							uni.navigateTo({
-								url:"/pages/my/freeGoods"
-							})
-						},800)
-					} else {
-						this.showToast(res.data.info);
-					} 
-				}
+			this.checkLogin().then(reslove => {
+				this.showLoading();
+				this.request({
+					url: '/tryAssemble/postAddProductApply',
+					method: 'POST',
+					data: {
+						product_id: this.trialId,
+						content: this.trialText,
+						user_mark_id: this.getUserId()
+					},
+					success: res => {
+						uni.hideLoading();
+						this.showTrial = false;
+						this.trialId = null;
+						console.log('申请试吃', res);
+						if (res.data.status === 1) {
+							this.showToast('申请成功!');
+							setTimeout(() => {
+								uni.navigateTo({
+									url: '/pages/my/freeGoods'
+								});
+							}, 800);
+						} else {
+							this.showToast(res.data.info);
+						}
+					}
+				});
 			});
 		},
 		// 0元试吃请求

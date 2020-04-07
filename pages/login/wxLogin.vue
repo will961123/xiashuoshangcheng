@@ -21,9 +21,8 @@
 </template>
 
 <script>
-	// import willMc from '../../components/will_mc/will_mc.vue'
+// import willMc from '../../components/will_mc/will_mc.vue'
 export default {
-	 
 	data() {
 		return {
 			showGetAuthor: true,
@@ -31,9 +30,11 @@ export default {
 			showMc: false
 		};
 	},
-	onLoad() {},
+	onLoad() {
+		console.log('是否含有分享信息?', uni.getStorageSync('searchGoodsInfo') ? uni.getStorageSync('searchGoodsInfo') : '没有')
+	},
 	methods: {
-		getOpenId_btn(e) { 
+		getOpenId_btn(e) {
 			this.showLoading();
 			console.log('按钮信息', e);
 			if (e.detail.errMsg === 'getUserInfo:ok') {
@@ -41,23 +42,55 @@ export default {
 					provider: 'weixin',
 					success: code => {
 						console.log('code', code);
-						this.request({
-							url: '',
-							data: {
-								appId: this.appId,
-								appScret: this.appScret,
-								code: code.code
-							},
+
+						uni.getUserInfo({
 							success: res => {
-								console.log('openid', res);
-								if (res.data.returnCode === 1) {
-									uni.setStorageSync('openId', res.data.obj.openid);
-									// that.showGetAuthor = false;
-									this.checkUserInfo_wx();
-								} else {
-									uni.hideLoading();
-									this.showToast(res.data.returnStr);
-								}
+								console.log('userinfo', res);
+								let userinfo = res;
+								this.request({
+									url: '/users/login',
+									method: 'POST',
+									data: {
+										// iv: encodeURIComponent(e.detail.iv),
+										// encryptedData: encodeURIComponent(e.detail.encryptedData),
+										// code: encodeURIComponent(code.code)
+										iv: userinfo.iv,
+										encryptedData: userinfo.encryptedData,
+										code: code.code
+									},
+									success: res => {
+										console.log('user_mark_id', res);
+										uni.hideLoading();
+										if (res.data.status === 1) {
+											uni.setStorageSync('user_mark_id', res.data.user_mark_id);
+											let searchGoodsInfo = uni.getStorageSync('searchGoodsInfo');
+											if (searchGoodsInfo) {
+												console.log('searchGoodsInfo',searchGoodsInfo)
+												uni.clearStorageSync('searchGoodsInfo');
+												this.request({
+													url: '/tryAssemble/postShareTryProduct',
+													method: 'POST',
+													data: {
+														user_mark_id: searchGoodsInfo.parentId,
+														target_mark_user_id: res.data.user_mark_id,
+														product_id: searchGoodsInfo.searchGoodsId
+													},
+													success: res => {
+														console.log('登陆后增加分享次数', res);
+													}
+												});
+											}
+											uni.switchTab({
+												url: '/pages/index/index'
+											});
+										} else if (res.data.status === 0) {
+											console.log(11111);
+											this.showToast('网络繁忙,请重试!');
+										} else {
+											this.showToast('网络繁忙,请重试!');
+										}
+									}
+								});
 							}
 						});
 					}
@@ -65,25 +98,6 @@ export default {
 			} else {
 				uni.hideLoading();
 			}
-		},
-		checkUserInfoByOpenid() {
-			this.request({
-				url: '',
-				data: {
-					openId: uni.getStorageSync('openId')
-				},
-				success: res => {
-					uni.hideLoading();
-					if (res.data.returnCode === 1) {
-						uni.setStorageSync('userInfo', res.data.obj);
-						uni.switchTab({
-							url: '/pages/index/index'
-						});
-					} else {
-						this.showToast(res.data.returnStr);
-					}
-				}
-			});
 		}
 	}
 };

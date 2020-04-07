@@ -36,15 +36,15 @@
 				<view v-else class="selectgg">{{ goodsInfo.specList[spaceIndex].name }}</view>
 				<image src="/static/aroow.png" mode="aspectFit"></image>
 			</view> -->
-			<view v-if="goodsType === 2" class="assemble  ">
+			<view v-if="goodsType === 2 && goodsInfo" class="assemble  ">
 				<view class="tit text-center">他们正在拼团 赶快加入把</view>
 				<view v-for="(item, index) in assembleList" :key="index" class="item flex align-center justify-between ">
 					<view class="left flex align-center">
-						<image :src="item.user.captain.pic" mode="aspectFill"></image>
-						<text>{{ item.user.captain.name }}</text>
+						<image :src="item.avatar" mode="aspectFill"></image>
+						<text>{{ item.nickName }}</text>
 					</view>
 					<view class="right flex align-center">
-						<text>{{ item.totNum }}人拼 还差{{ item.nowNum }}人成团</text>
+						<text>{{ goodsInfo.assemble_num }}人拼 还差{{ goodsInfo.assemble_num - item.join_num }}人成团</text>
 						<button @click="buyNow(2, item)" class="btn cu-btn bg-red ">去参团</button>
 					</view>
 				</view>
@@ -97,8 +97,8 @@
 		<view v-else class="pingjiaList">
 			<view v-for="(item, index) in evaluate" :key="index" class="item">
 				<view class="userbox flex align-center">
-					<image src="/static/headerpic.png" mode="aspectFill"></image>
-					<text class="name">名字</text>
+					<image :src="item.avatar" mode="aspectFill"></image>
+					<text class="name">{{ item.nickName }}</text>
 					<text>{{ item.date }}</text>
 				</view>
 				<view class="commenttxt">{{ item.content }}</view>
@@ -132,9 +132,9 @@
 					<text>收藏</text>
 				</view> -->
 			</view>
-			<button @click="showSpecFN(1, 1)" class=" cu-btn add">加入购物车</button>
+			<button v-if="goodsType !== 2" @click="showSpecFN(1, 1)" class=" cu-btn add">加入购物车</button>
 			<button v-if="goodsType === 1" @click="showSpecFN(2, 1)" class=" cu-btn buy">立即购买</button>
-			<button v-if="goodsType === 2" @click="showSpecFN(2, 2)" class=" cu-btn buy">发起拼团</button>
+			<button v-if="goodsType === 2" @click="showSpecFN(2, 2)" class=" cu-btn buy buy-group">发起拼团</button>
 			<button v-if="goodsType === 3" @click="showSpecFN(2, 3)" class=" cu-btn buy">{{ userInfo.isVip ? '免费领取' : '升级会员' }}</button>
 			<button v-if="goodsType === 4 && goodsInfo.canGetShareGoods" @click="showSpecFN(2, 4)" class=" cu-btn buy">免费领取</button>
 			<button v-if="goodsType === 4 && !goodsInfo.canGetShareGoods" open-type="share" class=" cu-btn buy">立即分享</button>
@@ -169,7 +169,7 @@
 					<view style="height: 40px;width: 100%;"></view>
 					<view class="numbox flex justify-between align-center">
 						<text class="tit">数量</text>
-						<sunui-stepper :val="1" :min="1" :max="999" @change="stepperChange"></sunui-stepper>
+						<sunui-stepper   :val="1" :min="1" :max="goodsType===2?1:999" @change="stepperChange"></sunui-stepper>
 					</view>
 					<view style="height: 20px;width: 100%;"></view>
 				</view>
@@ -196,32 +196,7 @@ export default {
 		return {
 			goodsInfo: {},
 			evaluate: [],
-			assembleList: [
-				{
-					user: {
-						captain: {
-							name: '队长1',
-							pic: '/static/goods.jpg'
-						},
-						team: []
-					},
-					totNum: 2,
-					nowNum: 1,
-					id: 1
-				},
-				{
-					user: {
-						captain: {
-							name: '队长1',
-							pic: '/static/goods.jpg'
-						},
-						team: [{ name: '队员1', pic: '/static/goods.jpg' }]
-					},
-					totNum: 2,
-					nowNum: 1,
-					id: 1
-				}
-			],
+			assembleList: [],
 			// 存放选择的规格
 			spaceIndex: -1,
 			spaceNum: 1,
@@ -249,6 +224,7 @@ export default {
 
 		this.getGoodsDetail();
 		this.findCommentByProductId();
+		this.goodsType === 2 && this.getGroupList();
 		// this.saveFootMark();
 	},
 	onShareAppMessage(e) {
@@ -267,6 +243,21 @@ export default {
 		}
 	},
 	methods: {
+		getGroupList() {
+			this.request({
+				url: '/tryAssemble/assembleProductList',
+				method: 'POST',
+				data: {
+					product_id: this.goodsId
+				},
+				success: res => {
+					console.log('拼团列表', res);
+					if (res.data.status === 1) {
+						this.assembleList = res.data.list;
+					}
+				}
+			});
+		},
 		viewImage(e) {
 			console.log(e.currentTarget.dataset);
 			uni.previewImage({
@@ -288,26 +279,29 @@ export default {
 			// 	this.showToast('请登录');
 			// 	return;
 			// }
-			this.showLoading();
-			this.request({
-				url: '/cart/postAdd',
-				method: 'POST',
-				data: {
-					product_id: this.goodsId,
-					product_num: this.spaceNum
-				},
-				success: res => {
-					uni.hideLoading();
-					this.showSpec = false;
-					if (res.data.status === 1) {
-						this.showToast('添加成功');
-						// uni.switchTab({
-						// 	url:'/pages/cars/cars'
-						// })
-					} else {
-						this.showToast(res.data.info);
+			this.checkLogin().then(reslove => {
+				this.showLoading();
+				this.request({
+					url: '/cart/postAdd',
+					method: 'POST',
+					data: {
+						product_id: this.goodsId,
+						product_num: this.spaceNum,
+						user_mark_id: this.getUserId()
+					},
+					success: res => {
+						uni.hideLoading();
+						this.showSpec = false;
+						if (res.data.status === 1) {
+							this.showToast('添加成功');
+							// uni.switchTab({
+							// 	url:'/pages/cars/cars'
+							// })
+						} else {
+							this.showToast(res.data.info);
+						}
 					}
-				}
+				});
 			});
 		},
 		AddsearchNum() {
@@ -325,19 +319,19 @@ export default {
 				}
 			});
 		},
-		showSpecFN(btnType,goodsType){
-			if(btnType===1){
-				this.btnType = 1
-				this.showSpec = true
-			}else if(btnType===2){
-				this.btnType =2
-				this.showSpec = true
+		showSpecFN(btnType, goodsType) {
+			if (btnType === 1) {
+				this.btnType = 1;
+				this.showSpec = true;
+			} else if (btnType === 2) {
+				this.btnType = 2;
+				this.showSpec = true;
 			}
 		},
 		clickSave() {
 			if (this.btnType === 1) {
 				this.addCrats();
-			} else if (this.btnType === 2) { 
+			} else if (this.btnType === 2) {
 				// goodsType 商品类型 1 普通商品 2团购 3会员 4分享领取
 				// buyType 购买类型 1普通 2参与拼图 3发起拼图 4会员 5分享
 				if (this.goodsType === 1) {
@@ -348,9 +342,43 @@ export default {
 				} else if (this.goodsType === 3) {
 					this.buyNow(4);
 				} else if (this.goodsType === 4) {
-					this.buyNow(5)
+					this.buyNow(5);
 				}
 			}
+		},
+		checkAssemble(type, group) {
+			return new Promise((resolve, reject) => {
+				let formData = {
+					product_id: this.goodsId,
+					type: 'join',
+					user_mark_id: this.getUserId()
+				};
+				if (type === 1) {
+					formData.start_user_id = group.user_id; // 参加拼团 团长
+				} else {
+					formData.type = 'start';
+				}
+				this.checkLogin().then(
+					success => {
+						this.request({
+							url: '/tryAssemble/checkAssemble',
+							data: formData,
+							method: 'POST',
+							success: res => {
+								console.log(type===1?'参与权限':'发起权限', res);
+								if (res.data.status === 1) {
+									resolve(res);
+								} else {
+									reject(res);
+								}
+							}
+						});
+					},
+					error => {
+						reject({ data: { info: '未登录' } });
+					}
+				);
+			});
 		},
 		/**
 		 * @param {number} buyType	购买类型
@@ -384,15 +412,31 @@ export default {
 					url: url
 				});
 			} else if (buyType === 2) {
-				url = '/pages/index/confirmOrder?from=1&goodslist=' + JSON.stringify(goodslist) + '&buyType=2' + '&assemble=' + JSON.stringify(assemble);
-				uni.navigateTo({
-					url: url
-				});
+				this.checkAssemble(1, assemble).then(
+					success => {
+						url = '/pages/index/confirmOrder?from=1&goodslist=' + JSON.stringify(goodslist) + '&buyType=2' + '&assemble=' + JSON.stringify(assemble);
+						uni.navigateTo({
+							url: url
+						});
+					},
+					error => {
+						console.log('校验失败',error);
+						this.showToast(error.data.info);
+					}
+				);
 			} else if (buyType === 3) {
-				url = '/pages/index/confirmOrder?from=1&goodslist=' + JSON.stringify(goodslist) + '&buyType=3';
-				uni.navigateTo({
-					url: url
-				});
+				this.checkAssemble(2).then(
+					success => {
+						url = '/pages/index/confirmOrder?from=1&goodslist=' + JSON.stringify(goodslist) + '&buyType=3';
+						uni.navigateTo({
+							url: url
+						});
+					},
+					error => {
+						console.log('校验失败',error);
+						this.showToast(error.data.info);
+					}
+				);
 			} else if (buyType === 4) {
 				url = '/pages/index/confirmOrder?from=1&goodslist=' + JSON.stringify(goodslist) + '&buyType=4';
 				if (this.userInfo.isVip) {
@@ -615,7 +659,7 @@ export default {
 .goodsDetail {
 	padding-bottom: 48px;
 	.banner_sw {
-		height: 375px;
+		height: 190px;
 		width: 100%;
 		swiper-item {
 			width: 100%;
@@ -882,6 +926,11 @@ export default {
 			border-top-right-radius: 20px;
 			border-bottom-right-radius: 20px;
 			margin-right: 4px;
+		}
+		.buy-group {
+			width: 520rpx;
+			border-top-left-radius: 20px;
+			border-bottom-left-radius: 20px;
 		}
 	}
 

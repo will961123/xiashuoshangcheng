@@ -9,7 +9,7 @@
 			</view>
 		</view>
 		<view class="VerticalBox">
-			<scroll-view class="VerticalNav nav bg-white" scroll-y scroll-with-animation :scroll-top="verticalNavTop"   :style="heightList">
+			<scroll-view class="VerticalNav nav bg-white" scroll-y scroll-with-animation :scroll-top="verticalNavTop" :style="heightList">
 				<!-- <view class="cu-item" :class="index == tabCur ? 'text-green cur' : ''" v-for="(item, index) in list" :key="index" @tap="TabSelect" :data-id="index">
 					{{ item.name }}
 				</view> -->
@@ -134,6 +134,13 @@ export default {
 		// uni.removeStorage({
 		// 	key: 'tabCurId'
 		// });
+	},
+	onShareAppMessage(res) {
+		return {
+			title: '苍都牧场',
+			path: '/pages/category/category?parentId=' + this.getUserId() || ''
+			// imageUrl: '测试图片'
+		};
 	},
 	methods: {
 		// #ifdef MP-WEIXIN

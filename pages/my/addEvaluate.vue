@@ -13,7 +13,6 @@
 						<image :src="imgList[index]" mode="aspectFill"></image>
 						<view class="cu-tag bg-red" @click.stop="DelImg" :data-index="index"><text class="cuIcon-close"></text></view>
 					</view>
-				
 				</view>
 			</view>
 		</view>
@@ -38,8 +37,8 @@ export default {
 			order: '',
 			commit: '',
 			imgList: [],
-			imgSrcList:[], // 上传后的路径
-			anonymous: false	
+			imgSrcList: [], // 上传后的路径
+			anonymous: false
 		};
 	},
 	onLoad(options) {
@@ -54,65 +53,72 @@ export default {
 				this.showToast('请输入评论内容');
 				return;
 			}
-			// let userInfo = uni.getStorageSync('userInfo');
-			// if (!userInfo) {
-			// 	this.showToast('请先登录');
-			// 	return;
-			// }
-			let formdata = { 
-				// userId: userInfo.userId,
-				// openid: uni.getStorageSync('openId'), 
-				// userName: userInfo.wxName || userInfo.name,
-				// userPic: userInfo.wxPic || '',
-				// toId: this.order.pro_list[0].productId,
-				// toName: this.order.pro_list[0].productName,
-				// toPic: this.order.pro_list[0].productPic,
-				// content: this.commit,
-				// anonymous: this.anonymous ? 1 : 2, // 是否匿名 1是 2否
-				// orderId: this.order.id
-				
-				order_id:this.order.order_id,
-				content:this.commit,
-				images:this.imgSrcList
-			};
-			this.showLoading();
-			this.request({
-				url: '/comment/postAdd',
-				data: formdata,
-				method:"POST",
-				success: res => {
-					console.log('保存评论', res);
-					uni.hideLoading();
-					if(res.data.status === 1){
-						setTimeout(() => {
-							uni.reLaunch({
-								url: '/pages/my/myOrder?type=5'
-							}) 
-						}, 1000);
-					}else{
-						this.showToast(res.data.info);
+			this.checkLogin().then(reslove => {
+				let formdata = {
+					// userId: userInfo.userId,
+					// openid: uni.getStorageSync('openId'),
+					// userName: userInfo.wxName || userInfo.name,
+					// userPic: userInfo.wxPic || '',
+					// toId: this.order.pro_list[0].productId,
+					// toName: this.order.pro_list[0].productName,
+					// toPic: this.order.pro_list[0].productPic,
+					// content: this.commit,
+					// anonymous: this.anonymous ? 1 : 2, // 是否匿名 1是 2否
+					// orderId: this.order.id
+
+					order_id: this.order.order_id,
+					content: this.commit,
+					images: this.imgSrcList,
+					user_mark_id: this.getUserId()
+				};
+				this.showLoading();
+				this.request({
+					url: '/comment/postAdd',
+					data: formdata,
+					method: 'POST',
+					success: res => {
+						console.log('保存评论', res);
+						uni.hideLoading();
+						if (res.data.status === 1) {
+							let pages = getCurrentPages(); //当前页面栈
+							if (pages.length > 1) {
+								let beforePage = pages[pages.length - 2]; //获取上一个页面实例对象
+								console.log(beforePage);
+								beforePage.$vm.getOrderList(); //触发父页面中的方法change()
+							}
+							setTimeout(() => {
+								uni.navigateBack({
+									delta: 1
+								});
+								// uni.reLaunch({
+								// 	url: '/pages/my/myOrder?type=5'
+								// });
+							}, 1000);
+						} else {
+							this.showToast(res.data.info);
+						}
+
+						// if (res.data.returnCode === 1) {
+						// 	if (!this.imgList.length) {
+						// 		this.showSuccess();
+						// 	} else {
+						// 		Promise.all(this.uploadIMGlist(res.data.obj.id)).then(
+						// 			res => {
+						// 				console.log('promise数组全部成功', res);
+						// 				this.showSuccess();
+						// 			},
+						// 			err => {
+						// 				console.log('promise数组没有全部成功', err);
+						// 				this.showSuccess(2);
+						// 			}
+						// 		);
+						// 	}
+						// } else {
+						// 	uni.hideLoading();
+						// 	this.showToast(res.data.returnStr);
+						// }
 					}
-					
-					// if (res.data.returnCode === 1) {
-					// 	if (!this.imgList.length) {
-					// 		this.showSuccess();
-					// 	} else {
-					// 		Promise.all(this.uploadIMGlist(res.data.obj.id)).then(
-					// 			res => {
-					// 				console.log('promise数组全部成功', res);
-					// 				this.showSuccess();
-					// 			},
-					// 			err => {
-					// 				console.log('promise数组没有全部成功', err);
-					// 				this.showSuccess(2);
-					// 			}
-					// 		);
-					// 	}
-					// } else {
-					// 	uni.hideLoading();
-					// 	this.showToast(res.data.returnStr);
-					// }
-				}
+				});
 			});
 		},
 		uploadIMGlist(id) {
@@ -152,7 +158,6 @@ export default {
 			uni.hideLoading();
 			this.showToast(type === 1 ? '评价成功!' : '部分图片上传失败');
 			setTimeout(() => {
-				
 				uni.redirectTo({
 					url: '/pages/my/myOrder?type=0'
 				});
@@ -173,8 +178,8 @@ export default {
 			});
 		},
 		ChooseImage() {
-			if(this.imgList.length>2){
-				return
+			if (this.imgList.length > 2) {
+				return;
 			}
 			uni.chooseImage({
 				count: 1, //默认9
@@ -186,28 +191,27 @@ export default {
 					} else {
 						this.imgList = res.tempFilePaths;
 					}
-					this.showLoading()
+					this.showLoading();
 					uni.uploadFile({
-						url: this.uploadUrl +'/admin/upload', //仅为示例，非真实的接口地址
+						url: this.uploadUrl + '/admin/upload', //仅为示例，非真实的接口地址
 						filePath: res.tempFilePaths[0],
 						name: 'file',
-						formData: { 
-						},
-						success:res=>{
-							uni.hideLoading()
-							let resoult = JSON.parse(res.data)
-							console.log('上传图片',resoult); 
-							if(resoult.status===1){
-								this.imgSrcList.push(resoult.url)
-								console.log(this.imgSrcList)
-							}else{
-								this.showToast(resoult.info)
+						formData: {},
+						success: res => {
+							uni.hideLoading();
+							let resoult = JSON.parse(res.data);
+							console.log('上传图片', resoult);
+							if (resoult.status === 1) {
+								this.imgSrcList.push(resoult.url);
+								console.log(this.imgSrcList);
+							} else {
+								this.showToast(resoult.info);
 							}
 						},
-						fail:err=>{
+						fail: err => {
 							console.log(err);
 						}
-					})
+					});
 				}
 			});
 		},
@@ -218,7 +222,7 @@ export default {
 			});
 		},
 		DelImg(e) {
-			console.log(1111)
+			console.log(1111);
 			this.imgList.splice(e.currentTarget.dataset.index, 1);
 			this.imgSrcList.splice(e.currentTarget.dataset.index, 1);
 			console.log(this.imgSrcList);

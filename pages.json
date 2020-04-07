@@ -218,7 +218,7 @@
 			"style": {
 				"navigationBarTitleText": "文稿列表"
 			}
-		},  {
+		}, {
 			"path": "pages/my/myContributionList",
 			"style": {
 				"navigationBarTitleText": "文稿管理"
@@ -228,18 +228,24 @@
 			"style": {
 				"navigationBarTitleText": "发布文稿"
 			}
-		}
-	    ,{
-            "path" : "pages/my/freeGoods",
-            "style" : {
+		}, {
+			"path": "pages/my/freeGoods",
+			"style": {
 				"navigationBarTitleText": "0元抢购"
 			}
-        }
-    ],
+		}, {
+			"path": "pages/my/searchGoodsDetail",
+			"style": {
+				"navigationBarTitleText": "分享详情"
+			}
+		}
+	],
 	"globalStyle": {
-		"navigationBarTextStyle": "black",
+		"navigationBarTextStyle": "white",
+		// "navigationBarTextStyle": "black",
 		"navigationBarTitleText": "商城",
-		"navigationBarBackgroundColor": "#F8F8F8",
+		"navigationBarBackgroundColor": "#048f13",
+		// "navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#FFF"
 	},
 	"tabBar": {

@@ -6,9 +6,9 @@
 				<view style="height: auto;" class="infobox flex flex-direction justify-between">
 					<view class="info textov2">{{ item.prize_name }}</view>
 					<view class="moneybox flex align-center justify-between">
-						<view class="money">￥0</view>
+						<view class="money">免费奖品</view>
 						<!-- <view class="xl">剩余{{ item.saleNum }}份</view> -->
-						<button @click="clickBtn(item)" class="btn cu-btn  ">填写地址</button>
+						<button @click="clickBtn(item)" class="btn cu-btn  ">立即领取</button>
 					</view>
 				</view>
 			</view>
@@ -29,21 +29,26 @@ export default {
 	},
 	methods: {
 		getList() {
-			this.showLoading();
-			this.request({
-				url: '/prize/myPrizeList',
-				data: {},
-				success: res => {
-					uni.hideLoading();
-					console.log('奖品列表', res);
-					if (res.data.status === 1) {
-						res.data.list = res.data.list.map(i => {
-							i.prize_picture = res.data.image_url + i.prize_picture;
-							return i;
-						});
-						this.goodsList = res.data.list;
+			this.checkLogin().then(reslove => {
+				this.showLoading();
+				this.request({
+					url: '/prize/myPrizeList',
+					method: 'POST',
+					data: {
+						user_mark_id: this.getUserId()
+					},
+					success: res => {
+						uni.hideLoading();
+						console.log('奖品列表', res);
+						if (res.data.status === 1) {
+							res.data.list = res.data.list.map(i => {
+								i.prize_picture = res.data.image_url + i.prize_picture;
+								return i;
+							});
+							this.goodsList = res.data.list;
+						}
 					}
-				}
+				});
 			});
 		},
 		clickBtn(item) {
@@ -58,10 +63,10 @@ export default {
 					total: 0
 				}
 			];
-			let url = '/pages/index/confirmOrder?from=3&goodslist=' + JSON.stringify(goodslist) + '&buyType=6'; 
+			let url = '/pages/index/confirmOrder?from=3&goodslist=' + JSON.stringify(goodslist) + '&buyType=6';
 			uni.navigateTo({
 				url: url
-			});  
+			});
 		}
 	}
 };
@@ -185,7 +190,8 @@ export default {
 						font-size: 28rpx;
 						border-radius: 23rpx;
 						padding: 0 24rpx;
-						background: #ff5858;
+						// background: #ff5858;
+						background: #fdd63b;
 						color: #fff;
 					}
 				}
