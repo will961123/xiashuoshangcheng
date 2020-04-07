@@ -2,7 +2,7 @@
 	export default {
 		onLaunch: function() { 
 			// #ifdef H5
-				uni.setStorageSync('user_mark_id','eyJpdiI6IjY3MGRNMEVpeFROV2VxN012dWZseHc9PSIsInZhbHVlIjoiQlg2R1RyZWJQMDZFTFJ3SU4zZndwZz09IiwibWFjIjoiY2RhZmM1NDA0ZGI2YzdkNDU3ZTExMThjZDI0MmIzYWFkZjkzMDNiOTdjOTVkNzJkZjk4NWFmOTBlZjkzYjJjMyJ9')
+				uni.setStorageSync('user_mark_id','eyJpdiI6Imlyd1hNa3NjbjF5a0Zja2xVMUorV3c9PSIsInZhbHVlIjoiUWVMTFFTVUxQZmdNREtOV0tIVjhHZz09IiwibWFjIjoiYmYwY2UxYzAxYWRmZmVmNGM4ZGRlYTExODY3MWU3NDFlOTA2ODI4ZTE0ZmIxYTg4MDFmMjNkZGMxM2YxZDA5YSJ9')
 			// #endif
 		},
 		onShow: function() { 

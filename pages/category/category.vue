@@ -164,7 +164,7 @@ export default {
 							});
 							return i;
 						});
-						this.list = res.data.list;
+						this.list = res.data.list; 
 						console.log(this.list);
 					}
 				}

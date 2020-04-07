@@ -3,14 +3,16 @@
 		<view class="topUinfo">
 			<image class="bg" src="/static/my_bg.png" mode="aspectFill"></image>
 			<view class="userbox flex justify-between align-center">
-				<view class="headerbox flex align-center"> 
-					<image :src="user_info ? user_info.avatar : '/static/headerpic.png'" mode="aspectFill" style="border-radius:50%;"></image>
+				<view class="headerbox flex align-center">
+					<image :src="user_info ? user_info.avatar : '/static/headerpic.png'" mode="aspectFill" style="border-radius:50%;background: #999;"></image>
 					<view>
 						<view class="uname">{{ user_info.nickName || '请登录' }}</view>
 						<!-- <view class="uphone">{{ userInfo ? userInfo.phone || '暂未设置' : '暂未设置' }}</view> -->
-						<!-- <view class="uVipLv bg-black">普通会员</view> -->
+						<view class="uVipLv bg-black">{{user_info&&user_info.level===1?'会员':'普通用户'}}</view>
 					</view>
 				</view>
+
+				<image v-if="user_info&&user_info.level!==1" @click="upVip" src="/static/upVip.png" style="width:180rpx " mode="widthFix"></image>
 				<!-- 	<view @click="gotoQrcode" class="ewmbox flex align-center">
 					<image src="/static/ewmsm.png" mode="aspectFit"></image>
 					<text>二维码</text>
@@ -174,6 +176,15 @@ export default {
 		};
 	},
 	methods: {
+		upVip(){
+			uni.showModal({
+				title:'开通会员',
+				content:'确定开通吗?',
+				success:res=>{
+					if(res.confirm){}
+				}
+			})
+		},
 		getUserInfoById() {
 			this.checkLogin().then(reslove => {
 				this.showLoading();

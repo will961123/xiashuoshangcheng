@@ -9,8 +9,8 @@
 			</view>
 		</view>
 
-		<swiper @change="swiperChange" :current="type" class="orderList" style="height: calc(100% - 100rpx); box-sizing: border-box; ">
-			<swiper-item v-for="(swiperitem, swiperindex) in orderList" :key="swiperindex" class="orderList" style="padding: 0 30rpx;box-sizing: border-box;">
+		<swiper @change="swiperChange" :current="type" class="orderList" style="height: calc(100% - 100rpx); box-sizing: border-box; padding: 0 30rpx;padding-top: 10px;">
+			<swiper-item v-for="(swiperitem, swiperindex) in orderList" :key="swiperindex" class="orderList"  > 
 				<scroll-view @scrolltolower="scrollBottom" :scroll-y="true" style="width: 100%;height: 100%;">
 					<view v-for="(item, index) in orderList[swiperindex]" :key="index" :class="{ nomargin: index === orderList[swiperindex].length - 1 }" class="item bg-white">
 						<view class="datebox flex justify-between">

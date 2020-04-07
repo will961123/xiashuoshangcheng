@@ -6,21 +6,22 @@
 			<view @click="changeGroupGoodsType(2)" :class="{ select: groupGoodsType === 2 }" class="tit">限时拼单</view>
 			<view @click="changeGroupGoodsType(3)" :class="{ select: groupGoodsType === 3 }" class="tit">新品优惠</view>
 		</view> -->
-		<view class="lsitbox flex justify-between flex-wrap" style="border-radius: 0;">
+		<view class="lsitbox flex justify-between flex-wrap" style="border-radius: 0;padding-top: 10px;">
 			<view @click="gotoDetail(item.id)" v-for="(item, index) in goodsList" :key="index" class="itemFree  ">
 				<image :src="item.picture" mode="aspectFill"></image>
 				<view style="height: auto;" class="infobox  ">
-					<view class="info textov2">{{ item.name }}</view>
+					<view class="info textov1">{{ item.name }}</view>
 					<!-- <view class="typeBox flex">
 						<view class="typeName">折扣</view>
 						<view class="typeName">保真</view>
 					</view> -->
 					<view class="moneybox flex align-center justify-between">
 						<view class="money">￥123</view>
-						<view class="xl"> {{ item.assemble_num }}人拼</view>
+						<view class="xl">需要{{ item.assemble_num }}人拼</view>
 					</view>
 				</view>
 			</view>
+			<will-nodata v-if="goodsList.length === 0" style="padding-top: 30px;"></will-nodata>
 		</view>
 	</view>
 </template>
@@ -143,6 +144,7 @@ export default {
 			width: 330rpx;
 			margin-bottom: 30rpx;
 			background: #ffffff;
+			border-radius: 14rpx;
 			& > image {
 				width: 330rpx;
 				height: 330rpx;
@@ -155,6 +157,7 @@ export default {
 				.info {
 					font-size: 28rpx;
 					line-height: 36rpx;
+					// min-height: 70rpx;
 					color: #000000;
 					.typeName {
 						margin-right: 4px;

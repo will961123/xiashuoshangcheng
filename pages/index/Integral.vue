@@ -28,6 +28,7 @@
 					</view>
 				</view>
 			</view>
+			<will-nodata v-if="goodsList.length === 0" style="padding-top: 30px;"></will-nodata>
 		</view>
 
 		<will-mc class="mc" v-if="showTrial">

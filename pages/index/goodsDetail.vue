@@ -108,7 +108,7 @@
 					</view>
 				</view>
 			</view>
-			<view v-if="!evaluate.length" class="bg-white" style="padding-top: 30px;"><will-nodata tittle="暂时没有评价"></will-nodata></view>
+			<view v-if="!evaluate.length" class="bg-white" style="padding: 30px 0;"><will-nodata tittle="暂时没有评价"></will-nodata></view>
 		</view>
 
 		<!-- <view class="fuwenbenbox">

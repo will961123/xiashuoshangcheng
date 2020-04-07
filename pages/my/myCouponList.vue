@@ -1,11 +1,11 @@
 <template>
 	<view class="counpon bg-white">
-		<view class="titbox flex justify-between">
+		<view v-if="!isSelectCoupon" class="titbox flex justify-between">
 			<view @click="chageTit(1)" :class="titType === 1 ? 'item select' : 'item'"><text>可使用</text></view>
 			<view @click="chageTit(2)" :class="titType === 2 ? 'item select' : 'item'"><text>已使用</text></view>
 			<view @click="chageTit(3)" :class="titType === 3 ? 'item select' : 'item'"><text>已过期</text></view>
 		</view>
-		<view class="counponListBox">
+		<view class="counponListBox" style="padding-top: 20px;">
 			<will-nodata v-if="counponList[titType - 1].length === 0" style="padding-top: 30px;"></will-nodata>
 			<view
 				v-for="(item, index) in counponList[titType - 1]"
@@ -13,6 +13,9 @@
 				:style="{ background: titType === 1 ? '#ff6f72' : '#c9c9c9' }"
 				class="item  pulse flex align-center"
 			>
+				<view @click="changeSelectIndex(index)" v-if="isSelectCoupon" class="radioBox">
+					<image :src="selectIndex === index ? '/static/select.png' : '/static/noo.png'" mode=""></image>
+				</view>
 				<view class="content flex  align-center">
 					<view class="price flex  align-center">
 						<text>￥</text>
@@ -35,19 +38,33 @@
 export default {
 	data() {
 		return {
+			isSelectCoupon: false,
+			selectIndex: -1,
 			titType: 1,
 			counponList: [[], [], []]
 		};
 	},
-	onLoad() {
+	onLoad(options) {
+		if (options.isSelectCoupon) {
+			this.isSelectCoupon = true;
+		}
 		this.getList();
 	},
 	methods: {
+		changeSelectIndex(index) {
+			this.selectIndex = index;
+			let counponInfo = this.counponList[0][this.selectIndex];
+			uni.setStorageSync('counponInfo', counponInfo);
+			uni.navigateBack({
+				delta: 1
+			});
+		},
 		chageTit(type) {
 			if (Number(type) === this.titType) {
 				return;
 			}
 			this.titType = Number(type);
+			this.counponList.splice(this.titType - 1, 1, []);
 			this.getList();
 		},
 		getList() {
@@ -93,7 +110,6 @@ export default {
 		border-bottom: 1rpx solid #f3f3f3;
 		height: 40px;
 		line-height: 38px;
-		margin-bottom: 20px;
 		.item {
 			text {
 				display: inline-block;
@@ -105,16 +121,29 @@ export default {
 		}
 	}
 	.counponListBox {
-		padding: 0 30rpx;
+		// padding: 0 30rpx;
 		.item {
 			height: 80px;
-			padding: 4px 0;
+			padding: 4px 0rpx;
 			box-sizing: content-box;
 			border-color: transparent;
 			background-color: #ff6f72;
 			margin-bottom: 8px;
+			.radioBox {
+				width: 44rpx;
+				height: 44rpx;
+				background: #fff;
+				border-radius: 50%;
+				margin-left: 30rpx;
+				& > image {
+					width: 100%;
+					height: 100%;
+				}
+			}
 			.content {
-				width: 100%;
+				// width: 100%;
+				width: calc(100% - 60rpx);
+				// flex: 1;
 				height: 100%;
 				color: rgba(255, 255, 255, 0.7);
 				padding: 0 34rpx;

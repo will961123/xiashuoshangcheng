@@ -71,10 +71,14 @@
 				<!-- <text @click="choosePayStyle" v-if="goodslist[0].hot != 4">{{ payStyle === 1 ? '微信支付' : payStyle === 2 ? '支付宝支付' : '余额支付' }}</text> -->
 				<!-- <text v-else>{{ '积分支付' }}</text> -->
 			</view>
-			<!-- <view @click="showCounpAnimation" class="payStyle flex justify-between align-center">
+			<!-- <view v-if="buyType===1" @click="showCounpAnimation" class="payStyle flex justify-between align-center">
 				优惠卷
 				<text>{{ selectCounopIdx > -1 ? '选择了第' + selectCounopIdx + '个' : '请选择' }}</text>
 			</view> -->
+			<view v-if="buyType === 1" @click="gotoChangeCounp" class="payStyle flex justify-between align-center">
+				优惠卷
+				<text style="color: red;">{{ counponInfo ? '满' + counponInfo.start_money + '减' + counponInfo.discount_money : '请选择' }}</text>
+			</view>
 			<view class="goodslist">
 				<view v-for="(item, index) in goodslist" :key="index" class="item flex">
 					<image :src="item.productPic" mode="aspectFill"></image>
@@ -185,9 +189,12 @@ export default {
 
 			buyType: 1, // 1 普通 2 参与拼团 3 发起拼团 4 会员领取 5分享领取 6我的奖品 7零元枪
 
+			// 显示优惠卷 弃用
 			showCounp: false,
 			animationData: {},
-			selectCounopIdx: -1
+			selectCounopIdx: -1,
+
+			counponInfo: ''
 		};
 	},
 	onLoad(options) {
@@ -218,6 +225,11 @@ export default {
 	onShow() {
 		// let addressInfo = uni.getStorageSync('addressInfo');
 		// addressInfo ? (this.addressInfo = addressInfo) : '';
+
+		if (this.buyType === 1) {
+			this.counponInfo = uni.getStorageSync('counponInfo') ? uni.getStorageSync('counponInfo') : '';
+			console.log('优惠卷', this.counponInfo);
+		}
 	},
 	computed: {
 		goodsLength() {
@@ -238,6 +250,11 @@ export default {
 		}
 	},
 	methods: {
+		gotoChangeCounp() {
+			uni.navigateTo({
+				url: '../my/myCouponList?isSelectCoupon=1'
+			});
+		},
 		stepperChange(e) {
 			console.log(e);
 			let idx = e.label;
@@ -420,6 +437,13 @@ export default {
 							formdata.assemble_type = 'start';
 						}
 					}
+					if (this.buyType === 1) {
+						if (this.counponInfo) {
+							formdata.coupon_id = this.counponInfo.id;
+						} else {
+							formdata.coupon_id = 0;
+						}
+					}
 					console.log(formdata);
 					this.showLoading();
 					this.request({
@@ -429,6 +453,7 @@ export default {
 						success: res => {
 							console.log(this.buyType === 2 ? '参与拼团--生成订单编号' : this.buyType === 3 ? '发起拼团--生成订单编号' : '普通商品--生成订单编号', res);
 							if (res.data.status === 1) {
+								uni.removeStorageSync('counponInfo')
 								uni.redirectTo({
 									url: '/pages/index/paymentResult?type=1'
 								});
