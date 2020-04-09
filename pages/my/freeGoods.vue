@@ -12,7 +12,7 @@
 					<view class="moneybox flex align-center justify-between">
 						<view class="money">零元抢购</view>
 						<!-- <view class="xl">剩余{{ item.saleNum }}份</view> -->
-						<button v-if="item.status === 0" class="btn cu-btn  bg-cancel">待审核</button>
+						<button v-if="item.status === 0 && item.type === 0" class="btn cu-btn  bg-cancel">待审核</button>
 						<!--type 0 0元 1 分享  clickBtn 1 0元 2 分享 -->
 						<button v-if="item.status === 1 && item.type === 0" @click="clickBtn(item, 1)" class="btn cu-btn  ">立即领取</button>
 						<button v-if="item.status === 0 && item.type === 1" @click="gotoDetail(item, 2)" class="btn cu-btn  ">查看详情</button>
@@ -21,6 +21,7 @@
 					</view>
 				</view>
 			</view>
+			<will-nodata  v-if="goodsList.length == 0"></will-nodata>
 
 			<!-- 	<view class="itemFree  flex align-center">
 				<image src="/static/goods.jpg" mode="aspectFill"></image>
@@ -45,7 +46,8 @@ export default {
 			addressInfo: null
 		};
 	},
-	onLoad(options) {
+	onLoad(options) {},
+	onShow() {
 		this.getList();
 	},
 	methods: {
@@ -98,21 +100,21 @@ export default {
 				url: '/pages/my/searchGoodsDetail?id=' + item.product_id
 			});
 		},
-		clickBtn(item, type) { 
+		clickBtn(item, type) {
 			let goodslist = [
 				{
 					checkState: true,
 					productId: item.product_id, // 商品id
-					prize_log_id: item.id, //数据id
 					productName: item.name,
 					productPic: item.picture,
 					price: 0,
 					number: 1,
-					total: 0
+					total: 0,
+					product_apply_id: item.id
 				}
 			];
 			let url = '/pages/index/confirmOrder?from=4&goodslist=' + JSON.stringify(goodslist) + '&buyType=7';
-			if (type === 2) { 
+			if (type === 2) {
 				url = '/pages/index/confirmOrder?from=6&goodslist=' + JSON.stringify(goodslist) + '&buyType=7';
 			}
 			uni.navigateTo({

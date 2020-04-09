@@ -124,7 +124,7 @@ export default {
 		//1搜索 2分类
 		this.type = options.type || 1;
 		// uni.setNavigationBarTitle({
-		// 	title: this.name || '所幕商城'
+		// 	title: this.name || '苍都牧场'
 		// });
 
 		this.findProductByCategoryId();

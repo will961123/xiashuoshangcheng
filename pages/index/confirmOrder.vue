@@ -355,9 +355,9 @@ export default {
 								return i.productId;
 							})
 							.join(','),
-						prize_log_id: this.goodslist
+						product_apply_id: this.goodslist
 							.map(i => {
-								return i.prize_log_id;
+								return i.product_apply_id;
 							})
 							.join(','),
 						product_nums: this.goodslist
@@ -453,10 +453,8 @@ export default {
 						success: res => {
 							console.log(this.buyType === 2 ? '参与拼团--生成订单编号' : this.buyType === 3 ? '发起拼团--生成订单编号' : '普通商品--生成订单编号', res);
 							if (res.data.status === 1) {
-								uni.removeStorageSync('counponInfo')
-								uni.redirectTo({
-									url: '/pages/index/paymentResult?type=1'
-								});
+								uni.removeStorageSync('counponInfo'); 
+								this.payOrder(res.data.order_sn)
 								// this.changeOrderType(res.data.obj.id, 2);
 								// this.del();
 							} else {
@@ -464,6 +462,26 @@ export default {
 							}
 						}
 					});
+				}
+			});
+		},
+		payOrder(orderId) {
+			this.showLoading();
+			this.request({
+				url: '/order/postDoPay',
+				method: 'POST',
+				data: {
+					order_sn: orderId
+				},
+				success: res => {
+					uni.hideLoading()
+					console.log('支付', res);
+					if(res.data.status===1){
+						// 吊起微信支付
+						uni.redirectTo({
+							url: '/pages/index/paymentResult?type=1'
+						});
+					}
 				}
 			});
 		},

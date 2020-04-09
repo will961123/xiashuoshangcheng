@@ -12,6 +12,7 @@
 					</view>
 				</view>
 			</view>
+			<will-nodata v-if="goodsList.length==0" ></will-nodata>
 		</view>
 	</view>
 </template>
@@ -25,6 +26,9 @@ export default {
 		};
 	},
 	onLoad(options) {
+		
+	},
+	onShow() {
 		this.getList();
 	},
 	methods: {

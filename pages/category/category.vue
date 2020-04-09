@@ -74,7 +74,7 @@
 		<will-mc class="mc" v-if="showGetAuthor">
 			<view class="_mcMain bg-white ">
 				<image @click="showGetAuthor = false" src="/static/delect.png" mode=""></image>
-				<view class="tit">欢迎授权登录霞烁商城</view>
+				<view class="tit">欢迎授权登录苍都牧场</view>
 				<view class="tip">授权登录后即可使用哦~</view>
 				<button @getuserinfo="getOpenId_btn" class="btn cu-btn" open-type="getUserInfo">点击授权</button>
 			</view>

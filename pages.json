@@ -3,7 +3,7 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "商城"
+				"navigationBarTitleText": "苍都牧场"
 					// #ifdef H5
 					,
 				"navigationStyle": "custom"

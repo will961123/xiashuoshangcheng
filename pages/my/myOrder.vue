@@ -42,7 +42,7 @@
 								<text v-else-if="item.order_type === 2 && item.try_product_type === 1">零元商品</text>
 								<text v-else-if="item.order_type === 2 && item.try_product_type === 2">会员免费</text>
 								<text v-else-if="item.order_type === 2 && item.try_product_type === 3">分享免费</text>
-								<text v-else-if="item.order_type === 3">拼团商品</text>
+								<text v-else-if="item.order_type === 3">拼团商品 <text style="color: red;margin-left: 10rpx;"> {{item.assemble_finish === 1?'拼团成功':'待拼团成功'}}</text></text>
 							</view>
 							<view class="totalbox">
 								共{{ item.product_order_list | getGoodsNum }}件商品

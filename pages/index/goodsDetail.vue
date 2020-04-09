@@ -37,14 +37,18 @@
 				<image src="/static/aroow.png" mode="aspectFit"></image>
 			</view> -->
 			<view v-if="goodsType === 2 && goodsInfo" class="assemble  ">
-				<view class="tit text-center">他们正在拼团 赶快加入把</view>
-				<view v-for="(item, index) in assembleList" :key="index" class="item flex align-center justify-between ">
+				<view class="tit text-center">{{assembleList.length>0?"他们正在拼团 赶快加入把":'展示没有人拼团，请发起拼团!'}}</view>
+				<view v-if="index < 5" v-for="(item, index) in assembleList" :key="index" class="item flex align-center justify-between ">
 					<view class="left flex align-center">
 						<image :src="item.avatar" mode="aspectFill"></image>
 						<text>{{ item.nickName }}</text>
 					</view>
 					<view class="right flex align-center">
-						<text>{{ goodsInfo.assemble_num }}人拼 还差{{ goodsInfo.assemble_num - item.join_num }}人成团</text>
+						<text>
+							{{ goodsInfo.assemble_num }}人拼 还差
+							<text style="color: red;">{{ goodsInfo.assemble_num - item.join_num }}</text>
+							人成团
+						</text>
 						<button @click="buyNow(2, item)" class="btn cu-btn bg-red ">去参团</button>
 					</view>
 				</view>
@@ -169,7 +173,7 @@
 					<view style="height: 40px;width: 100%;"></view>
 					<view class="numbox flex justify-between align-center">
 						<text class="tit">数量</text>
-						<sunui-stepper   :val="1" :min="1" :max="goodsType===2?1:999" @change="stepperChange"></sunui-stepper>
+						<sunui-stepper :val="1" :min="1" :max="goodsType === 2 ? 1 : 999" @change="stepperChange"></sunui-stepper>
 					</view>
 					<view style="height: 20px;width: 100%;"></view>
 				</view>
@@ -360,12 +364,14 @@ export default {
 				}
 				this.checkLogin().then(
 					success => {
+						this.showLoading();
 						this.request({
 							url: '/tryAssemble/checkAssemble',
 							data: formData,
 							method: 'POST',
 							success: res => {
-								console.log(type===1?'参与权限':'发起权限', res);
+								uni.hideLoading();
+								console.log(type === 1 ? '参与权限' : '发起权限', res);
 								if (res.data.status === 1) {
 									resolve(res);
 								} else {
@@ -420,7 +426,7 @@ export default {
 						});
 					},
 					error => {
-						console.log('校验失败',error);
+						console.log('校验失败', error);
 						this.showToast(error.data.info);
 					}
 				);
@@ -433,7 +439,7 @@ export default {
 						});
 					},
 					error => {
-						console.log('校验失败',error);
+						console.log('校验失败', error);
 						this.showToast(error.data.info);
 					}
 				);

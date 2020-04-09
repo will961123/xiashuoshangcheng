@@ -21,7 +21,8 @@
 					</view>
 					<view class="moneybox flex align-center justify-between">
 						<view class="money">￥{{ item.price }}</view>
-						<view class="xl">剩余{{ item.left_num }}份</view>
+						<view v-if="freeGoodsType!==3" class="xl">剩余{{ item.left_num }}份</view>
+						<view v-else class="xl">分享{{ item.share_num }}人</view>
 						<button v-if="item.product_type === 1" @click="ClickfreeBtn(item.id, item.product_type, item)" class="btn cu-btn  ">0元抢</button>
 						<button v-else-if="item.product_type === 2" @click="ClickfreeBtn(item.id, item.product_type, item)" class="btn cu-btn  ">会员免费</button>
 						<button open-type="share" v-else-if="item.product_type === 3" :data-pid="item.id" class="btn cu-btn  ">分享免费</button>
@@ -108,8 +109,8 @@ export default {
 				url: '/tryAssemble/postShareTryProduct',
 				method: 'POST',
 				data: {
-					user_mark_id: searchInfo.parentId,
-					target_mark_user_id: this.getUserId(),
+					user_mark_id:   this.getUserId(), 
+					parent_mark_user_id:searchInfo.parentId,
 					product_id: searchInfo.searchGoodsId
 				},
 				success: res => {
