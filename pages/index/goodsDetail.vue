@@ -37,7 +37,7 @@
 				<image src="/static/aroow.png" mode="aspectFit"></image>
 			</view> -->
 			<view v-if="goodsType === 2 && goodsInfo" class="assemble  ">
-				<view class="tit text-center">{{assembleList.length>0?"他们正在拼团 赶快加入把":'展示没有人拼团，请发起拼团!'}}</view>
+				<view class="tit text-center">{{ assembleList.length > 0 ? '他们正在拼团 赶快加入把' : '暂时没有人拼团，请发起拼团!' }}</view>
 				<view v-if="index < 5" v-for="(item, index) in assembleList" :key="index" class="item flex align-center justify-between ">
 					<view class="left flex align-center">
 						<image :src="item.avatar" mode="aspectFill"></image>
@@ -222,6 +222,7 @@ export default {
 	onLoad(options) {
 		options.goodsId ? (this.goodsId = options.goodsId) : '';
 		options.goodsType ? (this.goodsType = Number(options.goodsType)) : (this.goodsType = 1);
+		// 下面两行弃用
 		options.searchUserId ? (this.searchUserId = options.searchUserId) : (this.searchUserId = '');
 		this.searchUserId && AddsearchNum();
 		console.log('1 普通商品 2团购 3会员 4分享领取---', this.goodsType);
@@ -232,14 +233,20 @@ export default {
 		// this.saveFootMark();
 	},
 	onShareAppMessage(e) {
-		if (e.from === 'button') {
-			console.log(e.target);
-			return {
-				title: '免费试吃',
-				path: '/pages/index/goodsDetail?goodsId=' + id + '&goodsType=4' + '&searchUserId=' + uni.getStorageSync('userInfo').id
-				// imageUrl:'/static/goods.jpg'
-			};
-		}
+		return {
+			title: '苍都牧场',
+			path: '/pages/index/goodsDetail?goodsId=' + this.goodsId + '&goodsType=' + this.goodsType + '&parentId=' + this.getUserId()
+			// imageUrl:'/static/goods.jpg'
+		};
+
+		// if (e.from === 'button') {
+		// 	console.log(e.target);
+		// 	return {
+		// 		title: '免费试吃',
+		// 		path: '/pages/index/goodsDetail?goodsId=' + id + '&goodsType=4' + '&searchUserId=' + uni.getStorageSync('userInfo').id
+		// 		// imageUrl:'/static/goods.jpg'
+		// 	};
+		// }
 	},
 	filters: {
 		replaceImgStr(val) {

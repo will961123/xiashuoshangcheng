@@ -172,14 +172,15 @@ export default {
 			from: 1, // 1 详情来 2 购物车来 3 我的奖品(转盘抽的)  4 零元枪来 5 会员免费来 6 分享免费来
 			goodslist: [],
 			cartIds: [],
-			addressInfo: {
-				telNumber: '12345678911',
-				userName: 'userName',
-				provinceName: '省',
-				cityName: '市',
-				countyName: '区',
-				detailInfo: '详细地址'
-			},
+			// addressInfo: {
+			// 	telNumber: '12345678911',
+			// 	userName: 'userName',
+			// 	provinceName: '省',
+			// 	cityName: '市',
+			// 	countyName: '区',
+			// 	detailInfo: '详细地址'
+			// },
+			addressInfo:'',
 			payStyle: 1, // 1wx 2ali 3yue
 			message: '',
 

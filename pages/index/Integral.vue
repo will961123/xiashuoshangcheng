@@ -148,6 +148,7 @@ export default {
 			this.freeGoodsType = type;
 			this.getList();
 		},
+		// 弃用
 		ClickfreeBtn(id, type, item) {
 			if (type === 1) {
 				this.showTrialView(id);

@@ -21,8 +21,9 @@
 					</view>
 				</view>
 			</view>
-			<will-nodata v-if="goodsList.length === 0" style="padding-top: 30px;"></will-nodata>
+			
 		</view>
+		<will-nodata v-if="goodsList.length === 0" style="padding-top: 30px;"></will-nodata>
 	</view>
 </template>
 

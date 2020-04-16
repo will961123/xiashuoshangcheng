@@ -4,6 +4,9 @@
 			// #ifdef H5
 				// uni.setStorageSync('user_mark_id','eyJpdiI6IkM5bGJ4dzdJMkUzQjJENDNDd1FVU2c9PSIsInZhbHVlIjoiVTYzcUlJbGVla2RBOU54cWZtOU9tUT09IiwibWFjIjoiMmRmYmRiYjE2MzVlYTVlZTY0ZjQ3ZDVjYTZjZGU1ZTRmZjAwNzI1NzEzZGUxYjEzMzhjMTNhZjJjOTgyNGFjMCJ9')
 			// #endif
+			// #ifdef APP-PLUS
+				uni.setStorageSync('user_mark_id','eyJpdiI6IkM5bGJ4dzdJMkUzQjJENDNDd1FVU2c9PSIsInZhbHVlIjoiVTYzcUlJbGVla2RBOU54cWZtOU9tUT09IiwibWFjIjoiMmRmYmRiYjE2MzVlYTVlZTY0ZjQ3ZDVjYTZjZGU1ZTRmZjAwNzI1NzEzZGUxYjEzMzhjMTNhZjJjOTgyNGFjMCJ9')
+			// #endif
 		},
 		onShow: function() { 
 			// console.log(this.isLoad()?'已登录 ':'未登录')

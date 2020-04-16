@@ -102,7 +102,7 @@ export default {
 	onLoad(option) {
 		if (option.type) {
 			this.type = Number(option.type);
-		}
+		} 
 		this.getOrderList();
 		// this.findContact();
 	},
